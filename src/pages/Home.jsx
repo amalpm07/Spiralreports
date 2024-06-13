@@ -2,17 +2,18 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Autoplay, Pagination } from 'swiper/modules';
 import SwiperCore from 'swiper';
 import 'swiper/css/bundle';
 import ListingItem from '../components/ListingItem';
+import CategoryMetaNav from '../components/CategoryNav';
+SwiperCore.use([Navigation, Autoplay, Pagination]);
 
 export default function Home() {
   const [offerListings, setOfferListings] = useState([]);
   const [saleListings, setSaleListings] = useState([]);
   const [rentListings, setRentListings] = useState([]);
-  SwiperCore.use([Navigation]);
-  console.log(offerListings);
+  
   useEffect(() => {
     const fetchOfferListings = async () => {
       try {
@@ -24,6 +25,7 @@ export default function Home() {
         console.log(error);
       }
     };
+
     const fetchRentListings = async () => {
       try {
         const res = await fetch('/api/listing/get?type=rent&limit=4');
@@ -41,15 +43,83 @@ export default function Home() {
         const data = await res.json();
         setSaleListings(data);
       } catch (error) {
-        // eslint-disable-next-line no-undef
-        log(error);
+        console.log(error);
       }
     };
+
     fetchOfferListings();
   }, []);
+
   return (
     <div>
-      {/* top */}
+      {/* image carousel */}
+      <Swiper
+        navigation
+        autoplay={{ delay: 3000, disableOnInteraction: false }}
+        pagination={{ clickable: true }}
+        className='my-8 max-w-6xl mx-auto'
+      >
+        {/* Adding images to the carousel */}
+        <SwiperSlide>
+          <div
+            style={{
+              background: 'url(/images/carousel1.jpg) center no-repeat',
+              backgroundSize: 'cover',
+            }}
+            className='h-[500px]'
+          ></div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div
+            style={{
+              background: 'url(/images/carousel2.jpg) center no-repeat',
+              backgroundSize: 'cover',
+            }}
+            className='h-[500px]'
+          ></div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div
+            style={{
+              background: 'url(/images/carousel3.jpg) center no-repeat',
+              backgroundSize: 'cover',
+            }}
+            className='h-[500px]'
+          ></div>
+        </SwiperSlide>
+        {/* New Image from Pexels */}
+        <SwiperSlide>
+          <div
+            style={{
+              background: 'url(https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg) center no-repeat',
+              backgroundSize: 'cover',
+            }}
+            className='h-[500px]'
+          ></div>
+        </SwiperSlide>
+        {/* New Image from provided URL */}
+        <SwiperSlide>
+          <div
+            style={{
+              background: 'url(https://t3.ftcdn.net/jpg/06/93/34/28/240_F_693342898_x4sRRem5Jet4IoUYXqAo3KTWawtA5A5R.jpg) center no-repeat',
+              backgroundSize: 'cover',
+            }}
+            className='h-[500px]'
+          ></div>
+        </SwiperSlide>
+        {/* Another New Image from provided URL */}
+        <SwiperSlide>
+          <div
+            style={{
+              background: 'url(https://t3.ftcdn.net/jpg/07/01/93/94/240_F_701939441_W17piTgrQWkKPR40Qcj3lyEtLqJsapFe.jpg) center no-repeat',
+              backgroundSize: 'cover',
+            }}
+            className='h-[500px]'
+          ></div>
+        </SwiperSlide>
+      </Swiper>
+<CategoryMetaNav/>
+      {/* top section */}
       <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto'>
         <h1 className='text-slate-700 font-bold text-3xl lg:text-6xl'>
           Find your next <span className='text-slate-500'>perfect</span>
@@ -57,9 +127,7 @@ export default function Home() {
           place with ease
         </h1>
         <div className='text-gray-400 text-xs sm:text-sm'>
-         
           <br />
-         
         </div>
         <Link
           to={'/search'}
@@ -69,30 +137,10 @@ export default function Home() {
         </Link>
       </div>
 
-      {/* swiper */}
-      <Swiper navigation>
-        {offerListings &&
-          offerListings.length > 0 &&
-          offerListings.map((listing) => (
-            // eslint-disable-next-line react/jsx-key
-            <SwiperSlide>
-              <div
-                style={{
-                  background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                  backgroundSize: 'cover',
-                }}
-                className='h-[500px]'
-                key={listing._id}
-              ></div>
-            </SwiperSlide>
-          ))}
-      </Swiper>
-
       {/* listing results for offer, sale and rent */}
-
       <div className='max-w-6xl mx-auto p-3 flex flex-col gap-8 my-10'>
         {offerListings && offerListings.length > 0 && (
-          <div className=''>
+          <div>
             <div className='my-3'>
               <h2 className='text-2xl font-semibold text-slate-600'>Recent offers</h2>
               <Link className='text-sm text-blue-800 hover:underline' to={'/search?offer=true'}>Show more offers</Link>
@@ -105,7 +153,7 @@ export default function Home() {
           </div>
         )}
         {rentListings && rentListings.length > 0 && (
-          <div className=''>
+          <div>
             <div className='my-3'>
               <h2 className='text-2xl font-semibold text-slate-600'>Recent places for rent</h2>
               <Link className='text-sm text-blue-800 hover:underline' to={'/search?type=rent'}>Show more places for rent</Link>
@@ -118,7 +166,7 @@ export default function Home() {
           </div>
         )}
         {saleListings && saleListings.length > 0 && (
-          <div className=''>
+          <div>
             <div className='my-3'>
               <h2 className='text-2xl font-semibold text-slate-600'>Recent places for sale</h2>
               <Link className='text-sm text-blue-800 hover:underline' to={'/search?type=sale'}>Show more places for sale</Link>

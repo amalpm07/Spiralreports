@@ -1,0 +1,161 @@
+.category-meta-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .curved-div {
+    border-radius: 20px; /* Adjust the border-radius value to change the curve */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adjust the shadow properties as needed */
+    overflow: hidden; /* Ensure that content inside the div does not overflow */
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px; /* Adjust the margin to match the shadow spread */
+  }
+
+  .col {
+    flex: 0 0 calc(50% - 20px); /* Adjust column width */
+    margin: 10px; /* Adjust margin to create space between columns */
+  }
+  
+  .link-dark {
+    text-decoration: none;
+    color: #484848;
+  }
+  
+  .column-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .column-content img {
+    width: 40px;
+  }
+  
+  .column-content p {
+    font-size: 11px;
+  }
+  
+  .link-dark:hover {
+    color: #65518d;
+  }
+  .container {
+    width: 100%; /* Ensures the container takes up the full width of its parent */
+    max-width: 1200px; /* You can adjust this value to whatever width you prefer */
+    margin: 0 auto; /* Centers the container */
+    padding: 0 15px; /* Optional: Adds some padding on the sides */
+  }
+  
+  .category-meta-nav .curved-div {
+    width: 100%;
+  }
+  
+  .col {
+    flex: 1; /* Allows the columns to distribute evenly */
+    padding: 15px; /* Adds some padding inside each column */
+    text-align: center; /* Centers the content inside each column */
+  }
+  
+  .link-dark.column-content img {
+    display: block;
+    margin: 0 auto 10px; /* Centers the image and adds some margin below */
+  }
+  
+  /*footer*/
+  /* CompanyFooter.css */
+
+/* Footer Links */
+.list-unstyled li {
+  padding: 5px 0;
+}
+
+.list-unstyled li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.list-unstyled li a:hover {
+  text-decoration: underline;
+}
+
+/* Footer Contact Info */
+.list-unstyled li svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+/* CompanyFooter.css */
+
+/* Footer Container */
+.mdb-footer {
+  background-color: #000; /* Black background color */
+  color: #fff; /* White text color */
+}
+
+/* Footer Content */
+.mdb-footer .p-4 {
+  padding-top: 2rem; /* Top padding */
+  padding-bottom: 2rem; /* Bottom padding */
+}
+
+/* Footer Links Section */
+.mdb-footer .links-section h5 {
+  color: #fff; /* Section title color */
+  font-size: 1.2rem; /* Section title font size */
+  margin-bottom: 1rem; /* Bottom margin */
+}
+
+.mdb-footer .links-section a {
+  color: #fff; /* Link text color */
+  text-decoration: none; /* Remove underline */
+}
+
+.mdb-footer .links-section a:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+
+/* Footer Contact Info */
+.mdb-footer .contact-info li {
+  color: #fff; /* Text color */
+}
+/* styledComponents.css */
+
+/* Footer Container */
+.mdb-footer {
+  background-color: #000; /* Black background color */
+}
+
+/* Footer Content */
+.mdb-footer .p-4 {
+  padding-top: 2rem; /* Top padding */
+  padding-bottom: 2rem; /* Bottom padding */
+}
+
+/* Footer Links Section */
+.mdb-footer .links-section h5 {
+  color: #fff; /* Section title color */
+  font-size: 1.2rem; /* Section title font size */
+  margin-bottom: 1rem; /* Bottom margin */
+}
+
+.mdb-footer .links-section a {
+  color: #fff; /* Link text color */
+  text-decoration: none; /* Remove underline */
+}
+
+.mdb-footer .links-section a:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+
+/* Footer Contact Info */
+.mdb-footer .contact-info li {
+  color: #fff; /* Text color */
+}
+.text-white{
+  background-color: black;
+}
+/* footer */

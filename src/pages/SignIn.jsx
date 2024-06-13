@@ -8,6 +8,7 @@ import {
   signInFailure,
 } from '../redux/user/userSlice';
 import OAuth from '../components/OAuth';
+import { motion } from 'framer-motion'; // Import framer-motion for animations
 
 export default function SignIn() {
   const [formData, setFormData] = useState({ userName: '', password: '' });
@@ -26,7 +27,7 @@ export default function SignIn() {
     e.preventDefault();
     try {
       dispatch(signInStart());
-      
+
       const url = new URL('https://localhost:44359/User/Login');
       url.searchParams.append('userName', formData.userName);
       url.searchParams.append('password', formData.password);
@@ -41,9 +42,26 @@ export default function SignIn() {
       if (response.ok) {
         const data = await response.json();
         dispatch(signInSuccess(data)); // Assuming data contains user information
-        navigate('/'); // Redirect to the home page after successful sign-in
+        
+        // Determine the type of user
+        const userType = data.usertype; // Assuming 'usertype' is the property indicating user type
+      
+        // Redirect based on user type and pass user details
+        if (userType === 'user') {
+          navigate('/', { state: { user: data } }); // Redirect to the home page and pass user details
+        } else if (userType === 'provider') {
+          navigate('/create-listing', { state: { user: data } }); // Redirect to create listing page and pass user details
+        } else {
+          // Handle other user types or scenarios
+          // You can also have a default route here
+        }
       } else if (response.status === 400) {
-        throw new Error('User does not exist');
+        const data = await response.json();
+        if (data.message === 'User does not exist') {
+          throw new Error('User does not exist');
+        } else {
+          throw new Error(data.message || 'Failed to sign in');
+        }
       } else {
         throw new Error('Failed to sign in');
       }
@@ -52,9 +70,13 @@ export default function SignIn() {
     }
   };
   
-  
   return (
-    <div className='p-3 max-w-lg mx-auto'>
+    <motion.div // Add motion div for animations
+      initial={{ opacity: 0, y: -20 }} // Initial animation
+      animate={{ opacity: 1, y: 0 }} // Animation on load
+      transition={{ duration: 0.5 }} // Animation duration
+      className='p-3 max-w-lg mx-auto'
+    >
       <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
         <input
@@ -73,12 +95,17 @@ export default function SignIn() {
           value={formData.password}
           onChange={handleChange}
         />
-        <button
-          disabled={loading}
-          className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
-        >
-          {loading ? 'Loading...' : 'Sign In'}
-        </button>
+        <motion.button
+  disabled={loading}
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  className={`bg-slate-700 text-white p-3 rounded-lg uppercase ${
+    loading ? 'opacity-80 cursor-not-allowed' : 'hover:opacity-95'
+  }`}
+>Sign In
+  {/* {loading ? 'Sign In...' : 'Sign In'} */}
+</motion.button>
+
         <OAuth />
       </form>
       <div className='flex gap-2 mt-5'>
@@ -88,6 +115,6 @@ export default function SignIn() {
         </Link>
       </div>
       {error && <p className='text-red-500 mt-5'>{error}</p>}
-    </div>
+    </motion.div>
   );
 }

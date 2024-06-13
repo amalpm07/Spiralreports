@@ -2,25 +2,25 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   currentUser: null,
-  error: null,
   loading: false,
+  error: null,
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    signInStart: (state) => {
+    signInStart(state) {
       state.loading = true;
-    },
-    signInSuccess: (state, action) => {
-      state.currentUser = action.payload;
-      state.loading = false;
       state.error = null;
     },
-    signInFailure: (state, action) => {
-      state.error = action.payload;
+    signInSuccess(state, action) {
       state.loading = false;
+      state.currentUser = action.payload;
+    },
+    signInFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
     },
     updateUserStart: (state) => {
       state.loading = true;
@@ -39,6 +39,7 @@ const userSlice = createSlice({
     },
     deleteUserSuccess: (state) => {
       state.currentUser = null;
+      state.userId = null; // Clear userId on user deletion
       state.loading = false;
       state.error = null;
     },
@@ -46,18 +47,21 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
-    signOutUserStart: (state) => {
-      state.loading = true;
-    },
-    signOutUserSuccess: (state) => {
-      state.currentUser = null;
-      state.loading = false;
-      state.error = null;
-    },
-    signOutUserFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
+// actions.js
+ signOutUserStart : () => ({
+  type: 'SIGN_OUT_USER_START',
+}),
+
+ signOutUserSuccess : (data) => ({
+  type: 'SIGN_OUT_USER_SUCCESS',
+  payload: data,
+}),
+
+signOutUserFailure : (error) => ({
+  type: 'SIGN_OUT_USER_FAILURE',
+  payload: error,
+}),
+
   },
 });
 
