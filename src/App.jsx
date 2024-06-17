@@ -16,6 +16,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Booking from './pages/Booking';
 import Payment from './pages/Payment'
+import Showmybookings from './pages/showmybookings'
 
 export default function App() {
   return (
@@ -29,6 +30,8 @@ export default function App() {
         <Route path='/payment' element={<Payment />} />
         <Route path='/about' element={<About />} />
         <Route path='/search' element={<Search />} />
+        <Route path='/showmybookings' element={<Showmybookings />} />
+
         <Route path="/listing/:selectedType/:id" element={<Listing />} />        
         <Route path='/booking' element={<Booking />} />
         <Route path='/profile' element={<Profile />} />

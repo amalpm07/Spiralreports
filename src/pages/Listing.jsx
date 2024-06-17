@@ -2,14 +2,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaShare } from 'react-icons/fa';
-import Contact from '../components/Contact';
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [contact, setContact] = useState(false);
   const navigate = useNavigate();
 
   const { selectedType, id } = useParams();
