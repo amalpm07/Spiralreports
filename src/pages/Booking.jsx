@@ -1,9 +1,11 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FiCalendar } from 'react-icons/fi';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
 const BookingFormWrapper = styled.div`
     display: flex;
@@ -44,15 +46,6 @@ const FormGroup = styled.div`
     width: 100%;
 `;
 
-// eslint-disable-next-line no-unused-vars
-const InputGroup = styled.div`
-    display: flex;
-    align-items: center;
-    box-shadow: 0px 1px 18px 0px rgba(21, 44, 91, 0.1);
-    border-radius: 5px;
-    width: 100%;
-`;
-
 const Input = styled.input`
     border: 1px solid #e1e1e1;
     padding: 6px 15px;
@@ -61,26 +54,6 @@ const Input = styled.input`
     background: transparent;
     box-shadow: none;
     font-style: normal;
-    width: 100%;
-`;
-
-// eslint-disable-next-line no-unused-vars
-const InputGroupAddon = styled.div`
-    padding: 6px 15px;
-    cursor: pointer;
-`;
-
-const SelectElement = styled.select`
-    height: 50px;
-    padding: 6px 15px;
-    border: 1px solid #e1e1e1;
-    border-radius: 5px;
-    background: transparent;
-    color: #bbb5a5;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    box-shadow: none;
     width: 100%;
 `;
 
@@ -110,12 +83,6 @@ const Span = styled.span`
     font-weight: 300;
     display: flex;
     align-items: center;
-`;
-
-// eslint-disable-next-line no-unused-vars
-const Icon = styled(FiCalendar)`
-    margin-right: 5px;
-    font-size: 20px;
 `;
 
 const DatepickerWrapper = styled(DatePicker)`
@@ -177,11 +144,47 @@ const DatepickerWrapper = styled(DatePicker)`
 
 const BookingForm = () => {
     const [checkInDate, setCheckInDate] = useState(new Date());
-    const [checkOutDate, setCheckOutDate] = useState(new Date());
-    const navigate = useNavigate();
+    const [checkOutDate, setCheckOutDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1)));
 
-    const handleContactClick = () => {
-        navigate('/payment');
+    const location = useLocation();
+    const navigate = useNavigate();
+    const listing = location.state?.listing;
+    const currentUser = useSelector((state) => state.user.currentUser);
+
+    const handleProceedClick = async () => {
+        const currentDate = new Date();
+        const bookingData = {
+            customerName: currentUser?.userName || "Guest",
+            providerId: listing?.serviceHome?.userId,
+            serviceName: listing?.serviceHome?.serviceName,
+            bookingDate: currentDate.toISOString(),
+            serviceFromDate: checkInDate.toISOString(),
+            serviceToDate: checkOutDate.toISOString(),
+            charge: listing?.answer.find(item => item.answer.question_id === 38)?.answer.ans,
+            isCancelled: false,
+            isConfirmed: false,
+            isCompleted: false,
+            isActive: true,
+            cancelledBy: "",
+        };
+
+        try {
+            const response = await fetch('https://hibow.in/api/Booking/BookAService', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookingData)
+            });
+
+            if (response.ok) {
+                navigate('/payment');
+            } else {
+                console.error('Failed to submit booking:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error submitting booking:', error);
+        }
     };
 
     return (
@@ -189,11 +192,9 @@ const BookingForm = () => {
             <FormElement label="Check - In" icon={FiCalendar}>
                 <DatepickerWrapper
                     selected={checkInDate}
-                    onChange={(date) => setCheckInDate(date)}
+                    onChange={date => setCheckInDate(date)}
                     dateFormat="MM/dd/yyyy"
                     className="form-control"
-                    wrapperClassName="react-datepicker-wrapper"
-                    popperClassName="react-datepicker-popper"
                     customInput={<Input type="text" readOnly />}
                 />
             </FormElement>
@@ -201,57 +202,36 @@ const BookingForm = () => {
             <FormElement label="Check - Out" icon={FiCalendar}>
                 <DatepickerWrapper
                     selected={checkOutDate}
-                    onChange={(date) => setCheckOutDate(date)}
+                    onChange={date => setCheckOutDate(date)}
                     dateFormat="MM/dd/yyyy"
                     className="form-control"
-                    wrapperClassName="react-datepicker-wrapper"
-                    popperClassName="react-datepicker-popper"
                     customInput={<Input type="text" readOnly />}
                 />
             </FormElement>
 
-            <FormElement label="Guests">
-                <SelectElement>
-                    <option>02</option>
-                    <option>01</option>
-                    <option>03</option>
-                    <option>04</option>
-                    <option>05</option>
-                    <option>06</option>
-                </SelectElement>
-            </FormElement>
-
-            <FormElement label="Children">
-                <SelectElement>
-                    <option>01</option>
-                    <option>02</option>
-                    <option>03</option>
-                    <option>04</option>
-                    <option>05</option>
-                    <option>06</option>
-                </SelectElement>
-            </FormElement>
-
             <FormElement>
-                <Button type="submit">Check Availability</Button>
-            </FormElement>
-
-            <FormElement>
-                <Button onClick={handleContactClick}>Contact</Button>
+                <Button onClick={handleProceedClick}>Proceed</Button>
             </FormElement>
         </BookingFormWrapper>
     );
 };
 
-// eslint-disable-next-line react/prop-types
 const FormElement = ({ label, icon: IconComponent, children }) => (
     <SelectSub>
-        <Span>
-            {IconComponent && <IconComponent />}
-            {label && `${label}`}
-        </Span>
+        {label && (
+            <Span>
+                {IconComponent && <IconComponent style={{ marginRight: 5 }} />}
+                {label}
+            </Span>
+        )}
         <FormGroup>{children}</FormGroup>
     </SelectSub>
 );
+
+FormElement.propTypes = {
+    label: PropTypes.string,
+    icon: PropTypes.elementType,
+    children: PropTypes.node.isRequired,
+};
 
 export default BookingForm;

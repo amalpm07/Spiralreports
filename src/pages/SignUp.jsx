@@ -62,7 +62,7 @@ export default function SignUp() {
         pincode: formData.pincode.toString(),
       };
 
-      const response = await fetch('https://localhost:44359/User/Add', {
+      const response = await fetch('https://hibow.in/api/User/Add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function SignUp() {
 
   const checkUsernameAvailability = async (userName) => {
     try {
-      const response = await fetch(`https://hibow.in/User/CheckUsername?username=${userName}`);
+      const response = await fetch(`https://hibow.in/api/CheckUsername?username=${userName}`);
       const data = await response.json();
       return data.isAvailable;
     } catch (error) {

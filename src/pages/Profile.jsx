@@ -24,12 +24,12 @@ import * as Yup from 'yup';
 import styled from 'styled-components';
 
 const ProfileContainer = styled.div`
-  padding: 3rem;
-  max-width: 800px;
-  margin: auto;
-  background: #f9fafb;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #fff;
   border-radius: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 `;
 
 const AvatarContainer = styled.div`
@@ -45,7 +45,7 @@ const Avatar = styled.img`
   cursor: pointer;
   margin-top: 1rem;
   object-fit: cover;
-  border: 3px solid #1e293b;
+  border: 3px solid #e5e7eb;
 `;
 
 const EditIcon = styled.span`
@@ -53,8 +53,8 @@ const EditIcon = styled.span`
   bottom: 0;
   right: 50%;
   transform: translateX(50%);
-  background: #1e293b;
-  color: white;
+  background: #e5e7eb;
+  color: #1e293b;
   border-radius: 50%;
   padding: 0.5rem;
   cursor: pointer;
@@ -64,46 +64,50 @@ const SubmitButton = styled.button`
   background-color: #1e293b;
   color: white;
   border-radius: 0.375rem;
-  padding: 0.75rem;
+  padding: 0.75rem 1.5rem;
   text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
   &:hover {
-    opacity: 0.95;
+    background-color: #374151;
   }
   &:disabled {
-    opacity: 0.8;
+    background-color: #9ca3af;
+    cursor: not-allowed;
   }
 `;
 
-const DeleteButton = styled.span`
-  color: #dc2626;
+const LinkButton = styled(Link)`
+  display: inline-block;
+  background-color: #10b981;
+  color: white;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1.5rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: #047857;
+  }
+`;
+
+const ActionButton = styled.span`
   cursor: pointer;
+  font-weight: 600;
   &:hover {
     opacity: 0.75;
   }
 `;
 
-const SignOutButton = styled.span`
-  color: #ef4444;
-  cursor: pointer;
-  &:hover {
-    opacity: 0.75;
-  }
-`;
-
-const ErrorText = styled.p`
-  color: #dc2626;
-  margin-top: 1.25rem;
-`;
-
-const SuccessText = styled.p`
-  color: #16a34a;
-  margin-top: 1.25rem;
+const MessageText = styled.p`
+  color: ${({ error }) => (error ? '#dc2626' : '#16a34a')};
+  margin-top: 1rem;
+  text-align: center;
 `;
 
 const ListingContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   margin-top: 2rem;
 `;
 
@@ -116,6 +120,24 @@ const ListingCard = styled.div`
   border-radius: 0.375rem;
   background: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+`;
+
+const ListingImage = styled.img`
+  height: 3rem;
+  width: 3rem;
+  border-radius: 0.375rem;
+  object-fit: cover;
+`;
+
+const ListingDetails = styled.div`
+  flex: 1;
+  margin-left: 1rem;
+`;
+
+const ListingActions = styled.div`
+  display: flex;
+  gap: 1rem;
 `;
 
 const validationSchema = Yup.object({
@@ -188,7 +210,7 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
-      const res = await fetch(`https://hibow.in/User/LoginDelete?userid=${currentUser.id}`, {
+      const res = await fetch(`https://hibow.in/api/User/LoginDelete?userid=${currentUser.id}`, {
         method: 'DELETE',
       });
 
@@ -288,16 +310,18 @@ export default function Profile() {
                 src={formData?.avatar || currentUser?.avatar || ''}
                 alt='profile'
               />
-              <EditIcon onClick={() => fileRef.current.click()}>✎</EditIcon>
+              <EditIcon onClick={() => fileRef.current.click()}>
+                ✎
+              </EditIcon>
             </AvatarContainer>
 
             <p className='text-sm self-center'>
               {fileUploadError ? (
-                <span className='text-red-700'>Error uploading image (image must be less than 2 MB)</span>
+                <span>Error uploading image (image must be less than 2 MB)</span>
               ) : filePerc > 0 && filePerc < 100 ? (
-                <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
+                <span>{`Uploading ${filePerc}%`}</span>
               ) : filePerc === 100 ? (
-                <span className='text-green-700'>Image successfully uploaded!</span>
+                <span>Image successfully uploaded!</span>
               ) : (
                 ''
               )}
@@ -310,48 +334,48 @@ export default function Profile() {
             <SubmitButton type='submit' disabled={isSubmitting || loading}>
               {loading ? 'Loading...' : 'Update'}
             </SubmitButton>
-            <Link
-              className='bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95'
+            <LinkButton
               to='/create-listing'
             >
               Create Service
-            </Link>
+            </LinkButton>
           </Form>
         )}
       </Formik>
       <div className='flex justify-between mt-5'>
-        <DeleteButton onClick={handleDeleteUser}>
+        <ActionButton onClick={handleDeleteUser}>
           Delete account
-        </DeleteButton>
-        <SignOutButton onClick={handleSignOut}>
+        </ActionButton>
+        <ActionButton onClick={handleSignOut}>
           Sign out
-        </SignOutButton>
+        </ActionButton>
       </div>
-      <ErrorText>{error ? error : ''}</ErrorText>
-      <SuccessText>{updateSuccess ? 'User updated successfully!' : ''}</SuccessText>
+      <MessageText error={!!error}>{error ? error : updateSuccess ? 'User updated successfully!' : ''}</MessageText>
       <button onClick={handleShowListings} className='text-green-700 w-full mt-5'>
         Show your Services
       </button>
-      <ErrorText>{showListingsError ? 'Error showing listings' : ''}</ErrorText>
+      <MessageText error={showListingsError}>{showListingsError ? 'Error showing listings' : ''}</MessageText>
       {userListings && userListings.length > 0 && (
         <ListingContainer>
           <h1 className='text-center mt-7 text-2xl font-semibold'>Your Services</h1>
           {userListings.map((listing) => (
             <ListingCard key={listing._id}>
               <Link to={`/listing/${listing._id}`}>
-                <img src={listing.imageUrls[0]} alt='listing cover' className='h-16 w-16 object-cover' />
+                <ListingImage src={listing.imageUrls[0]} alt='listing cover' />
               </Link>
-              <Link className='text-slate-700 font-semibold hover:underline flex-1 truncate' to={`/listing/${listing._id}`}>
-                <p>{listing.name}</p>
-              </Link>
-              <div className='flex flex-col items-center'>
+              <ListingDetails>
+                <Link className='text-slate-700 font-semibold hover:underline' to={`/listing/${listing._id}`}>
+                  <p>{listing.name}</p>
+                </Link>
+              </ListingDetails>
+              <ListingActions>
                 <button onClick={() => handleListingDelete(listing._id)} className='text-red-700 uppercase'>
                   Delete
                 </button>
                 <Link to={`/update-listing/${listing._id}`}>
                   <button className='text-green-700 uppercase'>Edit</button>
                 </Link>
-              </div>
+              </ListingActions>
             </ListingCard>
           ))}
         </ListingContainer>

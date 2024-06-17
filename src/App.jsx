@@ -29,7 +29,7 @@ export default function App() {
         <Route path='/payment' element={<Payment />} />
         <Route path='/about' element={<About />} />
         <Route path='/search' element={<Search />} />
-        <Route path='/listing/:listingId' element={<Listing />} />
+        <Route path="/listing/:selectedType/:id" element={<Listing />} />        
         <Route path='/booking' element={<Booking />} />
         <Route path='/profile' element={<Profile />} />
           <Route path='/create-listing' element={<CreateListing />} />

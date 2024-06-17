@@ -7,16 +7,18 @@ import {
 } from 'firebase/storage';
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     imageUrls: [],
     hostelName: '',
     description: '',
     address: '',
-    type: '',
+    ServiceName: '',
     offer: false,
     answers: {},
   });
@@ -30,7 +32,7 @@ export default function CreateListing() {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          `https://localhost:44359/Booking/GetTheListofQuestions?serviceName=${formData.type}`
+          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=${formData.ServiceName}`
         );
         const data = await response.json();
         setQuestions(data);
@@ -39,10 +41,10 @@ export default function CreateListing() {
       }
     };
 
-    if (formData.type) {
+    if (formData.ServiceName) {
       fetchQuestions();
     }
-  }, [formData.type]);
+  }, [formData.ServiceName]);
 
   const handleImageSubmit = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -110,7 +112,7 @@ export default function CreateListing() {
     if (id === 'Provider BoardingQuestions' || id === 'training' || id === 'grooming') {
       setFormData({
         ...formData,
-        type: id,
+        ServiceName: id,
       });
     } else {
       setFormData({
@@ -142,33 +144,39 @@ export default function CreateListing() {
       setLoading(true);
       setError(null);
 
-      const { hostelName, address, description, imageUrls, answers } = formData;
+      // eslint-disable-next-line no-unused-vars
+      const { hostelName, ServiceName, address, description, imageUrls, answers } = formData;
 
-      // Log the form data to the console
+      let selectedType = '';
+      if (formData.ServiceName === 'Provider BoardingQuestions') {
+        selectedType = 'Provider BoardingQuestions';
+      } else if (formData.ServiceName === 'training') {
+        selectedType = 'training';
+      } else if (formData.ServiceName === 'grooming') {
+        selectedType = 'grooming';
+      }
+
       console.log('Form Data:', formData);
 
-      // Map imageUrls to the photo fields required by the API
       const photos = imageUrls.reduce((acc, url, index) => {
         acc[`photo${index + 1}`] = url;
         return acc;
       }, {});
 
-      // Ensure all photo fields are included
       for (let i = imageUrls.length; i < 6; i++) {
         photos[`photo${i + 1}`] = '';
       }
 
-      // Prepare the payload for AddServiceHomeDetails API
       const serviceHomePayload = {
         id: 0,
         userId: currentUser.id,
+        ServiceName: selectedType,
         hostelName,
         address,
         description,
         ...photos,
       };
 
-      // Prepare the payload for AddAnswers API
       const answersPayload = Object.keys(answers).map((questionId) => ({
         id: 0,
         question_id: questionId,
@@ -176,16 +184,15 @@ export default function CreateListing() {
         ans: String(answers[questionId]),
       }));
 
-      // Make both API calls concurrently
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
-        fetch('https://localhost:44359/Provider/AddServiceHomeDetails', {
+        fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(serviceHomePayload),
         }),
-        fetch('https://localhost:44359/User/AddAnswers', {
+        fetch('https://hibow.in/api/User/AddAnswers', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -194,11 +201,9 @@ export default function CreateListing() {
         }),
       ]);
 
-      // Parse the responses
       const serviceHomeData = await serviceHomeRes.json();
       const addAnswersData = await addAnswersRes.json();
 
-      // Check for errors in serviceHomeRes
       if (!serviceHomeRes.ok || !serviceHomeData.success) {
         throw new Error(
           serviceHomeData.message || 'Failed to add service home details'
@@ -206,13 +211,13 @@ export default function CreateListing() {
       }
       console.log('Service Home Data:', serviceHomeData);
 
-      // Check for errors in addAnswersRes
       if (!addAnswersRes.ok || !addAnswersData.success) {
         throw new Error(addAnswersData.message || 'Failed to add answers');
       }
       console.log('Add Answers Data:', addAnswersData);
 
-      // Navigation logic can be added here if needed
+      navigate(`/listing/${selectedType}/${serviceHomeData.id}`);
+
     } catch (error) {
       setError(error.message);
     } finally {
@@ -263,7 +268,7 @@ export default function CreateListing() {
                 id='Provider BoardingQuestions'
                 className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
                 onChange={handleChange}
-                checked={formData.type === 'Provider BoardingQuestions'}
+                checked={formData.ServiceName === 'Provider BoardingQuestions'}
               />
               <span className='text-gray-700'>Boarding</span>
             </div>
@@ -273,7 +278,7 @@ export default function CreateListing() {
                 id='training'
                 className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
                 onChange={handleChange}
-                checked={formData.type === 'training'}
+                checked={formData.ServiceName === 'training'}
               />
               <span className='text-gray-700'>Training</span>
             </div>
@@ -283,7 +288,7 @@ export default function CreateListing() {
                 id='grooming'
                 className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
                 onChange={handleChange}
-                checked={formData.type === 'grooming'}
+                checked={formData.ServiceName === 'grooming'}
               />
               <span className='text-gray-700'>Grooming</span>
             </div>
@@ -339,7 +344,7 @@ export default function CreateListing() {
             <div className='mt-6'>
               <h2 className='text-xl font-semibold text-gray-800'>Questions</h2>
               <ul className='list-disc ml-5'>
-                {questions.map((question, index) => (
+                {questions.map((question) => (
                   <li key={question.id} className='mb-2'>
                     <div className='text-gray-700'>{question.questions}</div>
                     <div className='flex flex-col gap-2 mt-2'>
