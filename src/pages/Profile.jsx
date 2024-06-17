@@ -1,5 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import {
   getDownloadURL,
   getStorage,
@@ -157,6 +159,7 @@ export default function Profile() {
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (file) {
@@ -221,6 +224,8 @@ export default function Profile() {
 
       const data = await res.json();
       dispatch(signOutUserSuccess(data));
+      navigate('/');
+      
     } catch (error) {
       dispatch(signOutUserFailure(error.message));
       console.error('Sign-out error:', error);
