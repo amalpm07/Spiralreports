@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -6,6 +7,14 @@ import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+
+// Popup component for success message
+const SuccessPopup = ({ onClose }) => (
+    <div className="popup">
+        <p>Booking Successful!</p>
+        <button onClick={onClose}>Close</button>
+    </div>
+);
 
 const BookingFormWrapper = styled.div`
     display: flex;
@@ -145,6 +154,7 @@ const DatepickerWrapper = styled(DatePicker)`
 const BookingForm = () => {
     const [checkInDate, setCheckInDate] = useState(new Date());
     const [checkOutDate, setCheckOutDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1)));
+    const [showSuccess, setShowSuccess] = useState(false); // State to control popup visibility
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -178,7 +188,11 @@ const BookingForm = () => {
             });
 
             if (response.ok) {
-                navigate('/payment');
+                setShowSuccess(true); // Show success popup
+                // Optionally navigate to home page after a delay
+                setTimeout(() => {
+                    navigate('/'); // Navigate to home page after 2 seconds
+                }, 2000);
             } else {
                 console.error('Failed to submit booking:', response.statusText);
             }
@@ -212,6 +226,9 @@ const BookingForm = () => {
             <FormElement>
                 <Button onClick={handleProceedClick}>Proceed</Button>
             </FormElement>
+
+            {/* Popup for success message */}
+            {showSuccess && <SuccessPopup onClose={() => setShowSuccess(false)} />}
         </BookingFormWrapper>
     );
 };

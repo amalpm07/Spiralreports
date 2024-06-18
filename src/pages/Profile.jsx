@@ -2,7 +2,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   getDownloadURL,
@@ -18,6 +18,7 @@ import {
   signOutUserStart,
   signOutUserSuccess,
   signOutUserFailure,
+  clearCurrentUser, // Import the clearCurrentUser action
 } from '../redux/user/userSlice';
 import { Link } from 'react-router-dom';
 
@@ -30,14 +31,9 @@ export default function Profile() {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
-  // eslint-disable-next-line no-unused-vars
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  const [showListingsError, setShowListingsError] = useState(false);
-  const [userListings, setUserListings] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [userBookings, setUserBookings] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [showBookingsError, setShowBookingsError] = useState(false);
+  
+  const [signOutMessage, setSignOutMessage] = useState(''); // State for sign-out message
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -97,70 +93,57 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     if (!currentUser) return;
-
+  
     try {
       dispatch(signOutUserStart());
       const res = await fetch(`https://hibow.in/api/User/LoginDelete?userid=${currentUser.id}`, {
         method: 'DELETE',
       });
-
+  
       if (res.ok) {
-        const data = await res.json();
-        dispatch(signOutUserSuccess(data));
-        navigate('/')
+        const contentType = res.headers.get('content-type');
+        let data;
         
+        // Check if response is JSON
+        if (contentType && contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          data = await res.text(); // Handle plain text response
+        }
+  
+        dispatch(signOutUserSuccess(data));
+        dispatch(clearCurrentUser()); // Clear the current user from the Redux store
+        setSignOutMessage('You have been signed out successfully.'); // Set the sign-out message
+        setTimeout(() => {
+          navigate('/'); // Navigate to the home page after a short delay
+        }, 1000); // 3-second delay before navigating
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to logout');
       }
-      const errorData = await res.json();
-      throw new Error(errorData.message || 'Failed to logout');
-     
     } catch (error) {
       dispatch(signOutUserFailure(error.message));
       console.error('Sign-out error:', error);
     }
   };
+  
+    
 
-  const handleShowListings = async () => {
-    if (!currentUser) return;
-  
-    try {
-      setShowListingsError(false);
-      const res = await fetch(`https://hibow.in/api/Provider/GetServiceHomeByUserId?serviceName=Provider%20BoardingQuestions&userId=${currentUser.id}`);
-      console.log('API Response:', res); // Log the API response
-      const data = await res.json();
-      console.log('Data:', data); // Log the parsed data
-  
-      if (!res.ok || !data.success) {
-        setShowListingsError(true);
-        // console.error('Failed to fetch listings:', data.message);
-        return;
-      }
-  
-      console.log('Listings:', data); // Log the listings data
-      setUserListings(data.listings); // Assuming data.listings is an array of listings
-    } catch (error) {
-      setShowListingsError(true);
-      console.error('An error occurred while fetching listings:', error.message);
-    }
-  };
-  
-  
-
-
-  const handleListingDelete = async (listingId) => {
-    try {
-      const res = await fetch(`/api/listing/delete/${listingId}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if (!data.success) {
-        console.log(data.message);
-        return;
-      }
-      setUserListings((prev) => prev.filter((listing) => listing._id !== listingId));
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  // const handleListingDelete = async (listingId) => {
+  //   try {
+  //     const res = await fetch(`/api/listing/delete/${listingId}`, {
+  //       method: 'DELETE',
+  //     });
+  //     const data = await res.json();
+  //     if (!data.success) {
+  //       console.log(data.message);
+  //       return;
+  //     }
+  //     setUserListings((prev) => prev.filter((listing) => listing._id !== listingId));
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
 
   if (!currentUser) {
     return null; // Or render a loading state, or redirect to login, etc.
@@ -194,7 +177,7 @@ export default function Profile() {
           )}
         </p>
         <div className="flex flex-col gap-4 mt-4 w-full">
-        <Link
+          <Link
             to="/showmybookings"
             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center"
           >
@@ -209,16 +192,15 @@ export default function Profile() {
           <button
             type="button"
             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
-            onClick={handleShowListings}
             disabled={loading}
           >
             Show My Listings
           </button>
-          {showListingsError && (
+          {/* {showListingsError && (
             <p className="text-red-600 mt-4">Failed to load listings. Please try again later.</p>
-          )}
+          )} */}
 
-          {userListings.length > 0 && (
+          {/* {userListings.length > 0 && (
             <div className="mt-4 w-full">
               <h4 className="mb-2 text-xl font-semibold">My Listings</h4>
               {userListings.map((data) => (
@@ -244,9 +226,8 @@ export default function Profile() {
                 </div>
               ))}
             </div>
-          )}
+          )} */}
 
-          
           <button
             type="button"
             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
@@ -274,6 +255,10 @@ export default function Profile() {
         {updateSuccess && (
           <p className="text-green-600 mt-4">Profile updated successfully!</p>
         )}
+        {signOutMessage && (
+          <p className="text-green-600 mt-4">{signOutMessage}</p> // Display the sign-out message
+        )}
+        
       </div>
     </main>
   );

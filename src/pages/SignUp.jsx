@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import OAuth from '../components/OAuth';
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaHome, FaMapMarkerAlt, FaCity,FaImage,  FaSignInAlt } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaHome, FaMapMarkerAlt, FaCity,  FaSignInAlt } from 'react-icons/fa';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -53,15 +53,16 @@ export default function SignUp() {
       setError(validationError);
       return;
     }
-
+  
     setLoading(true);
     try {
       const userModel = {
         ...formData,
         phoneNumber: formData.phoneNumber.toString(),
         pincode: formData.pincode.toString(),
+        photo: '', // Ensure photo field is set to empty string
       };
-
+  
       const response = await fetch('https://hibow.in/api/User/Add', {
         method: 'POST',
         headers: {
@@ -69,7 +70,7 @@ export default function SignUp() {
         },
         body: JSON.stringify(userModel),
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         try {
@@ -80,7 +81,7 @@ export default function SignUp() {
         }
         return;
       }
-
+  
       alert("Sign up successful! Please sign in with your credentials.");
       setLoading(false);
       setError(null);
@@ -91,7 +92,7 @@ export default function SignUp() {
       setError(error.message || 'Failed to add user');
     }
   };
-
+  
   const checkUsernameAvailability = async (userName) => {
     try {
       const response = await fetch(`https://hibow.in/api/CheckUsername?username=${userName}`);
@@ -292,20 +293,8 @@ export default function SignUp() {
               />
             </div>
           </div>
-          <div className="flex flex-col sm:col-span-2 disply-none">
-            <label className="text-sm font-medium text-gray-700 mb-1">Photo URL</label>
-            <div className="relative">
-              <FaImage className="absolute top-3 left-3 text-gray-400" />
-              <input
-                type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-                id="photo"
-                value={formData.photo}
-                onChange={handleChange}
-                placeholder="Photo URL"
-              />
-            </div>
-          </div>
+       {/* Photo URL input removed */}
+
           <button
             disabled={loading}
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-lg uppercase hover:from-blue-700 hover:to-indigo-700 disabled:bg-blue-400 col-span-2 flex items-center justify-center transition duration-300"

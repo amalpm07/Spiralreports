@@ -53,7 +53,7 @@ const Home = () => {
               <img className="w-full h-48 object-cover" src={home.photo1} alt={home.serviceName} />
               <div className="p-4">
                 <p className="text-gray-700 text-base mb-4">
-                  {home.description}
+                  {home.hostelName}
                 </p>
                 <p className="text-gray-600 text-sm">{home.address}</p>
               </div>

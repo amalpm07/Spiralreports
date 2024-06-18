@@ -156,8 +156,6 @@ export default function CreateListing() {
         selectedType = 'grooming';
       }
 
-      console.log('Form Data:', formData);
-
       const photos = imageUrls.reduce((acc, url, index) => {
         acc[`photo${index + 1}`] = url;
         return acc;
@@ -209,14 +207,12 @@ export default function CreateListing() {
           serviceHomeData.message || 'Failed to add service home details'
         );
       }
-      console.log('Service Home Data:', serviceHomeData);
 
       if (!addAnswersRes.ok || !addAnswersData.success) {
         throw new Error(addAnswersData.message || 'Failed to add answers');
       }
-      console.log('Add Answers Data:', addAnswersData);
 
-      navigate(`/listing/${selectedType}/${serviceHomeData.id}`);
+      navigate(`/`);
 
     } catch (error) {
       setError(error.message);
@@ -234,7 +230,7 @@ export default function CreateListing() {
         <div className='flex flex-col gap-4'>
           <input
             type='text'
-            placeholder='Name'
+            placeholder='hostalName'
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
             id='hostelName'
             maxLength='62'

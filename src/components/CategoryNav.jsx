@@ -36,10 +36,10 @@ const columns = [
     text: "Pet Grooming"
   },
   {
-    link: "/dog-walking",
+    link: "https://leashbench.com",
     imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/dog-walking.png",
     alt: "dog walking near me",
-    text: "Dog Walking"
+    text: "pet store"
   },
   {
     link: "/pet-taxi",
