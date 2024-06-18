@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import OAuth from '../components/OAuth';
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaHome, FaMapMarkerAlt, FaCity,  FaSignInAlt } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaHome, FaMapMarkerAlt, FaCity, FaSignInAlt } from 'react-icons/fa';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -16,8 +16,9 @@ export default function SignUp() {
     landmark: '',
     district: '',
     pincode: '',
-    photo: ''
+    photo: '', // Initialize photo field as an empty string
   });
+
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -39,7 +40,8 @@ export default function SignUp() {
 
   const validateForm = () => {
     for (let key in formData) {
-      if (!formData[key]) {
+      // Exclude validation for the 'photo' field
+      if (key !== 'photo' && !formData[key]) {
         return `Please fill out the ${key} field.`;
       }
     }
@@ -53,7 +55,7 @@ export default function SignUp() {
       setError(validationError);
       return;
     }
-  
+
     setLoading(true);
     try {
       const userModel = {
@@ -62,7 +64,7 @@ export default function SignUp() {
         pincode: formData.pincode.toString(),
         photo: '', // Ensure photo field is set to empty string
       };
-  
+
       const response = await fetch('https://hibow.in/api/User/Add', {
         method: 'POST',
         headers: {
@@ -70,7 +72,7 @@ export default function SignUp() {
         },
         body: JSON.stringify(userModel),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         try {
@@ -79,9 +81,10 @@ export default function SignUp() {
         } catch {
           setError(errorText);
         }
+        setLoading(false);
         return;
       }
-  
+
       alert("Sign up successful! Please sign in with your credentials.");
       setLoading(false);
       setError(null);
@@ -92,7 +95,7 @@ export default function SignUp() {
       setError(error.message || 'Failed to add user');
     }
   };
-  
+
   const checkUsernameAvailability = async (userName) => {
     try {
       const response = await fetch(`https://hibow.in/api/CheckUsername?username=${userName}`);
@@ -120,6 +123,8 @@ export default function SignUp() {
       }
     }
   };
+
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
