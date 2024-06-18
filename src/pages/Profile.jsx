@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/no-unescaped-entities */
 import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +16,7 @@ import {
   signOutUserStart,
   signOutUserSuccess,
   signOutUserFailure,
-  clearCurrentUser, // Import the clearCurrentUser action
+  clearCurrentUser,
 } from '../redux/user/userSlice';
 import { Link } from 'react-router-dom';
 
@@ -32,8 +30,7 @@ export default function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
-  
-  const [signOutMessage, setSignOutMessage] = useState(''); // State for sign-out message
+  const [signOutMessage, setSignOutMessage] = useState('');
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -41,12 +38,6 @@ export default function Profile() {
       handleFileUpload(file);
     }
   }, [file]);
-
-  useEffect(() => {
-    if (currentUser) {
-      console.log('Current User:', currentUser);
-    }
-  }, [currentUser]);
 
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
@@ -72,7 +63,9 @@ export default function Profile() {
   };
 
   const handleDeleteUser = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete your account? This action cannot be undone.'
+    );
     if (!confirmDelete || !currentUser) return;
 
     try {
@@ -93,30 +86,29 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     if (!currentUser) return;
-  
+
     try {
       dispatch(signOutUserStart());
       const res = await fetch(`https://hibow.in/api/User/LoginDelete?userid=${currentUser.id}`, {
         method: 'DELETE',
       });
-  
+
       if (res.ok) {
         const contentType = res.headers.get('content-type');
         let data;
-        
-        // Check if response is JSON
+
         if (contentType && contentType.includes('application/json')) {
           data = await res.json();
         } else {
-          data = await res.text(); // Handle plain text response
+          data = await res.text();
         }
-  
+
         dispatch(signOutUserSuccess(data));
-        dispatch(clearCurrentUser()); // Clear the current user from the Redux store
-        setSignOutMessage('You have been signed out successfully.'); // Set the sign-out message
+        dispatch(clearCurrentUser());
+        setSignOutMessage('You have been signed out successfully.');
         setTimeout(() => {
-          navigate('/'); // Navigate to the home page after a short delay
-        }, 1000); // 3-second delay before navigating
+          navigate('/');
+        }, 1000);
       } else {
         const errorData = await res.json();
         throw new Error(errorData.message || 'Failed to logout');
@@ -126,28 +118,6 @@ export default function Profile() {
       console.error('Sign-out error:', error);
     }
   };
-  
-    
-
-  // const handleListingDelete = async (listingId) => {
-  //   try {
-  //     const res = await fetch(`/api/listing/delete/${listingId}`, {
-  //       method: 'DELETE',
-  //     });
-  //     const data = await res.json();
-  //     if (!data.success) {
-  //       console.log(data.message);
-  //       return;
-  //     }
-  //     setUserListings((prev) => prev.filter((listing) => listing._id !== listingId));
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
-
-  if (!currentUser) {
-    return null; // Or render a loading state, or redirect to login, etc.
-  }
 
   return (
     <main className="flex flex-col md:flex-row gap-8 p-8 mx-auto max-w-4xl">
@@ -179,55 +149,29 @@ export default function Profile() {
         <div className="flex flex-col gap-4 mt-4 w-full">
           <Link
             to="/showmybookings"
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center"
+            className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center ${
+              !currentUser && 'opacity-50 pointer-events-none'
+            }`}
           >
             Bookings
           </Link>
-          <Link
-            to="/create-listing"
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center"
-          >
-            Create Listing
-          </Link>
-          <button
-            type="button"
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
-            disabled={loading}
-          >
-            Show My Listings
-          </button>
-          {/* {showListingsError && (
-            <p className="text-red-600 mt-4">Failed to load listings. Please try again later.</p>
-          )} */}
-
-          {/* {userListings.length > 0 && (
-            <div className="mt-4 w-full">
-              <h4 className="mb-2 text-xl font-semibold">My Listings</h4>
-              {userListings.map((data) => (
-                <div key={data.id} className="border p-4 rounded-lg mb-2">
-                  <h5 className="text-lg font-semibold">{data.hostelName}</h5>
-                  <p className="text-sm mb-2">{data.address}</p>
-                  <p className="text-sm mb-2">{data.description}</p>
-                  {data.photo1 && (
-                    <img
-                      src={data.photo1}
-                      alt="listing_photo"
-                      className="w-full h-32 object-cover mb-2"
-                    />
-                  )}
-                  <button
-                    type="button"
-                    className="bg-red-500 text-white py-1 px-3 rounded-lg hover:bg-red-600 transition duration-200"
-                    onClick={() => handleListingDelete(data.id)}
-                    disabled={loading}
-                  >
-                    Delete Listing
-                  </button>
-                </div>
-              ))}
-            </div>
-          )} */}
-
+          {currentUser && currentUser.usertype === 'provider' && (
+            <>
+              <Link
+                to="/create-listing"
+                className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center`}
+              >
+                Create Listing
+              </Link>
+              <button
+                type="button"
+                className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200`}
+                disabled={loading}
+              >
+                Show My Listings
+              </button>
+            </>
+          )}
           <button
             type="button"
             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
@@ -249,16 +193,9 @@ export default function Profile() {
           Hey, I'm <strong>{currentUser?.userName ?? 'User'}</strong>
         </h4>
         <h5 className="text-lg mb-4">{currentUser?.email}</h5>
-        {error && (
-          <p className="text-red-600 mt-4">{error}</p>
-        )}
-        {updateSuccess && (
-          <p className="text-green-600 mt-4">Profile updated successfully!</p>
-        )}
-        {signOutMessage && (
-          <p className="text-green-600 mt-4">{signOutMessage}</p> // Display the sign-out message
-        )}
-        
+        {error && <p className="text-red-600 mt-4">{error}</p>}
+        {updateSuccess && <p className="text-green-600 mt-4">Profile updated successfully!</p>}
+        {signOutMessage && <p className="text-green-600 mt-4">{signOutMessage}</p>}
       </div>
     </main>
   );
