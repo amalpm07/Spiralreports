@@ -17,7 +17,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Booking from './pages/Booking';
 import Payment from './pages/Payment'
 import Showmybookings from './pages/showmybookings'
-// import Showmylisting from './pages/showmylisting'
+import Showmylisting from './pages/showmylisting'
 
 export default function App() {
   return (
@@ -32,7 +32,8 @@ export default function App() {
         <Route path='/about' element={<About />} />
         <Route path='/search' element={<Search />} />
         <Route path='/showmybookings' element={<Showmybookings />} />
-        {/* <Route path='/showmylisting' element={<Showmylisting/>} /> */}
+        <Route path='/showmylisting' element={<Showmylisting/>} />
+        <Route path='/listing/:listingId' element={<Listing />} />
 
         <Route path="/listing/:selectedType/:id" element={<Listing />} />        
         <Route path='/booking' element={<Booking />} />

@@ -45,13 +45,15 @@ export default function SignIn() {
         
         // Determine the type of user
         const userType = data.usertype; // Assuming 'usertype' is the property indicating user type
-      
+      const hasListing = data.hasListing;
         // Redirect based on user type and pass user details
         if (userType === 'user') {
           navigate('/', { state: { user: data } }); // Redirect to the home page and pass user details
-        } else if (userType === 'provider') {
+        } else if (userType === 'provider'&& hasListing ==='false') {
           navigate('/create-listing', { state: { user: data } }); // Redirect to create listing page and pass user details
-        } else {
+        } else  {
+          navigate('/profile', { state: { user: data } }); // Redirect to create listing page and pass user details
+
           // Handle other user types or scenarios
           // You can also have a default route here
         }

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +30,7 @@ export default function Profile() {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  // eslint-disable-next-line no-unused-vars
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [signOutMessage, setSignOutMessage] = useState('');
   const dispatch = useDispatch();
@@ -37,6 +39,7 @@ export default function Profile() {
     if (file) {
       handleFileUpload(file);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
   const handleFileUpload = (file) => {
