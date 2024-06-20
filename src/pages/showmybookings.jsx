@@ -2,11 +2,11 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-// eslint-disable-next-line no-unused-vars
- function BookingsPage() {
+function BookingsPage() {
   const [userBookings, setUserBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [expandedBookingId, setExpandedBookingId] = useState(null); // State to track expanded booking
   const { currentUser } = useSelector((state) => state.user);
 
   const handleShowBookings = async () => {
@@ -34,53 +34,62 @@ import { useSelector } from 'react-redux';
     }
   };
 
+  const toggleExpandBooking = (bookingId) => {
+    if (expandedBookingId === bookingId) {
+      setExpandedBookingId(null);
+    } else {
+      setExpandedBookingId(bookingId);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4">My Bookings</h2>
-      <button
-        className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        onClick={handleShowBookings}
-        disabled={loading}
-      >
-        {loading ? 'Loading...' : 'Show My Bookings'}
-      </button>
+      <h2 className="text-3xl font-semibold mb-8 text-center">My Bookings</h2>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {userBookings.length > 0 ? (
+          userBookings.map((booking) => (
+            <div key={booking.id} className="border border-gray-200 rounded-lg p-6">
+              <p className="font-semibold">Booking ID: {booking.id}</p>
+              <p>Customer Name: {booking.customerName}</p>
+              <p>Service Name: {booking.serviceName}</p>
+              <p>Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
+              <p>Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
+              <p>Charge: ${`${booking.charge.toFixed(2)}`}</p>
 
-      {error && <p className="text-red-600">{error}</p>}
+              {/* Additional details hidden by default */}
+              {expandedBookingId === booking.id && (
+                <div className="mt-4">
+                  <p className="text-gray-700">Additional details can go here.</p>
+                </div>
+              )}
 
-      {userBookings.length > 0 ? (
-        <div className="mt-4">
-          <table className="w-full border-collapse border border-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border border-gray-300 px-4 py-2">Booking ID</th>
-                <th className="border border-gray-300 px-4 py-2">Customer Name</th>
-                <th className="border border-gray-300 px-4 py-2">Service Name</th>
-                <th className="border border-gray-300 px-4 py-2">Booking Date</th>
-                <th className="border border-gray-300 px-4 py-2">Service Dates</th>
-                <th className="border border-gray-300 px-4 py-2">Charge</th>
-                {/* Add more headers as needed */}
-              </tr>
-            </thead>
-            <tbody>
-              {userBookings.map((booking) => (
-                <tr key={booking.id} className="border-b border-gray-200">
-                  <td className="border border-gray-300 px-4 py-2">{booking.id}</td>
-                  <td className="border border-gray-300 px-4 py-2">{booking.customerName}</td>
-                  <td className="border border-gray-300 px-4 py-2">{booking.serviceName}</td>
-                  <td className="border border-gray-300 px-4 py-2">{new Date(booking.bookingDate).toLocaleDateString()}</td>
-                  <td className="border border-gray-300 px-4 py-2">{`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</td>
-                  <td className="border border-gray-300 px-4 py-2">{`${booking.charge.toFixed(2)}`}</td>
-                  {/* Add more columns based on booking data */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p className="mt-4 text-gray-600">{loading ? 'Loading...' : 'No bookings found.'}</p>
+              {/* Toggle expand button */}
+              <button
+                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm"
+                onClick={() => toggleExpandBooking(booking.id)}
+              >
+                {expandedBookingId === booking.id ? 'Hide Details' : 'View More'}
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-lg text-gray-600 mt-4 mx-auto"> {loading ? 'Loading...' : 'No bookings found.'} </p>
+        )}
+      </div>
+
+      {loading && <p className="mt-8 text-center">Loading...</p>}
+      {error && <p className="mt-8 text-center text-red-600">{error}</p>}
+      
+      {/* Show button to fetch bookings */}
+      {!loading && userBookings.length === 0 && (
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-8 mx-auto block"
+          onClick={handleShowBookings}
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : 'Show My Bookings'}
+        </button>
       )}
-
-      {loading && <p className="mt-4">Loading...</p>}
     </div>
   );
 }

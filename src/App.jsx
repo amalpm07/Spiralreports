@@ -18,7 +18,7 @@ import Booking from './pages/Booking';
 import Payment from './pages/Payment'
 import Showmybookings from './pages/showmybookings'
 import Showmylisting from './pages/showmylisting'
-
+import BookingDetailsPage from './pages/BookingDetailsPage'
 export default function App() {
   return (
     <BrowserRouter>
@@ -34,7 +34,7 @@ export default function App() {
         <Route path='/showmybookings' element={<Showmybookings />} />
         <Route path='/showmylisting' element={<Showmylisting/>} />
         <Route path='/listing/:listingId' element={<Listing />} />
-
+        <Route path="/booking/:id" element={<BookingDetailsPage />} />
         <Route path="/listing/:selectedType/:id" element={<Listing />} />        
         <Route path='/booking' element={<Booking />} />
         <Route path='/profile' element={<Profile />} />

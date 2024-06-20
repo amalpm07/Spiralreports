@@ -32,7 +32,7 @@ export default function CreateListing() {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=${formData.ServiceName}`
+          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${formData.ServiceName}`
         );
         const data = await response.json();
         setQuestions(data);
@@ -109,7 +109,7 @@ export default function CreateListing() {
   const handleChange = (e) => {
     const { id, value } = e.target;
 
-    if (id === 'Provider BoardingQuestions' || id === 'training' || id === 'grooming') {
+    if (id === 'boarding' || id === 'training' || id === 'grooming') {
       setFormData({
         ...formData,
         ServiceName: id,
@@ -148,8 +148,8 @@ export default function CreateListing() {
       const { hostelName, ServiceName, address, description, imageUrls, answers } = formData;
 
       let selectedType = '';
-      if (formData.ServiceName === 'Provider BoardingQuestions') {
-        selectedType = 'Provider BoardingQuestions';
+      if (formData.ServiceName === 'boarding') {
+        selectedType = 'boarding';
       } else if (formData.ServiceName === 'training') {
         selectedType = 'training';
       } else if (formData.ServiceName === 'grooming') {
@@ -261,10 +261,10 @@ export default function CreateListing() {
             <div className='flex items-center gap-2'>
               <input
                 type='checkbox'
-                id='Provider BoardingQuestions'
+                id='boarding'
                 className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
                 onChange={handleChange}
-                checked={formData.ServiceName === 'Provider BoardingQuestions'}
+                checked={formData.ServiceName === 'boarding'}
               />
               <span className='text-gray-700'>Boarding</span>
             </div>

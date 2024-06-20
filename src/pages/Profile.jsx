@@ -34,7 +34,10 @@ export default function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [signOutMessage, setSignOutMessage] = useState('');
   const dispatch = useDispatch();
-
+  // eslint-disable-next-line no-unused-vars
+  const [userListings, setUserListings] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [showListingsError, setShowListingsError] = useState(false);
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
@@ -121,7 +124,36 @@ export default function Profile() {
       console.error('Sign-out error:', error);
     }
   };
-
+   
+  
+    // const handleShowListings = async () => {
+    //   try {
+    //     setShowListingsError(false);
+    //     const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=provider%20boardingquestions&userId=${currentUser.id}`);
+  
+    //     // Check if the response status is OK (status code 200-299)
+    //     if (!res.ok) {
+    //       throw new Error(`HTTP error! status: ${res.status}`);
+    //     }
+    //     const data = await res.json();
+    //     // Check if the response data indicates a failure
+    //     if (!data || !data.serviceHome) {
+    //       setShowListingsError(true);
+    //       return;
+    //     }
+  
+    //     setUserListings([data.serviceHome]); // Wrap it in an array since it seems to be a single object
+    //   } catch (error) {
+    //     console.error("Error fetching user listings:", error);
+    //     setShowListingsError(true);
+    //   }
+    // };
+  
+    // eslint-disable-next-line no-unused-vars
+    const handleListingDelete = async (listingId) => {
+      // Implement delete functionality here
+      // After successful deletion, update userListings state
+    };
   return (
     <main className="flex flex-col md:flex-row gap-8 p-8 mx-auto max-w-4xl">
       <div className="md:w-1/3 flex flex-col items-center border-r-2 border-gray-200 pr-4">
