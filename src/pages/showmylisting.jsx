@@ -10,7 +10,7 @@ function UserListings() {
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=provider%20boardingquestions&userId=${currentUser.id}`);
+      const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=training&userId=${currentUser.id}`);
 
       // Check if the response status is OK (status code 200-299)
       if (!res.ok) {

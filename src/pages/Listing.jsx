@@ -47,24 +47,6 @@ const Listing = () => {
 
   const renderListingDetails = () => (
     <>
-      <div
-        className='image-banner'
-        style={{
-          backgroundImage: `url(${listing?.serviceHome.photo1})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          height: '300px', // Adjust height as per your design
-        }}
-      />
-      <div className='fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
-        <FaShare className='text-slate-500' onClick={handleShareClick} />
-      </div>
-      {copied && (
-        <p className='fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2'>
-          Link copied!
-        </p>
-      )}
-
       <div className='flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4'>
         <p className='text-2xl font-semibold'>
           {listing?.serviceHome.hostelName}
@@ -77,7 +59,25 @@ const Listing = () => {
           <span className='font-semibold text-black'>Description - </span>
           {listing?.serviceHome.description}
         </p>
-        
+
+        {/* Image Gallery */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+          {Object.keys(listing?.serviceHome)
+            .filter(key => key.startsWith('photo') && listing.serviceHome[key])
+            .map((key, index) => (
+              <div
+                key={index}
+                className="relative overflow-hidden rounded-lg"
+                style={{
+                  paddingTop: '100%', // Maintain aspect ratio 1:1
+                  backgroundImage: `url(${listing?.serviceHome[key]})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+            ))}
+        </div>
+
         {/* Display answers */}
         <div className="mt-6">
           <ul className="mt-3">
@@ -114,6 +114,16 @@ const Listing = () => {
           Book Now
         </button>
       </div>
+
+      {/* Share Link and Copy Notification */}
+      <div className='fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
+        <FaShare className='text-slate-500' onClick={handleShareClick} />
+      </div>
+      {copied && (
+        <p className='fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2'>
+          Link copied!
+        </p>
+      )}
     </>
   );
 
