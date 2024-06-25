@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import CategoryMetaNav from '../components/CategoryNav'; // Fixed import name
+import CategoryMetaNav from '../components/CategoryNav';
+// Import necessary icon libraries
+import { FaGoogle, FaFacebook, FaCheckCircle } from 'react-icons/fa';
 
 const Home = () => {
   const [serviceHomes, setServiceHomes] = useState([]);
@@ -9,10 +11,13 @@ const Home = () => {
     const fetchServiceHomes = async () => {
       try {
         const res = await fetch('https://hibow.in/api/Provider/GetAllServiceHomes');
+        if (!res.ok) {
+          throw new Error('Failed to fetch service homes');
+        }
         const data = await res.json();
         setServiceHomes(data);
       } catch (error) {
-        console.log('Error fetching service homes:', error);
+        console.error('Error fetching service homes:', error);
       }
     };
 
@@ -22,10 +27,10 @@ const Home = () => {
   return (
     <div>
       {/* Banner Section */}
-      <div className="relative bg-gray-800">
+      <section className="relative bg-gray-800">
         <img
           className="w-full h-64 object-cover"
-          src="/path/to/your/banner.jpg"  // Replace with your actual path
+          src="/path/to/your/banner.jpg" // Replace with your actual path
           alt="Banner"
         />
         <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
@@ -41,7 +46,7 @@ const Home = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Main Content */}
       <CategoryMetaNav />
@@ -67,6 +72,23 @@ const Home = () => {
                   {home.hostelName}
                 </p>
                 <p className="mt-1 text-sm text-gray-600">{home.address}</p>
+                {/* Verification Status */}
+                <div className="mt-2 flex items-center space-x-2">
+                  {/* Google Verification */}
+                  <div className="flex items-center space-x-1">
+                    <FaGoogle className={home.isGoogleVerified ? "text-gray-800" : "text-gray-300"} />
+                    {home.isGoogleVerified ? (
+                      <FaCheckCircle className="text-green-500" />
+                    ) : null}
+                  </div>
+                  {/* Facebook Verification */}
+                  <div className="flex items-center space-x-1">
+                    <FaFacebook className={home.isFacebookVerified ? "text-gray-800" : "text-gray-300"} />
+                    {home.isFacebookVerified ? (
+                      <FaCheckCircle className="text-green-500" />
+                    ) : null}
+                  </div>
+                </div>
               </div>
             </Link>
           ))}

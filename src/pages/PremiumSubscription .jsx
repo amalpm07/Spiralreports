@@ -44,7 +44,7 @@ const PremiumSubscription = () => {
   const [showInvoice, setShowInvoice] = useState(false);
   const [paymentError, setPaymentError] = useState('');
   const { currentUser } = useSelector((state) => state.user);
-console.log(currentUser)
+
   const bookingDetails = {
     CustomerId: currentUser.id,
     customerName: currentUser.userName,
@@ -76,16 +76,13 @@ console.log(currentUser)
     if (validateEmail(email) && validateMobile(mobile)) {
       try {
         const orderResponse = await axios.post(
-          `https://hibow.in/api/Order/Initiate Order?providerId=${currentUser.id}`,
+          `https://hibow.in/api/Order/Initiate Order?userId=${currentUser.id}`,
           {
             customername: bookingDetails.customerName,
             email,
             mobile,
             totalAmount: bookingDetails.charge,
-            currency: 'INR',
-            key: 'YOUR_RAZER_PAY_KEY',
-            transactionId: 'YOUR_TRANSACTION_ID',
-            orderId: 'YOUR_ORDER_ID',
+            
           }
         );
 
@@ -93,7 +90,7 @@ console.log(currentUser)
 
         const options = {
           key,
-          amount: bookingDetails.charge * 100,
+          amount: orderResponse.totalAmount,
           currency: 'INR',
           order_id: orderId,
           name: 'Your Company Name',
@@ -102,11 +99,11 @@ console.log(currentUser)
           handler: async (response) => {
             try {
               const verifyResponse = await axios.post(
-                'YOUR_SERVER_ENDPOINT_TO_VERIFY_PAYMENT',
+                'https://localhost:44359/Order/PaymentVerification',
                 {
-                  paymentId: response.razorpay_payment_id,
-                  orderId: response.razorpay_order_id,
-                  signature: response.razorpay_signature,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
                 }
               );
 
@@ -160,7 +157,7 @@ console.log(currentUser)
             >
               <CardContentCentered>
                 <Typography variant="h5" color="secondary">{plan} Plan</Typography>
-                <Typography variant="h6">{`$${plan === 'Basic' ? 1 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
+                <Typography variant="h6">{`$${plan === 'Basic' ? 10 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
               </CardContentCentered>
               <CardActionsCentered>
                 <Button

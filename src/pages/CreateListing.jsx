@@ -135,18 +135,18 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       if (formData.imageUrls.length < 1) {
         throw new Error('You must upload at least one image');
       }
-
+  
       setLoading(true);
       setError(null);
-
+  
       // eslint-disable-next-line no-unused-vars
       const { hostelName, ServiceName, address, description, imageUrls, answers } = formData;
-
+  
       let selectedType = '';
       if (formData.ServiceName === 'boarding') {
         selectedType = 'boarding';
@@ -155,16 +155,16 @@ export default function CreateListing() {
       } else if (formData.ServiceName === 'grooming') {
         selectedType = 'grooming';
       }
-
+  
       const photos = imageUrls.reduce((acc, url, index) => {
         acc[`photo${index + 1}`] = url;
         return acc;
       }, {});
-
+  
       for (let i = imageUrls.length; i < 6; i++) {
         photos[`photo${i + 1}`] = '';
       }
-
+  
       const serviceHomePayload = {
         id: 0,
         userId: currentUser.id,
@@ -174,14 +174,14 @@ export default function CreateListing() {
         description,
         ...photos,
       };
-
+  
       const answersPayload = Object.keys(answers).map((questionId) => ({
         id: 0,
         question_id: questionId,
         customer_id: currentUser.id,
         ans: String(answers[questionId]),
       }));
-
+  
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
         fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
@@ -198,28 +198,29 @@ export default function CreateListing() {
           body: JSON.stringify(answersPayload),
         }),
       ]);
-
+  
       const serviceHomeData = await serviceHomeRes.json();
+      // eslint-disable-next-line no-unused-vars
       const addAnswersData = await addAnswersRes.json();
-
-      if (!serviceHomeRes.ok || !serviceHomeData.success) {
-        throw new Error(
-          serviceHomeData.message || 'Failed to add service home details'
-        );
+  
+      setLoading(false);
+  
+      if (serviceHomeData.success === false) {
+        setError(serviceHomeData.message);
+        window.alert(`Error: ${serviceHomeData.message}`);
+      } else {
+        // Success case: Show success message and then navigate
+        window.alert('Listing created successfully!');
+        navigate(`/listing/${formData.ServiceName}/${serviceHomeData._id}`);
       }
-
-      if (!addAnswersRes.ok || !addAnswersData.success) {
-        throw new Error(addAnswersData.message || 'Failed to add answers');
-      }
-
-      navigate(`/`);
-
+  
     } catch (error) {
       setError(error.message);
-    } finally {
       setLoading(false);
+      window.alert(`Error: ${error.message}`);
     }
   };
+  
 
   return (
     <main className='p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg'>
@@ -230,7 +231,7 @@ export default function CreateListing() {
         <div className='flex flex-col gap-4'>
           <input
             type='text'
-            placeholder='hostalName'
+            placeholder='Hostel Name'
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
             id='hostelName'
             maxLength='62'

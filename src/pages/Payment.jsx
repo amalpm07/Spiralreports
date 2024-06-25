@@ -87,16 +87,12 @@ const PaymentPage = () => {
       try {
         // Step 1: Create an order on your server
         const orderResponse = await axios.post(
-          `https://hibow.in/api/Order/Initiate Order?providerId=${bookingDetails.providerId}`,
+          `https://hibow.in/api/Order/Initiate Order?userId=${bookingDetails.providerId}`,
           {
             customername: bookingDetails.customerName,
             email,
             mobile,
             totalAmount: bookingDetails.charge,
-            currency: 'INR', // Replace with actual currency if applicable
-            key: 'YOUR_RAZER_PAY_KEY', // Replace with actual key
-            transactionId: 'YOUR_TRANSACTION_ID', // Replace with actual transaction ID
-            orderId: 'YOUR_ORDER_ID', // Replace with actual order ID
           }
         );
 
@@ -105,7 +101,7 @@ const PaymentPage = () => {
         // Step 2: Configure Razer Pay options
         const options = {
           key, // Use the extracted key from orderResponse
-          amount: bookingDetails.charge * 100, // Amount in smallest currency unit (INR here)
+          amount: orderResponse.totalAmount, // Amount in smallest currency unit (INR here)
           currency: 'INR', // Your currency
           order_id: orderId, // Order ID from your server
           name: 'Your Company Name',
@@ -133,7 +129,7 @@ const PaymentPage = () => {
                 const paymentInfo = {
                   orderId: response.razorpay_order_id,
                   paymentId: response.razorpay_payment_id,
-                  amount: bookingDetails.charge,
+                  amount: orderResponse.totalAmount,
                   // Include other relevant information as needed
                 };
 
