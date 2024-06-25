@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios'; // Import axios for HTTP requests
@@ -48,6 +48,7 @@ const PaymentPage = () => {
   const [emailError, setEmailError] = useState('');
   const [mobileError, setMobileError] = useState('');
   const [paymentError, setPaymentError] = useState('');
+  const [showInvoice, setShowInvoice] = useState(false);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,9 +99,9 @@ const PaymentPage = () => {
             orderId: 'YOUR_ORDER_ID', // Replace with actual order ID
           }
         );
-  
+
         const { orderId, key } = orderResponse.data;
-  
+
         // Step 2: Configure Razer Pay options
         const options = {
           key, // Use the extracted key from orderResponse
@@ -121,11 +122,27 @@ const PaymentPage = () => {
                   signature: response.razorpay_signature,
                 }
               );
-  
+
               if (verifyResponse.data.success) {
                 // Handle successful payment
                 console.log('Payment successful:', verifyResponse.data);
-                // Redirect to success page or show success message
+                // Show invoice after successful payment
+                setShowInvoice(true);
+
+                // Step 4: Update database with payment information
+                const paymentInfo = {
+                  orderId: response.razorpay_order_id,
+                  paymentId: response.razorpay_payment_id,
+                  amount: bookingDetails.charge,
+                  // Include other relevant information as needed
+                };
+
+                const updateDatabaseResponse = await axios.post(
+                  'YOUR_SERVER_ENDPOINT_TO_UPDATE_DATABASE',
+                  paymentInfo
+                );
+
+                console.log('Database update response:', updateDatabaseResponse.data);
               } else {
                 throw new Error('Payment verification failed');
               }
@@ -143,8 +160,8 @@ const PaymentPage = () => {
             color: '#3399cc',
           },
         };
-  
-        // Step 4: Open the Razer Pay payment window
+
+        // Step 5: Open the Razer Pay payment window
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       } catch (error) {
@@ -168,7 +185,6 @@ const PaymentPage = () => {
       }
     }
   };
-  
 
   return (
     <PaymentPageWrapper>
@@ -224,6 +240,18 @@ const PaymentPage = () => {
             <Input type="submit" value="Proceed to Payment" />
           </FormGroup>
         </PaymentForm>
+      )}
+      {showInvoice && (
+        <div>
+          <h3>Invoice</h3>
+          <p><strong>Customer Name:</strong> {bookingDetails.customerName}</p>
+          <p><strong>Service Name:</strong> {bookingDetails.serviceName}</p>
+          <p><strong>Booking Date:</strong> {formatDate(bookingDetails.bookingDate)}</p>
+          <p><strong>Service From Date:</strong> {formatDate(bookingDetails.serviceFromDate)}</p>
+          <p><strong>Service To Date:</strong> {formatDate(bookingDetails.serviceToDate)}</p>
+          <p><strong>Charge:</strong> {bookingDetails.charge}</p>
+          {/* Add more details as needed */}
+        </div>
       )}
     </PaymentPageWrapper>
   );

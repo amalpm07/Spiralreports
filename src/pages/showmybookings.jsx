@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom'; // Import Link for navigation
@@ -17,7 +18,7 @@ function BookingsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByProvider?providerId=${currentUser.id}`);
+      const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByUserTypeAndId?userType=${currentUser.usertype}&userId=${currentUser.id}`);
 
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);

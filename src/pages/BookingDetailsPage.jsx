@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 function BookingDetailsPage() {
   const { id } = useParams();
@@ -8,6 +10,7 @@ function BookingDetailsPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const { currentUser } = useSelector((state) => state.user);
+  const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
 
   useEffect(() => {
     // Fetch booking details using the id from useParams()
@@ -19,6 +22,8 @@ function BookingDetailsPage() {
         }
         const data = await res.json();
         setBookingDetails(data);
+        // Update the isBookingConfirmed state based on the fetched data
+        setIsBookingConfirmed(data.isConfirmed);
       } catch (error) {
         console.error('An error occurred while fetching booking details:', error);
       }
@@ -53,6 +58,7 @@ function BookingDetailsPage() {
       }
       setPopupMessage("Booking successfully confirmed.");
       setShowPopup(true);
+      setIsBookingConfirmed(true);
     } catch (error) {
       setPopupMessage(`An error occurred: ${error.message}`);
       setShowPopup(true);
@@ -82,18 +88,27 @@ function BookingDetailsPage() {
           <p><strong>Charge:</strong> {bookingDetails.charge}</p>
         </div>
         <div className="flex justify-end space-x-4 mt-4">
-          <button
-            className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300"
-            onClick={handleCancelBooking}
-          >
-            Cancel
-          </button>
-          <button
-            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 transition duration-300"
-            onClick={handleConfirmBooking}
-          >
-            Confirm
-          </button>
+          {!isBookingConfirmed ? (
+            <>
+              <button
+                className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300"
+                onClick={handleCancelBooking}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 transition duration-300"
+                onClick={handleConfirmBooking}
+              >
+                Confirm
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 text-2xl" />
+              <p className="text-green-500 text-xl font-semibold">Confirmed</p>
+            </div>
+          )}
         </div>
       </div>
 

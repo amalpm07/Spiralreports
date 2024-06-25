@@ -10,7 +10,6 @@ const Home = () => {
       try {
         const res = await fetch('https://hibow.in/api/Provider/GetAllServiceHomes');
         const data = await res.json();
-        console.log('Service Homes Data:', data);
         setServiceHomes(data);
       } catch (error) {
         console.log('Error fetching service homes:', error);
@@ -30,10 +29,16 @@ const Home = () => {
           alt="Banner"
         />
         <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-white">Welcome to Service Homes</h1>
-            <p className="mt-4 text-lg text-gray-300">Find your ideal service home here</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white">
+          <div>
+            <h1 className="text-4xl font-bold">Welcome to Service Homes</h1>
+            <p className="mt-4 text-lg">Find your ideal service home here</p>
+            <Link
+              to="/premium-subscription"
+              className="mt-6 bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md transition duration-300"
+            >
+              Explore Premium
+            </Link>
           </div>
         </div>
       </div>
@@ -41,21 +46,27 @@ const Home = () => {
       {/* Main Content */}
       <CategoryMetaNav />
 
-      <div className="max-w-6xl mx-auto p-4">
-        <h2 className="text-3xl font-bold text-slate-700 my-6">Service Homes</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Service Homes</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {serviceHomes.map((home) => (
             <Link
               key={home.id}
               to={`/listing/${home.serviceName}/${home.userId}`}
-              className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="group block rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
-              <img className="w-full h-48 object-cover" src={home.photo1} alt={home.serviceName} />
+              <div className="relative aspect-w-16 aspect-h-9">
+                <img
+                  className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                  src={home.photo1}
+                  alt={home.serviceName}
+                />
+              </div>
               <div className="p-4">
-                <p className="text-gray-700 text-base mb-4">
+                <p className="text-gray-900 font-semibold group-hover:text-blue-600">
                   {home.hostelName}
                 </p>
-                <p className="text-gray-600 text-sm">{home.address}</p>
+                <p className="mt-1 text-sm text-gray-600">{home.address}</p>
               </div>
             </Link>
           ))}

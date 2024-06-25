@@ -1,53 +1,57 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import PrivateRoute from './components/PrivateRoute';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import About from './pages/About';
 import Profile from './pages/Profile';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import PrivateRoute from './components/PrivateRoute';
 import CreateListing from './pages/CreateListing';
 import UpdateListing from './pages/UpdateListing';
 import Listing from './pages/Listing';
 import Search from './pages/Search';
-import 'react-datepicker/dist/react-datepicker.css';
-// index.js or App.js
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Booking from './pages/Booking';
-import Payment from './pages/Payment'
-import Showmybookings from './pages/showmybookings'
-import Showmylisting from './pages/showmylisting'
-import BookingDetailsPage from './pages/BookingDetailsPage'
-export default function App() {
+import Payment from './pages/Payment';
+import ShowMyBookings from './pages/ShowMyBookings';
+import ShowMyListing from './pages/ShowMyListing';
+import BookingDetailsPage from './pages/BookingDetailsPage';
+import PremiumSubscription from './pages/PremiumSubscription '; // Corrected import path
+
+const theme = createTheme();
+
+function App() {
   return (
-    <BrowserRouter>
-      <Header />
-      
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/sign-in' element={<SignIn />} />
-        <Route path='/sign-up' element={<SignUp />} />
-        <Route path='/payment' element={<Payment />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/search' element={<Search />} />
-        <Route path='/showmybookings' element={<Showmybookings />} />
-        <Route path='/showmylisting' element={<Showmylisting/>} />
-        <Route path='/listing/:listingId' element={<Listing />} />
-        <Route path="/booking/:id" element={<BookingDetailsPage />} />
-        <Route path="/listing/:selectedType/:id" element={<Listing />} />        
-        <Route path='/booking' element={<Booking />} />
-        <Route path='/profile' element={<Profile />} />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/sign-in' element={<SignIn />} />
+          <Route path='/sign-up' element={<SignUp />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/profile' element={<Profile />} />
           <Route path='/create-listing' element={<CreateListing />} />
-          <Route
-            path='/update-listing/:listingId'
-            element={<UpdateListing />}
-          />
-        <Route element={<PrivateRoute />}>
-      
-        </Route>
-      </Routes>
-      <Footer/>
-    </BrowserRouter>
+          <Route path='/update-listing/:listingId' element={<UpdateListing />} />
+          <Route path='/listing/:listingId' element={<Listing />} />
+          <Route path='/listing/:selectedType/:id' element={<Listing />} />
+          <Route path='/search' element={<Search />} />
+          <Route path='/booking' element={<Booking />} />
+          <Route path='/payment' element={<Payment />} />
+          <Route path='/showmybookings' element={<ShowMyBookings />} />
+          <Route path='/showmylisting' element={<ShowMyListing />} />
+          <Route path='/booking/:id' element={<BookingDetailsPage />} />
+          <Route path='/premium-subscription' element={<PremiumSubscription />} />
+          <Route element={<PrivateRoute />} /> {/* Protected routes */}
+        </Routes>
+        <Footer />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
+
+export default App;

@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { FiCalendar } from 'react-icons/fi';
-import styled, { createGlobalStyle } from 'styled-components';
-import { useNavigate, useLocation } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
-import { useSpring, animated } from 'react-spring';
+// Import necessary modules from React and other libraries
+import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';  // Import date picker component
+import 'react-datepicker/dist/react-datepicker.css';  // Import date picker styles
+import { FiCalendar } from 'react-icons/fi';  // Import calendar icon from react-icons
+import styled, { createGlobalStyle } from 'styled-components';  // Import styled-components for styling
+import { useNavigate, useLocation } from 'react-router-dom';  // Import hooks from react-router-dom
+import PropTypes from 'prop-types';  // Import PropTypes for prop validation
+import { useSelector } from 'react-redux';  // Import useSelector hook from react-redux
+import { useSpring, animated } from 'react-spring';  // Import animation hooks from react-spring
 
-// Global styles for consistent styling
+// Global styles for consistent styling across the application
 const GlobalStyle = createGlobalStyle`
   body {
     font-family: 'Roboto', sans-serif;
@@ -18,7 +19,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-// Styled Components
+// Styled components for custom styled elements
 const BookingFormWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -205,17 +206,19 @@ const CloseButton = styled(Button)`
 
 // Main BookingForm Component
 const BookingForm = () => {
+  // State variables using useState hook
   const [checkInDate, setCheckInDate] = useState(new Date());
   const [checkOutDate, setCheckOutDate] = useState(new Date(new Date().setDate(new Date().getDate() + 1)));
   const [showSuccess, setShowSuccess] = useState(false);
-  const [questions, setQuestions] = useState([]);
-  const [answers, setAnswers] = useState({});
-  const [dateError, setDateError] = useState('');
-  const location = useLocation();
-  const navigate = useNavigate();
-  const listing = location.state?.listing;
-  const currentUser = useSelector((state) => state.user.currentUser);
+  const [questions, setQuestions] = useState([]);  // State for questions fetched from API
+  const [answers, setAnswers] = useState({});  // State for storing answers to questions
+  const [dateError, setDateError] = useState('');  // State for handling date validation error
+  const location = useLocation();  // Hook to access current location
+  const navigate = useNavigate();  // Hook for navigation using react-router-dom
+  const listing = location.state?.listing;  // Extracting listing from location state
+  const currentUser = useSelector((state) => state.user.currentUser);  // Selecting current user from Redux store
 
+  // useEffect hook to fetch questions from API on component mount
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -224,24 +227,28 @@ const BookingForm = () => {
           throw new Error('Failed to fetch questions');
         }
         const data = await response.json();
-        setQuestions(data);
+        setQuestions(data);  // Update questions state with fetched data
       } catch (error) {
         console.error('Error fetching questions:', error);
       }
     };
 
-    fetchQuestions();
-  }, []);
+    fetchQuestions();  // Call fetchQuestions function on component mount
+  }, []);  // Empty dependency array ensures useEffect runs only once on mount
 
+  // Function to handle proceed button click event
   const handleProceedClick = async () => {
     try {
+      // Validate check-out date is after check-in date
       if (checkOutDate <= checkInDate) {
         setDateError('Check-out date must be after check-in date');
         return;
       }
-  
-      const currentDate = new Date();
+
+      const currentDate = new Date();  // Get current date and time
+      // Construct booking data object
       const bookingData = {
+        customer_id: currentUser.id,
         customerName: currentUser?.userName || "Guest",
         providerId: listing?.serviceHome?.userId,
         serviceName: listing?.serviceHome?.serviceName,
@@ -255,61 +262,72 @@ const BookingForm = () => {
         isActive: true,
         cancelledBy: "",
         answers: Object.keys(answers).map((questionId) => ({
-          id: 0, // Assuming this needs to be set to 0 for new answers
-          question_id: parseInt(questionId), // Ensure question_id is an integer
+          id: 0,
+          question_id: parseInt(questionId),
           customer_id: currentUser.id,
           ans: String(answers[questionId]),
         }))
       };
-  
-      const [bookingRes, answersRes] = await Promise.all([
-        fetch('https://hibow.in/api/Booking/BookAService', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(bookingData)
-        }),
-        fetch('https://hibow.in/api/User/AddAnswers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(
-            Object.keys(answers).map((questionId) => ({
-              id: 0, // Assuming this needs to be set to 0 for new answers
-              question_id: parseInt(questionId), // Ensure question_id is an integer
-              customer_id: currentUser.id,
-              ans: String(answers[questionId]),
-            }))
-          )
-        })
-      ]);
-  
-      if (!bookingRes.ok || !answersRes.ok) {
-        throw new Error('Failed to book service or add answers');
+
+      console.log('Booking data:', bookingData);  // Log booking data to console
+
+      // Send POST request to book service
+      const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingData)
+      });
+
+      if (!bookingRes.ok) {
+        const bookingError = await bookingRes.text();  // Parse error response
+        throw new Error(`Failed to book service: ${bookingError.message}`);
       }
-  
-      const bookingResult = await bookingRes.json();
-      const answersResult = await answersRes.text();
-  
-      console.log('Booking response:', bookingResult);
-      console.log('Answers response:', answersResult);
-  
-      // Check if the responses contain the expected properties or success indicators
-      if (bookingResult && bookingResult.id && answersResult.includes('Successfully added')) {
-        // Redirect to payment page
+
+      const bookingResult = await bookingRes.json();  // Parse booking response
+      console.log('Booking response:', bookingResult);  // Log booking response
+
+      // Create array of answers data from answers state object
+      const answersData = Object.keys(answers).map((questionId) => ({
+        id: 0,
+        question_id: parseInt(questionId),
+        customer_id: currentUser.id,
+        ans: String(answers[questionId]),
+      }));
+
+      console.log('Answers data:', answersData);  // Log answers data
+
+      // Send POST request to add answers
+      const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(answersData)
+      });
+
+      if (!answersRes.ok) {
+        const answersError = await answersRes.text();  // Parse error response
+        throw new Error(`Failed to add answers: ${answersError}`);
+      }
+
+      const answersResult = await answersRes.text();  // Parse answers response
+      console.log('Answers response:', answersResult);  // Log answers response
+
+      // Navigate to payment page if booking and adding answers successful
+      if (bookingResult.id && answersResult.includes('Successfully added')) {
         navigate('/payment', { state: { bookingResponse: bookingResult } });
       } else {
         throw new Error('Booking or adding answers failed');
       }
     } catch (error) {
-      console.error('Error during booking:', error);
-      // Handle error state or feedback to the user
+      console.error('Error during booking:', error.message);  // Log error message to console
+      alert(`Error: ${error.message}`);  // Show alert with error message to user
     }
   };
-  
-  
+
+  // Function to handle answer change for text input questions
   const handleAnswerChange = (questionId, answer) => {
     setAnswers(prevAnswers => ({
       ...prevAnswers,
@@ -317,6 +335,7 @@ const BookingForm = () => {
     }));
   };
 
+  // Function to handle checkbox change for checkbox questions
   const handleCheckboxChange = (questionId, option) => {
     setAnswers(prevAnswers => {
       const questionAnswers = prevAnswers[questionId] || {};
@@ -330,9 +349,21 @@ const BookingForm = () => {
     });
   };
 
+  // useEffect hook to modify answer for the 4th question when questions array changes
+  useEffect(() => {
+    const fourthQuestion = questions[3];  // Assuming questions[3] is the 4th question
+    if (fourthQuestion) {
+      const fourthQuestionId = fourthQuestion.id;  // Get question ID of the 4th question
+      const newAnswer = "Modified answer for the 4th question";  // New answer for the 4th question
+      handleAnswerChange(fourthQuestionId, newAnswer);  // Call handleAnswerChange function with new answer
+    }
+  }, [questions]);  // useEffect runs when questions array changes
+
+  // Return JSX for BookingForm component
   return (
     <BookingFormWrapper>
-      <GlobalStyle />
+      <GlobalStyle />  {/* Apply global styles */}
+      {/* JSX for Check-In date picker */}
       <FormElement label="Check - In" icon={FiCalendar}>
         <DatepickerWrapper
           selected={checkInDate}
@@ -345,10 +376,11 @@ const BookingForm = () => {
           }}
           dateFormat="MM/dd/yyyy"
           className="form-control"
-          customInput={<Input type="text" readOnly />}
+          customInput={<Input type="text" readOnly />}  // Custom input component for date picker
         />
       </FormElement>
 
+      {/* JSX for Check-Out date picker */}
       <FormElement label="Check - Out" icon={FiCalendar}>
         <DatepickerWrapper
           selected={checkOutDate}
@@ -362,14 +394,18 @@ const BookingForm = () => {
           }}
           dateFormat="MM/dd/yyyy"
           className="form-control"
-          customInput={<Input type="text" readOnly />}
+          customInput={<Input type="text" readOnly />}  // Custom input component for date picker
         />
+        {/* Display error message if dateError state is not empty */}
         {dateError && <p style={{ color: 'red' }}>{dateError}</p>}
       </FormElement>
 
+      {/* Mapping over questions array to render form elements */}
       {questions && questions.map((question, index) => (
-        <FormElement key={question.id} label={question.questions}>
-          {index === 0 || index === 3 ? (
+        <React.Fragment key={question.id}>
+          <FormElement label={question.questions} />
+          {/* Render checkbox group for index 0 and 3 */}
+          {index === 0 ? (
             <CheckboxGroup>
               <label>
                 <input
@@ -377,7 +413,7 @@ const BookingForm = () => {
                   checked={!!answers[question.id]?.['Option 1']}
                   onChange={() => handleCheckboxChange(question.id, 'Option 1')}
                 />
-                Option 1
+                DOG
               </label>
               <label>
                 <input
@@ -385,7 +421,7 @@ const BookingForm = () => {
                   checked={!!answers[question.id]?.['Option 2']}
                   onChange={() => handleCheckboxChange(question.id, 'Option 2')}
                 />
-                Option 2
+                CAT
               </label>
               <label>
                 <input
@@ -393,7 +429,34 @@ const BookingForm = () => {
                   checked={!!answers[question.id]?.['Option 3']}
                   onChange={() => handleCheckboxChange(question.id, 'Option 3')}
                 />
-                Option 3
+                BIRD
+              </label>
+            </CheckboxGroup>
+          ) : index === 3 ? (
+            <CheckboxGroup>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={!!answers[question.id]?.['Small']}
+                  onChange={() => handleCheckboxChange(question.id, 'Small')}
+                />
+                Small
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={!!answers[question.id]?.['Medium']}
+                  onChange={() => handleCheckboxChange(question.id, 'Medium')}
+                />
+                Medium
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={!!answers[question.id]?.['Large']}
+                  onChange={() => handleCheckboxChange(question.id, 'Large')}
+                />
+                Large
               </label>
             </CheckboxGroup>
           ) : (
@@ -403,48 +466,56 @@ const BookingForm = () => {
               onChange={e => handleAnswerChange(question.id, e.target.value)}
             />
           )}
-        </FormElement>
+        </React.Fragment>
       ))}
 
+      {/* JSX for Proceed button */}
       <FormElement>
         <Button onClick={handleProceedClick}>Proceed</Button>
       </FormElement>
 
+      {/* Display SuccessPopup component if showSuccess state is true */}
       {showSuccess && <SuccessPopup onClose={() => setShowSuccess(false)} />}
     </BookingFormWrapper>
   );
 };
 
+// Functional component for form elements with label, icon, and children props
 const FormElement = ({ label, icon: IconComponent, children }) => (
   <FormGroup>
+    {/* Render label and optional icon */}
     {label && (
       <Span>
         {IconComponent && <IconComponent style={{ marginRight: 5 }} />}
         {label}
       </Span>
     )}
-    {children}
+    {children}  {/* Render children components */}
   </FormGroup>
 );
 
+// PropTypes validation for FormElement component props
 FormElement.propTypes = {
-  label: PropTypes.string,
-  icon: PropTypes.elementType,
-  children: PropTypes.node.isRequired,
+  label: PropTypes.string,  // label prop should be a string
+  icon: PropTypes.elementType,  // icon prop should be a valid React component
+  children: PropTypes.node,  // children prop should be a valid React node
 };
 
+// SuccessPopup component for displaying success message with animation
 const SuccessPopup = ({ onClose }) => {
   const animation = useSpring({
     opacity: 1,
     transform: 'translateY(0)',
-    from: { opacity: 0, transform: 'translateY(-50px)' },
+    from: { opacity: 0, transform: 'translateY(-50px)' },  // Animation from 50px above final position
   });
 
   return (
     <Popup>
       <animated.div style={animation}>
+        {/* JSX for success message popup */}
         <PopupContent>
           <p>Booking Successful!</p>
+          {/* Button to close popup */}
           <CloseButton onClick={onClose}>Close</CloseButton>
         </PopupContent>
       </animated.div>
@@ -452,8 +523,9 @@ const SuccessPopup = ({ onClose }) => {
   );
 };
 
+// PropTypes validation for SuccessPopup component props
 SuccessPopup.propTypes = {
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,  // onClose prop is required and should be a function
 };
 
-export default BookingForm;
+export default BookingForm;  // Export BookingForm component as default
