@@ -211,7 +211,7 @@ export default function CreateListing() {
       } else {
         // Success case: Show success message and then navigate
         window.alert('Listing created successfully!');
-        navigate(`/listing/${formData.ServiceName}/${serviceHomeData._id}`);
+        navigate(`/listing/${formData.ServiceName}/${serviceHomeData.id}`);
       }
   
     } catch (error) {
@@ -235,7 +235,7 @@ export default function CreateListing() {
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
             id='hostelName'
             maxLength='62'
-            minLength='10'
+            minLength='5'
             required
             onChange={handleChange}
             value={formData.hostelName}

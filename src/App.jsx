@@ -20,7 +20,7 @@ import ShowMyBookings from './pages/ShowMyBookings';
 import ShowMyListing from './pages/ShowMyListing';
 import BookingDetailsPage from './pages/BookingDetailsPage';
 import PremiumSubscription from './pages/PremiumSubscription '; // Corrected import path
-
+import BookingModule from './pages/BookingModule';
 const theme = createTheme();
 
 function App() {
@@ -40,6 +40,7 @@ function App() {
           <Route path='/listing/:listingId' element={<Listing />} />
           <Route path='/listing/:selectedType/:id' element={<Listing />} />
           <Route path='/search' element={<Search />} />
+          <Route path='/BookingModule' element={<BookingModule />} />
           <Route path='/booking' element={<Booking />} />
           <Route path='/payment' element={<Payment />} />
           <Route path='/showmybookings' element={<ShowMyBookings />} />

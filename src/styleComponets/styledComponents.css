@@ -170,4 +170,77 @@
   filter: none;
   opacity: 1;
 }
+/* BookingModule.css */
+.modalbook-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+}
+
+@media only screen and (max-width: 600px) {
+  .modalbook-content {
+    width: 80%;
+  }
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.bordered-box {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin: 10px;
+}
+
+.btn-primary-fill {
+  background-color: #644b8e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn-primary-fill:hover {
+  background-color: #543b7e;
+}
+
+.btn-large {
+  font-size: 1.2em;
+}
+.book-now-button {
+  position: sticky;
+  bottom: 4rem;
+  right: 4rem;
+  z-index: 10; /* Ensure it's above other content */
+}
+
 

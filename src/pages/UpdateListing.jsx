@@ -7,12 +7,13 @@ import {
 } from 'firebase/storage';
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-export default function CreateListing() {
+export default function UpdateListing() {
   const { currentUser } = useSelector((state) => state.user);
-  const [files, setFiles] = useState([]);
+  const { listingId } = useParams();
   const navigate = useNavigate();
+  const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
     hostelName: '',
@@ -27,36 +28,61 @@ export default function CreateListing() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch(
-          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=${formData.ServiceName}`
-        );
-        const data = await response.json();
-        setQuestions(data);
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
-    };
 
-    if (formData.ServiceName) {
-      fetchQuestions();
-    }
-  }, [formData.ServiceName]);
   useEffect(() => {
     const fetchListing = async () => {
-      const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`);
-      const data = await res.json();
-      if (data.success === false) {
-        console.log(data.message);
-        return;
+      try {
+        const res = await fetch(`https://hibow.in/api/Provider/GetListingById?id=${listingId}`);
+        const data = await res.json();
+        
+        if (data.success === false) {
+          console.log(data.message);
+          return;
+        }
+
+        const {
+          hostelName,
+          description,
+          address,
+          ServiceName,
+          photo1,
+          photo2,
+          photo3,
+          photo4,
+          photo5,
+          photo6,
+        } = data.serviceHome;
+
+        setFormData({
+          hostelName,
+          description,
+          address,
+          ServiceName,
+          imageUrls: [photo1, photo2, photo3, photo4, photo5, photo6].filter(Boolean),
+          answers: {}, // Assuming you fetch answers separately if needed
+        });
+
+        // Fetch questions based on ServiceName
+        await fetchQuestions(ServiceName);
+      } catch (error) {
+        console.error('Error fetching listing:', error);
       }
-      setFormData(data);
     };
 
     fetchListing();
-  }, []);
+  }, [listingId]);
+
+  const fetchQuestions = async (serviceName) => {
+    try {
+      const response = await fetch(
+        `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=${serviceName}`
+      );
+      const data = await response.json();
+      setQuestions(data);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  };
 
   const handleImageSubmit = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -119,9 +145,14 @@ export default function CreateListing() {
   };
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
+    const { id, value, type, checked } = e.target;
 
-    if (id === 'Provider BoardingQuestions' || id === 'training' || id === 'grooming') {
+    if (type === 'checkbox') {
+      setFormData({
+        ...formData,
+        [id]: checked,
+      });
+    } else if (id === 'Provider BoardingQuestions' || id === 'training' || id === 'grooming') {
       setFormData({
         ...formData,
         ServiceName: id,
@@ -156,17 +187,7 @@ export default function CreateListing() {
       setLoading(true);
       setError(null);
 
-      // eslint-disable-next-line no-unused-vars
       const { hostelName, ServiceName, address, description, imageUrls, answers } = formData;
-
-      let selectedType = '';
-      if (formData.ServiceName === 'Provider BoardingQuestions') {
-        selectedType = 'Provider BoardingQuestions';
-      } else if (formData.ServiceName === 'training') {
-        selectedType = 'training';
-      } else if (formData.ServiceName === 'grooming') {
-        selectedType = 'grooming';
-      }
 
       const photos = imageUrls.reduce((acc, url, index) => {
         acc[`photo${index + 1}`] = url;
@@ -178,9 +199,9 @@ export default function CreateListing() {
       }
 
       const serviceHomePayload = {
-        id: 0,
+        id: listingId, // Ensure you pass the listingId for update
         userId: currentUser.id,
-        ServiceName: selectedType,
+        ServiceName,
         hostelName,
         address,
         description,
@@ -188,22 +209,22 @@ export default function CreateListing() {
       };
 
       const answersPayload = Object.keys(answers).map((questionId) => ({
-        id: 0,
+        id: 0, // Ensure you set the correct answerId for update if needed
         question_id: questionId,
         customer_id: currentUser.id,
         ans: String(answers[questionId]),
       }));
 
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
-        fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
-          method: 'POST',
+        fetch('https://hibow.in/api/Provider/UpdateServiceHomeDetails', {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(serviceHomePayload),
         }),
-        fetch('https://hibow.in/api/User/AddAnswers', {
-          method: 'POST',
+        fetch('https://hibow.in/api/User/UpdateAnswers', {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -216,16 +237,15 @@ export default function CreateListing() {
 
       if (!serviceHomeRes.ok || !serviceHomeData.success) {
         throw new Error(
-          serviceHomeData.message || 'Failed to add service home details'
+          serviceHomeData.message || 'Failed to update service home details'
         );
       }
 
       if (!addAnswersRes.ok || !addAnswersData.success) {
-        throw new Error(addAnswersData.message || 'Failed to add answers');
+        throw new Error(addAnswersData.message || 'Failed to update answers');
       }
 
       navigate(`/`);
-
     } catch (error) {
       setError(error.message);
     } finally {
@@ -236,13 +256,13 @@ export default function CreateListing() {
   return (
     <main className='p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg'>
       <h1 className='text-4xl font-bold text-center my-8 text-gray-800'>
-       Update  a Listing
+        Update Listing
       </h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
         <div className='flex flex-col gap-4'>
           <input
             type='text'
-            placeholder='hostalName'
+            placeholder='Hostel Name'
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
             id='hostelName'
             maxLength='62'
@@ -252,7 +272,6 @@ export default function CreateListing() {
             value={formData.hostelName}
           />
           <textarea
-            type='text'
             placeholder='Description'
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
             id='description'
@@ -376,7 +395,7 @@ export default function CreateListing() {
           disabled={loading || uploading}
           className='p-3 bg-blue-600 text-white rounded-lg uppercase hover:bg-blue-700 disabled:opacity-80 mt-6'
         >
-          {loading ? 'Creating...' : 'Create listing'}
+          {loading ? 'Updating...' : 'Update Listing'}
         </button>
         {error && <p className='text-red-600 text-sm'>{error}</p>}
       </form>

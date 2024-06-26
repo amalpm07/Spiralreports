@@ -1,8 +1,9 @@
 // CompanyFooter.jsx
 
-
 // eslint-disable-next-line no-unused-vars
-import { MDBFooter, MDBContainer, MDBRow, MDBCol, MDBIcon, MDBBtn, MDBInput } from 'mdb-react-ui-kit';
+import { MDBFooter, MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import '../styleComponets/styledComponents.css';
 
 export default function CompanyFooter() {
@@ -13,7 +14,7 @@ export default function CompanyFooter() {
           <MDBCol lg='4' className='mb-4 mb-md-0'>
             <h5 className='text-uppercase'>About Us</h5>
             <p>
-              [Your company description goes here. Lorem ipsum dolor sit amet, consectetur adipiscing elit.]
+              Welcome to Orpits Pvt, your go-to source for all things pet-related. We're dedicated to providing you the very best of pet care products and services, with a focus on quality, customer service, and uniqueness.
             </p>
           </MDBCol>
           <MDBCol lg='4' className='mb-4 mb-md-0'>
@@ -37,20 +38,20 @@ export default function CompanyFooter() {
             <h5 className='text-uppercase'>Contact Us</h5>
             <ul className='list-unstyled mb-0'>
               <li>
-                <MDBIcon icon='map-marker-alt' /> Address: 123 Company St, City, Country
+                <FontAwesomeIcon icon={faMapMarkerAlt} /> Address: 123 Pet Street, PetCity, PetCountry
               </li>
               <li>
-                <MDBIcon icon='phone' /> Phone: +123 456 7890
+                <FontAwesomeIcon icon={faPhone} /> Phone: +123 456 7890
               </li>
               <li>
-                <MDBIcon icon='envelope' /> Email: info@example.com
+                <FontAwesomeIcon icon={faEnvelope} /> Email: info@orpits.com
               </li>
             </ul>
           </MDBCol>
         </MDBRow>
       </MDBContainer>
       <div className='text-center p-3' style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-        &copy; {new Date().getFullYear()} Your Company Name. All rights reserved.
+        &copy; {new Date().getFullYear()} Orpits Pvt. All rights reserved.
       </div>
     </MDBFooter>
   );

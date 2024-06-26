@@ -1,7 +1,6 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CategoryMetaNav from '../components/CategoryNav';
-// Import necessary icon libraries
 import { FaGoogle, FaFacebook, FaCheckCircle } from 'react-icons/fa';
 
 const Home = () => {
@@ -60,7 +59,7 @@ const Home = () => {
               to={`/listing/${home.serviceName}/${home.userId}`}
               className="group block rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
-              <div className="relative aspect-w-16 aspect-h-9">
+              <div className="relative w-full h-48">
                 <img
                   className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
                   src={home.photo1}
@@ -71,7 +70,9 @@ const Home = () => {
                 <p className="text-gray-900 font-semibold group-hover:text-blue-600">
                   {home.hostelName}
                 </p>
-                <p className="mt-1 text-sm text-gray-600">{home.address}</p>
+                <p className="mt-1 text-sm text-gray-600 truncate">
+                  {home.address}
+                </p>
                 {/* Verification Status */}
                 <div className="mt-2 flex items-center space-x-2">
                   {/* Google Verification */}

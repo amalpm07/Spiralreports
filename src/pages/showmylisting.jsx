@@ -30,10 +30,26 @@ function UserListings() {
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
   const handleListingDelete = async (listingId) => {
-    // Implement delete functionality here
-    // After successful deletion, update userListings state
+    try {
+      // Assuming you have an endpoint for deleting listings
+      const res = await fetch(`https://hibow.in/api/DeleteListing/${listingId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      // Remove the deleted listing from state
+      setUserListings(userListings.filter(listing => listing.id !== listingId));
+    } catch (error) {
+      console.error("Error deleting listing:", error);
+      // Handle error state or notification
+    }
   };
 
   return (
@@ -76,7 +92,7 @@ function UserListings() {
                 >
                   Delete
                 </button>
-                <Link to={`/update-listing/${listing.userId}`}>
+                <Link to={`/update-listing/${listing.id}`}>
                   <button className='text-green-700 uppercase'>Edit</button>
                 </Link>
               </div>

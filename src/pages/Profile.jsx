@@ -198,13 +198,13 @@ export default function Profile() {
               >
                 Create Listing
               </Link>
-              <button
-                type="button"
-                className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200`}
-                disabled={loading}
+              <Link
+                to="/showmylisting"
+                className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center`}
               >
-                Show My Listings
-              </button>
+              Show My Listings
+              </Link>
+          
             </>
           )}
           <button
