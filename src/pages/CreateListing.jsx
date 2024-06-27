@@ -182,6 +182,7 @@ export default function CreateListing() {
         ans: String(answers[questionId]),
       }));
   
+      // eslint-disable-next-line no-unused-vars
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
         fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
@@ -199,9 +200,8 @@ export default function CreateListing() {
         }),
       ]);
   
-      const serviceHomeData = await serviceHomeRes.json();
-      // eslint-disable-next-line no-unused-vars
-      const addAnswersData = await addAnswersRes.json();
+      const serviceHomeText = await serviceHomeRes.text();
+      const serviceHomeData = JSON.parse(serviceHomeText);
   
       setLoading(false);
   
@@ -209,11 +209,9 @@ export default function CreateListing() {
         setError(serviceHomeData.message);
         window.alert(`Error: ${serviceHomeData.message}`);
       } else {
-        // Success case: Show success message and then navigate
         window.alert('Listing created successfully!');
         navigate(`/listing/${formData.ServiceName}/${serviceHomeData.id}`);
       }
-  
     } catch (error) {
       setError(error.message);
       setLoading(false);

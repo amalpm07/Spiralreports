@@ -14,7 +14,8 @@ const Home = () => {
           throw new Error('Failed to fetch service homes');
         }
         const data = await res.json();
-        setServiceHomes(data);
+        const serviceHomesData = data.map(item => item.serviceHome);
+        setServiceHomes(serviceHomesData);
       } catch (error) {
         console.error('Error fetching service homes:', error);
       }
@@ -55,7 +56,7 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {serviceHomes.map((home) => (
             <Link
-              key={home.id}
+              key={home.id} // Ensure the key is unique
               to={`/listing/${home.serviceName}/${home.userId}`}
               className="group block rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
             >

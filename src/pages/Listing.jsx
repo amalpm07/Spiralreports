@@ -1,30 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaMapMarkerAlt, FaShare, FaDog, FaCat, FaPaw, FaBed,  FaStar } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaShare, FaDog, FaCat, FaPaw, FaBed, FaStar } from 'react-icons/fa';
 import '../styleComponets/styledComponents.css';
-
-// const Map = ({ lat, lng }) => {
-//   if (!lat || !lng) return null;
-
-//   const mapLink = `https://maps.google.com/?q=Dolittle@${lat},${lng}`;
-//   const iframeSrc = `https://www.google.com/maps/embed/v1/view?key=AIzaSyBEveG1KjtzqKXgVnimrIELXixBHG1GzWc&center=${lat},${lng}&maptype=roadmap&zoom=13`;
-
-//   return (
-//     <div id="map" className="my-6">
-//       <a href={mapLink} target="_blank" rel="noopener noreferrer">
-//         <iframe
-//           style={{ border: 0, width: '100%', height: '300px' }}
-//           src={iframeSrc}
-//           frameBorder="0"
-//           scrolling="no"
-//           marginHeight="0"
-//           marginWidth="0"
-//           title="Google Map"
-//         ></iframe>
-//       </a>
-//     </div>
-//   );
-// };
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
@@ -35,6 +12,7 @@ const Listing = () => {
   const [newReview, setNewReview] = useState({ text: '', rating: 0 });
   const [reviewError, setReviewError] = useState(null);
   const navigate = useNavigate();
+  const [questions, setQuestions] = useState([]);
 
   const { selectedType, id } = useParams();
 
@@ -59,6 +37,18 @@ const Listing = () => {
       }
     };
 
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch(
+          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${selectedType}`
+        );
+        const data = await response.json();
+        setQuestions(data);
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+      }
+    };
+
     const fetchReviews = async () => {
       try {
         const res = await fetch(`https://hibow.in/api/Provider/GetReviewsByListingId?listingId=${id}`);
@@ -69,12 +59,12 @@ const Listing = () => {
         setReviews(data);
       } catch (error) {
         console.error('Error fetching reviews:', error);
-        // Optionally, you can set an empty array or handle the error state here
         setReviews([]); // Set reviews to an empty array or handle the error state
       }
     };
-    
+
     fetchListing();
+    fetchQuestions();
     fetchReviews();
   }, [selectedType, id]);
 
@@ -135,9 +125,6 @@ const Listing = () => {
       '10-20kg': <FaPaw className='text-xl' />,
     };
 
-    // const lat = listing?.serviceHome.latitude;
-    // const lng = listing?.serviceHome.longitude;
-
     return (
       <>
         <div className='flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4'>
@@ -183,52 +170,37 @@ const Listing = () => {
           {/* Display answers */}
           <div className='mt-6'>
             <ul className='mt-3 space-y-4'>
-              <li className='text-slate-800'>
-                <strong>Number of pets that will be watched at one time:</strong>
-                <div className='flex items-center gap-2'>
-                  <span>{listing?.answer.find((item) => item.answer.question_id === 32)?.answer.ans}</span>
-                </div>
-              </li>
-              <li className='text-slate-800'>
-                <strong>Accepted Pet Types:</strong>
-                <div className='flex gap-2'>
-                  {acceptedPetTypes.map((type) => (
-                    <span key={type} className='flex items-center gap-1'>
-                      {petTypeIcons[type]} {type}
-                    </span>
-                  ))}
-                </div>
-              </li>
-              <li className='text-slate-800'>
-                <strong>Accepted Pet size:</strong>
-                <div className='flex gap-2'>
-                  {acceptedPetSizes.map((size) => (
-                    <span key={size} className='flex items-center gap-1'>
-                      {petSizeIcons[size]} {size}
-                    </span>
-                  ))}
-                </div>
-              </li>
-              <li className='text-slate-800'>
-                <strong>The number of walks provided per day:</strong>
-                <div className='flex items-center gap-2'>
-                  <FaPaw className='text-xl' />
-                  <span>{listing?.answer.find((item) => item.answer.question_id === 37)?.answer.ans}</span>
-                </div>
-              </li>
-              <li className='text-slate-800'>
-                <strong>The place your pet will sleep at night:</strong>
-                <div className='flex items-center gap-2'>
-                  <FaBed className='text-xl' />
-                  <span>{listing?.answer.find((item) => item.answer.question_id === 36)?.answer.ans}</span>
-                </div>
-              </li>
-              <li className='text-slate-800'>
-                <strong>Charge per day:</strong>
-                <div className='flex items-center gap-2'>
-                  <span>{listing?.answer.find((item) => item.answer.question_id === 38)?.answer.ans}</span>
-                </div>
-              </li>
+              {questions.map((question) => {
+                const answer = listing?.answer.find(
+                  (item) => item.answer.question_id === question.id
+                )?.answer.ans;
+                return (
+                  <li key={question.id} className='text-slate-800'>
+                    <strong>{question.questions}:</strong>
+                    <div className='flex items-center gap-2'>
+                      {question.id === 33 && (
+                        <div className='flex gap-2'>
+                          {acceptedPetTypes.map((type) => (
+                            <span key={type} className='flex items-center gap-1'>
+                              {petTypeIcons[type]} {type}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {question.id === 34 && (
+                        <div className='flex gap-2'>
+                          {acceptedPetSizes.map((size) => (
+                            <span key={size} className='flex items-center gap-1'>
+                              {petSizeIcons[size]} {size}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {question.id !== 33 && question.id !== 34 && <span>{answer}</span>}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -244,84 +216,89 @@ const Listing = () => {
           <div className='mt-10'>
             <h2 className='text-2xl font-semibold'>Reviews</h2>
             {reviews.length === 0 ? (
-              <p className='text-slate-600 mt-4'>No reviews yet. Be the first to review!</p>
+              <p className='text-slate-700'>No reviews yet.</p>
             ) : (
-              <ul className='mt-4 space-y-4'>
+              <ul className='space-y-4 mt-4'>
                 {reviews.map((review, index) => (
-                  <li key={index} className='p-4 border rounded-lg'>
-                    <div className='flex items-center gap-2'>
-                      {[...Array(review.rating)].map((_, i) => (
-                        <FaStar key={i} className='text-yellow-500' />
-                      ))}
+                  <li key={index} className='border-b pb-4'>
+                    <div className='flex items-center'>
+                      <FaStar className='text-yellow-400' />
+                      <span className='ml-2 font-semibold'>{review.rating}</span>
                     </div>
-                    <p className='mt-2'>{review.text}</p>
+                    <p className='text-slate-700 mt-2'>{review.text}</p>
                   </li>
                 ))}
               </ul>
             )}
+            <form onSubmit={handleReviewSubmit} className='mt-6'>
+              <div className='flex flex-col'>
+                <label htmlFor='rating' className='text-slate-700'>
+                  Rating:
+                </label>
+                <input
+                  id='rating'
+                  type='number'
+                  value={newReview.rating}
+                  onChange={(e) => setNewReview({ ...newReview, rating: e.target.value })}
+                  className='border p-2 rounded mt-1'
+                  min='0'
+                  max='5'
+                />
+              </div>
+              <div className='flex flex-col mt-4'>
+                <label htmlFor='review' className='text-slate-700'>
+                  Review:
+                </label>
+                <textarea
+                  id='review'
+                  value={newReview.text}
+                  onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                  className='border p-2 rounded mt-1'
+                />
+              </div>
+              {reviewError && <p className='text-red-600 mt-2'>{reviewError}</p>}
+              <button
+                type='submit'
+                className='bg-blue-600 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-6'
+              >
+                Submit Review
+              </button>
+            </form>
           </div>
 
-          {/* Review Form */}
-          <form onSubmit={handleReviewSubmit} className='mt-6'>
-            <h3 className='text-xl font-semibold'>Add a Review</h3>
-            <div className='mt-4'>
-              <label htmlFor='rating' className='block text-slate-800'>
-                Rating:
-              </label>
-              <select
-                id='rating'
-                value={newReview.rating}
-                onChange={(e) => setNewReview({ ...newReview, rating: e.target.value })}
-                className='mt-1 block w-full p-2 border rounded-md'
-              >
-                <option value='0'>Select Rating</option>
-                <option value='1'>1 Star</option>
-                <option value='2'>2 Stars</option>
-                <option value='3'>3 Stars</option>
-                <option value='4'>4 Stars</option>
-                <option value='5'>5 Stars</option>
-              </select>
-            </div>
-            <div className='mt-4'>
-              <label htmlFor='reviewText' className='block text-slate-800'>
-                Review:
-              </label>
-              <textarea
-                id='reviewText'
-                value={newReview.text}
-                onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
-                className='mt-1 block w-full p-2 border rounded-md'
-              />
-            </div>
-            {reviewError && <p className='text-red-600 mt-2'>{reviewError}</p>}
-            <button
-              type='submit'
-              className='bg-green-600 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-4'
-            >
-              Submit Review
-            </button>
-          </form>
+          {/* Question and Answers Section */}
+          {/* <div className='mt-10'>
+            <h2 className='text-2xl font-semibold'>Questions & Answers</h2>
+            {questions.length === 0 ? (
+              <p className='text-slate-700'>No questions available.</p>
+            ) : (
+              <ul className='space-y-4 mt-4'>
+                {questions.map((question, index) => (
+                  <li key={index} className='border-b pb-4'>
+                    <p className='text-slate-700'>
+                      <strong>Q:</strong> {question.questions}
+                    </p>
+                    <p className='text-slate-700 mt-2'>
+                      <strong>A:</strong> {listing?.answer.find(
+                        (item) => item.answer.question_id === question.id
+                      )?.answer.ans || 'No answer provided.'}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div> */}
         </div>
-
-        {/* Share Link and Copy Notification */}
-        <div className='fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
-          <FaShare className='text-slate-500' onClick={handleShareClick} />
-        </div>
-        {copied && (
-          <p className='fixed top-[23%] right-[5%] z-10 rounded-md bg-slate-100 p-2'>
-            Link copied!
-          </p>
-        )}
       </>
     );
   };
 
   return (
-    <main>
-      {loading && <p className='text-center my-7 text-2xl'>Loading...</p>}
-      {error && <p className='text-center my-7 text-2xl'>{error}</p>}
-      {listing && !loading && !error && renderListingDetails()}
-    </main>
+    <div>
+      {loading && <p>Loading...</p>}
+      {error && <p className='text-red-600'>{error}</p>}
+      {!loading && !error && listing && renderListingDetails()}
+    </div>
   );
 };
 
