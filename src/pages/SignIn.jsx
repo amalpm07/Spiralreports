@@ -12,7 +12,9 @@ import { motion } from 'framer-motion'; // Import framer-motion for animations
 
 export default function SignIn() {
   const [formData, setFormData] = useState({ userName: '', password: '' });
-  const { loading, error } = useSelector((state) => state.user);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const { loading } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
@@ -25,6 +27,8 @@ export default function SignIn() {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     try {
       dispatch(signInStart());
 
@@ -42,20 +46,20 @@ export default function SignIn() {
       if (response.ok) {
         const data = await response.json();
         dispatch(signInSuccess(data)); // Assuming data contains user information
-        
+        setSuccess('Sign in successful!');
+
         // Determine the type of user
         const userType = data.usertype; // Assuming 'usertype' is the property indicating user type
-      const hasListing = data.hasListing;
+        const hasListing = data.hasListing;
         // Redirect based on user type and pass user details
-        if (userType === 'user') {
+        if (userType === 'provider') {
+          if (hasListing === false) {
+            navigate('/create-listing', { state: { user: data } }); // Redirect to create listing page and pass user details
+          } else {
+            navigate('/profile', { state: { user: data } }); // Redirect to profile page and pass user details
+          }
+        } else {
           navigate('/', { state: { user: data } }); // Redirect to the home page and pass user details
-        } else if (userType === 'provider'&& hasListing ==='false') {
-          navigate('/create-listing', { state: { user: data } }); // Redirect to create listing page and pass user details
-        } else  {
-          navigate('/profile', { state: { user: data } }); // Redirect to create listing page and pass user details
-
-          // Handle other user types or scenarios
-          // You can also have a default route here
         }
       } else if (response.status === 400) {
         const data = await response.json();
@@ -69,6 +73,7 @@ export default function SignIn() {
       }
     } catch (error) {
       dispatch(signInFailure(error.message || 'Failed to sign in'));
+      setError(error.message || 'Failed to sign in');
     }
   };
   
@@ -98,16 +103,15 @@ export default function SignIn() {
           onChange={handleChange}
         />
         <motion.button
-  disabled={loading}
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.95 }}
-  className={`bg-slate-700 text-white p-3 rounded-lg uppercase ${
-    loading ? 'opacity-80 cursor-not-allowed' : 'hover:opacity-95'
-  }`}
->Sign In
-  {/* {loading ? 'Sign In...' : 'Sign In'} */}
-</motion.button>
-
+          disabled={loading}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className={`bg-slate-700 text-white p-3 rounded-lg uppercase ${
+            loading ? 'opacity-80 cursor-not-allowed' : 'hover:opacity-95'
+          }`}
+        >
+          Sign In
+        </motion.button>
         <OAuth />
       </form>
       <div className='flex gap-2 mt-5'>
@@ -116,7 +120,8 @@ export default function SignIn() {
           <span className='text-blue-700'>Sign up</span>
         </Link>
       </div>
-      {error && <p className='text-red-500 mt-5'>{error}</p>}
+      {error && <p className='text-red-500 mt-5'>User doesnot Exist</p>}
+      {success && <p className='text-green-500 mt-5'>{success}</p>}
     </motion.div>
   );
 }

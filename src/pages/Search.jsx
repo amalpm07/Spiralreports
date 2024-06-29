@@ -55,9 +55,19 @@ export default function Search() {
     setLoading(true);
     setShowMore(false);
     try {
-      const urlParams = new URLSearchParams();
-      urlParams.set('searchTerm', sidebardata.searchTerm);
-      const url = `https://hibow.in/api/Provider/SearchProviderByName?providerName=${sidebardata.searchTerm}`;
+      let url = '';
+      const { searchTerm, type } = sidebardata;
+      
+      if (searchTerm) {
+        url = `https://hibow.in/api/Provider/SearchProviderByName?providerName=${searchTerm}`;
+      } else if (type === 'location') {
+        url = `https://localhost:44359/Provider/SearchServiceHomeByLocation?serviceHomeLocation=${sidebardata.searchTerm}&serviceName=Boarding`;
+      } else if (type === 'service') {
+        url = `https://localhost:44359/Provider/SearchServiceHomeByService?serviceName=Boarding`;
+      } else {
+        url = `https://localhost:44359/Provider/SearchServiceHomeByName?serviceHomeName=${sidebardata.searchTerm}`;
+      }
+
       const res = await fetch(url);
       if (!res.ok) {
         throw new Error('Network response was not ok');
@@ -115,7 +125,19 @@ export default function Search() {
     const urlParams = new URLSearchParams(location.search);
     urlParams.set('startIndex', numberOfListings);
     try {
-      const url = `https://hibow.in/api/Provider/SearchProviderByName?providerName=${sidebardata.searchTerm}&${urlParams.toString()}`;
+      let url = '';
+      const { searchTerm, type } = sidebardata;
+      
+      if (searchTerm) {
+        url = `https://hibow.in/api/Provider/SearchProviderByName?providerName=${searchTerm}&${urlParams.toString()}`;
+      } else if (type === 'location') {
+        url = `https://localhost:44359/Provider/SearchServiceHomeByLocation?serviceHomeLocation=${sidebardata.searchTerm}&serviceName=Boarding&${urlParams.toString()}`;
+      } else if (type === 'service') {
+        url = `https://localhost:44359/Provider/SearchServiceHomeByService?serviceName=Boarding&${urlParams.toString()}`;
+      } else {
+        url = `https://localhost:44359/Provider/SearchServiceHomeByName?serviceHomeName=${sidebardata.searchTerm}&${urlParams.toString()}`;
+      }
+
       const res = await fetch(url);
       if (!res.ok) {
         throw new Error('Network response was not ok');

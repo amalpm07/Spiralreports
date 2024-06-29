@@ -1,4 +1,5 @@
-import  { useState, useEffect } from 'react';
+/* eslint-disable react/no-unescaped-entities */
+import { useState, useEffect } from 'react';
 import { Container, Typography, Card, CardContent, CardActions, Button, Grid, Box, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 import axios from 'axios';
@@ -7,21 +8,14 @@ import { useSelector } from 'react-redux';
 const StyledContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(8),
   paddingBottom: theme.spacing(8),
-  backgroundColor: '#f5f5f5',
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[2],
 }));
 
 const StyledCard = styled(Card)(({ theme, selected }) => ({
-  border: selected ? `2px solid ${theme.palette.primary.main}` : '1px solid #ddd',
   transition: 'transform 0.3s, border-color 0.3s',
   transform: selected ? 'scale(1.05)' : 'scale(1)',
   '&:hover': {
     transform: 'scale(1.05)',
-    borderColor: theme.palette.primary.main,
   },
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[3],
 }));
 
 const CardContentCentered = styled(CardContent)({
@@ -36,6 +30,34 @@ const CenteredBox = styled(Box)({
   textAlign: 'center',
   marginTop: '16px',
 });
+
+const Image = styled('img')({
+  width: '100%',
+  borderRadius: '8px',
+  marginBottom: '16px',
+});
+
+const QuoteBox = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: theme.shadows[1],
+  marginBottom: theme.spacing(2),
+  textAlign: 'center',
+  border: '1px solid #ddd',
+  transition: 'transform 0.3s, border-color 0.3s, box-shadow 0.3s',
+  '&:hover': {
+    transform: 'scale(1.05)',
+    borderColor: theme.palette.primary.main,
+    boxShadow: theme.shadows[3],
+  },
+}));
+
+const quotes = [
+  "Pets are not our whole life, but they make our lives whole.",
+  "The better I get to know men, the more I find myself loving dogs.",
+  "No one appreciates the very special genius of your conversation as much as the dog does.",
+];
 
 const PremiumSubscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -78,11 +100,14 @@ const PremiumSubscription = () => {
         const orderResponse = await axios.post(
           `https://hibow.in/api/Order/Initiate Order?userId=${currentUser.id}`,
           {
+            Key: 'your_key_here', // Replace with your actual key
+            OrderId: 'your_order_id_here', // Replace with your actual order ID
+            Currency: 'INR',
+            TransactionId: 'your_transaction_id_here', // Replace with your actual transaction ID
             customername: bookingDetails.customerName,
             email,
             mobile,
             totalAmount: bookingDetails.charge,
-            
           }
         );
 
@@ -148,6 +173,9 @@ const PremiumSubscription = () => {
       <Typography variant="h4" gutterBottom align="center" color="primary">
         Select Your Premium Subscription
       </Typography>
+      <Typography variant="h6" gutterBottom align="center">
+        Choose the plan that best suits your pet's needs
+      </Typography>
       <Grid container spacing={4}>
         {['Basic', 'Standard', 'Premium'].map((plan) => (
           <Grid item xs={12} sm={6} md={4} key={plan}>
@@ -155,6 +183,7 @@ const PremiumSubscription = () => {
               selected={selectedPlan === plan}
               onClick={() => setSelectedPlan(plan)}
             >
+              <Image src={`https://example.com/${plan.toLowerCase()}-plan.jpg`} alt={`${plan} Plan`} />
               <CardContentCentered>
                 <Typography variant="h5" color="secondary">{plan} Plan</Typography>
                 <Typography variant="h6">{`$${plan === 'Basic' ? 10 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
@@ -217,6 +246,28 @@ const PremiumSubscription = () => {
           </Typography>
         </CenteredBox>
       )}
+      <CenteredBox>
+        <Typography variant="h6" color="primary" gutterBottom>
+          Why Go Premium?
+        </Typography>
+        <Typography variant="body1" paragraph>
+          With our premium subscription, your pet will enjoy top-notch care and exclusive benefits including:
+        </Typography>
+        <ul>
+          <li>Priority booking</li>
+          <li>Personalized care plans</li>
+          <li>Discounts on additional services</li>
+        </ul>
+      </CenteredBox>
+      <CenteredBox>
+        {quotes.map((quote, index) => (
+          <QuoteBox key={index}>
+            <Typography variant="body1" style={{ fontStyle: 'italic' }}>
+              "{quote}"
+            </Typography>
+          </QuoteBox>
+        ))}
+      </CenteredBox>
     </StyledContainer>
   );
 };

@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import OAuth from '../components/OAuth';
-import { FaUser, FaEnvelope, FaLock, FaPhone, FaHome, FaMapMarkerAlt, FaCity, FaSignInAlt } from 'react-icons/fa';
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaPhone,
+  FaHome,
+  FaMapMarkerAlt,
+  FaCity,
+  FaSignInAlt,
+} from 'react-icons/fa';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -85,7 +94,7 @@ export default function SignUp() {
         return;
       }
 
-      alert("Sign up successful! Please sign in with your credentials.");
+      alert('Sign up successful! Please sign in with your credentials.');
       setLoading(false);
       setError(null);
       navigate('/sign-in');
@@ -96,48 +105,25 @@ export default function SignUp() {
     }
   };
 
-  const checkUsernameAvailability = async (userName) => {
-    try {
-      const response = await fetch(`https://hibow.in/api/CheckUsername?username=${userName}`);
-      const data = await response.json();
-      return data.isAvailable;
-    } catch (error) {
-      console.error('Error checking username availability:', error);
-      return false;
-    }
-  };
-
-  const handleUsernameChange = async (e) => {
-    const { value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      userName: value,
-    }));
-
-    if (value) {
-      const isAvailable = await checkUsernameAvailability(value);
-      if (!isAvailable) {
-        setError("Username already exists. Please choose another one.");
-      } else {
-        setError(null);
-      }
-    }
-  };
-
-
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
-      <div className="p-8 bg-white shadow-2xl rounded-lg max-w-2xl w-full">
-        <h1 className="text-4xl text-center font-bold mb-8 text-gray-800">Sign Up</h1>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4 sm:p-6">
+      <div className="p-4 sm:p-8 bg-white shadow-2xl rounded-lg max-w-2xl w-full">
+        <h1 className="text-2xl sm:text-4xl text-center font-bold mb-6 sm:mb-8 text-gray-800">
+          Sign Up
+        </h1>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"
+        >
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">First Name</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              First Name
+            </label>
             <div className="relative">
-              <FaUser className="absolute top-3 left-3 text-gray-400" />
+              <FaUser className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
@@ -146,12 +132,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Last Name</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Last Name
+            </label>
             <div className="relative">
-              <FaUser className="absolute top-3 left-3 text-gray-400" />
+              <FaUser className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
@@ -160,21 +148,25 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col sm:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-1">Username</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Username
+            </label>
             <div className="relative">
-              <FaUser className="absolute top-3 left-3 text-gray-400" />
+              <FaUser className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                 id="userName"
                 value={formData.userName}
-                onChange={handleUsernameChange}
+                onChange={handleChange}
                 placeholder="Username"
               />
             </div>
           </div>
           <div className="flex flex-col sm:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-1">User Type</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              User Type
+            </label>
             <div className="flex items-center space-x-4">
               <label className="flex items-center">
                 <input
@@ -201,12 +193,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
             <div className="relative">
-              <FaEnvelope className="absolute top-3 left-3 text-gray-400" />
+              <FaEnvelope className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="email"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -215,12 +209,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
             <div className="relative">
-              <FaLock className="absolute top-3 left-3 text-gray-400" />
+              <FaLock className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="password"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -229,12 +225,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
             <div className="relative">
-              <FaPhone className="absolute top-3 left-3 text-gray-400" />
+              <FaPhone className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
@@ -243,12 +241,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">House Name</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              House Name
+            </label>
             <div className="relative">
-              <FaHome className="absolute top-3 left-3 text-gray-400" />
+              <FaHome className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="housename"
                 value={formData.housename}
                 onChange={handleChange}
@@ -257,12 +257,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Landmark</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Landmark
+            </label>
             <div className="relative">
-              <FaMapMarkerAlt className="absolute top-3 left-3 text-gray-400" />
+              <FaMapMarkerAlt className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="landmark"
                 value={formData.landmark}
                 onChange={handleChange}
@@ -271,12 +273,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">District</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              District
+            </label>
             <div className="relative">
-              <FaCity className="absolute top-3 left-3 text-gray-400" />
+              <FaCity className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="district"
                 value={formData.district}
                 onChange={handleChange}
@@ -285,12 +289,14 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Pincode</label>
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Pincode
+            </label>
             <div className="relative">
-              <FaMapMarkerAlt className="absolute top-3 left-3 text-gray-400" />
+              <FaMapMarkerAlt className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="pincode"
                 value={formData.pincode}
                 onChange={handleChange}
@@ -298,15 +304,15 @@ export default function SignUp() {
               />
             </div>
           </div>
-       {/* Photo URL input removed */}
 
           <button
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-lg uppercase hover:from-blue-700 hover:to-indigo-700 disabled:bg-blue-400 col-span-2 flex items-center justify-center transition duration-300"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-lg uppercase hover:from-blue-700 hover:to-indigo-700 disabled:bg-blue-400 col-span-1 sm:col-span-2 flex items-center justify-center transition duration-300"
           >
-            {loading ? 'Loading...' : <><FaSignInAlt className="mr-2" />Sign Up</>}
+            {loading ? 'Loading...' : <FaSignInAlt className="mr-2" />}
+            Sign Up
           </button>
-          <OAuth className="col-span-2" />
+          <OAuth className="col-span-1 sm:col-span-2" />
         </form>
         <div className="flex justify-center mt-5">
           <p>Have an account?</p>
@@ -314,7 +320,9 @@ export default function SignUp() {
             Sign in
           </Link>
         </div>
-        {error && <p className="text-red-500 mt-5 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 mt-5 text-center">{error}</p>
+        )}
       </div>
     </div>
   );

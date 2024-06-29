@@ -242,5 +242,59 @@
   right: 4rem;
   z-index: 10; /* Ensure it's above other content */
 }
+/* Custom CSS for animations and styling */
+body {
+  font-family: Arial, sans-serif;
+}
+
+.card-animate {
+  animation: fadeInUp 1s ease-out;
+  background: hsla(0, 0%, 100%, 0.85);
+  backdrop-filter: blur(30px);
+}
+
+.img-animate {
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h2 {
+  color: #1266f1;
+}
+
+.MDBBtn {
+  transition: transform 0.3s;
+}
+
+.MDBBtn:hover {
+  transform: scale(1.05);
+}
+
+.MDBInput {
+  transition: box-shadow 0.3s;
+}
+
+.MDBInput:focus-within {
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
 
 

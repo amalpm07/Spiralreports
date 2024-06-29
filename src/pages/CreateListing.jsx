@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import {
   getDownloadURL,
@@ -17,7 +18,11 @@ export default function CreateListing() {
     imageUrls: [],
     hostelName: '',
     description: '',
-    address: '',
+    houseName: '',
+    city: '',
+    district: '',
+    state: '',
+    phoneNumber: '',
     ServiceName: '',
     offer: false,
     answers: {},
@@ -144,15 +149,25 @@ export default function CreateListing() {
       setLoading(true);
       setError(null);
   
-      // eslint-disable-next-line no-unused-vars
-      const { hostelName, ServiceName, address, description, imageUrls, answers } = formData;
+      const {
+        hostelName,
+        ServiceName,
+        houseName,
+        city,
+        district,
+        state,
+        phoneNumber,
+        description,
+        imageUrls,
+        answers,
+      } = formData;
   
       let selectedType = '';
-      if (formData.ServiceName === 'boarding') {
+      if (ServiceName === 'boarding') {
         selectedType = 'boarding';
-      } else if (formData.ServiceName === 'training') {
+      } else if (ServiceName === 'training') {
         selectedType = 'training';
-      } else if (formData.ServiceName === 'grooming') {
+      } else if (ServiceName === 'grooming') {
         selectedType = 'grooming';
       }
   
@@ -170,7 +185,11 @@ export default function CreateListing() {
         userId: currentUser.id,
         ServiceName: selectedType,
         hostelName,
-        address,
+        houseName,
+        city,
+        district,
+        state,
+        phoneNumber,
         description,
         ...photos,
       };
@@ -182,7 +201,6 @@ export default function CreateListing() {
         ans: String(answers[questionId]),
       }));
   
-      // eslint-disable-next-line no-unused-vars
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
         fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
@@ -210,7 +228,7 @@ export default function CreateListing() {
         window.alert(`Error: ${serviceHomeData.message}`);
       } else {
         window.alert('Listing created successfully!');
-        navigate(`/listing/${formData.ServiceName}/${serviceHomeData.id}`);
+        navigate(`/listing/${ServiceName}/${serviceHomeData.id}`);
       }
     } catch (error) {
       setError(error.message);
@@ -218,7 +236,6 @@ export default function CreateListing() {
       window.alert(`Error: ${error.message}`);
     }
   };
-  
 
   return (
     <main className='p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg'>
@@ -249,12 +266,48 @@ export default function CreateListing() {
           />
           <input
             type='text'
-            placeholder='Address'
+            placeholder='House Name'
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='address'
+            id='houseName'
             required
             onChange={handleChange}
-            value={formData.address}
+            value={formData.houseName}
+          />
+          <input
+            type='text'
+            placeholder='City'
+            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
+            id='city'
+            required
+            onChange={handleChange}
+            value={formData.city}
+          />
+          <input
+            type='text'
+            placeholder='District'
+            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
+            id='district'
+            required
+            onChange={handleChange}
+            value={formData.district}
+          />
+          <input
+            type='text'
+            placeholder='State'
+            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
+            id='state'
+            required
+            onChange={handleChange}
+            value={formData.state}
+          />
+          <input
+            type='text'
+            placeholder='Phone Number'
+            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
+            id='phoneNumber'
+            required
+            onChange={handleChange}
+            value={formData.phoneNumber}
           />
           <div className='flex flex-wrap gap-4 mt-4'>
             <div className='flex items-center gap-2'>
@@ -365,7 +418,7 @@ export default function CreateListing() {
         >
           {loading ? 'Creating...' : 'Create listing'}
         </button>
-        {error && <p className='text-red-600 text-sm'>{error}</p>}
+        {error && <p className='text-red-600 text-sm'>unable to create </p>}
       </form>
     </main>
   );

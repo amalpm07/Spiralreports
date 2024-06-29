@@ -41,11 +41,11 @@ const BookingFormWrapper = styled.div`
 `;
 
 const FormGroup = styled.div`
-  position: relative;
+ position: relative;
   display: flex;
   align-items: center;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -103,7 +103,7 @@ const Span = styled.span`
   font-weight: 300;
 
   @media (max-width: 768px) {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 `;
 
@@ -337,18 +337,12 @@ const BookingForm = () => {
 
   // Function to handle checkbox change for checkbox questions
   const handleCheckboxChange = (questionId, option) => {
-    setAnswers(prevAnswers => {
-      const questionAnswers = prevAnswers[questionId] || {};
-      return {
-        ...prevAnswers,
-        [questionId]: {
-          ...questionAnswers,
-          [option]: !questionAnswers[option]
-        }
-      };
-    });
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
+      [questionId]: option
+    }));
   };
-
+  
   // useEffect hook to modify answer for the 4th question when questions array changes
   useEffect(() => {
     const fourthQuestion = questions[3];  // Assuming questions[3] is the 4th question
@@ -406,66 +400,71 @@ const BookingForm = () => {
           <FormElement label={question.questions} />
           {/* Render checkbox group for index 0 and 3 */}
           {index === 0 ? (
-            <CheckboxGroup>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!!answers[question.id]?.['Option 1']}
-                  onChange={() => handleCheckboxChange(question.id, 'Option 1')}
-                />
-                DOG
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!!answers[question.id]?.['Option 2']}
-                  onChange={() => handleCheckboxChange(question.id, 'Option 2')}
-                />
-                CAT
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!!answers[question.id]?.['Option 3']}
-                  onChange={() => handleCheckboxChange(question.id, 'Option 3')}
-                />
-                BIRD
-              </label>
-            </CheckboxGroup>
-          ) : index === 3 ? (
-            <CheckboxGroup>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!!answers[question.id]?.['Small']}
-                  onChange={() => handleCheckboxChange(question.id, 'Small')}
-                />
-                Small
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!!answers[question.id]?.['Medium']}
-                  onChange={() => handleCheckboxChange(question.id, 'Medium')}
-                />
-                Medium
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!!answers[question.id]?.['Large']}
-                  onChange={() => handleCheckboxChange(question.id, 'Large')}
-                />
-                Large
-              </label>
-            </CheckboxGroup>
-          ) : (
-            <Input
-              type="text"
-              value={answers[question.id] || ''}
-              onChange={e => handleAnswerChange(question.id, e.target.value)}
-            />
-          )}
+              // Render radio buttons for index 0 questions
+              // Render radio buttons for index 0 questions
+<CheckboxGroup>
+  <label>
+    <input
+      type="radio"
+      checked={answers[question.id] === 'dog'}
+      onChange={() => handleCheckboxChange(question.id, 'dog')}
+    />
+    DOG
+  </label>
+  <label>
+    <input
+      type="radio"
+      checked={answers[question.id] === 'cat'}
+      onChange={() => handleCheckboxChange(question.id, 'cat')}
+    />
+    CAT
+  </label>
+  <label>
+    <input
+      type="radio"
+      checked={answers[question.id] === 'bird'}
+      onChange={() => handleCheckboxChange(question.id, 'bird')}
+    />
+    BIRD
+  </label>
+</CheckboxGroup>
+
+            ) : index === 3 ? (
+              // Render radio buttons for index 3 questions
+              <CheckboxGroup>
+                <label>
+                  <input
+                    type="radio"
+                    checked={answers[question.id] === 'Small'}
+                    onChange={() => handleCheckboxChange(question.id, 'Small')}
+                  />
+                  Small
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    checked={answers[question.id] === 'Medium'}
+                    onChange={() => handleCheckboxChange(question.id, 'Medium')}
+                  />
+                  Medium
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    checked={answers[question.id] === 'Large'}
+                    onChange={() => handleCheckboxChange(question.id, 'Large')}
+                  />
+                  Large
+                </label>
+              </CheckboxGroup>
+            ) : (
+              // Default to text input for other questions
+              <Input
+                type="text"
+                value={answers[question.id] || ''}
+                onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+              />
+            )}
         </React.Fragment>
       ))}
 
@@ -490,7 +489,7 @@ const FormElement = ({ label, icon: IconComponent, children }) => (
         {label}
       </Span>
     )}
-    {children}  {/* Render children components */}
+    {children} {/* Render children components */}
   </FormGroup>
 );
 

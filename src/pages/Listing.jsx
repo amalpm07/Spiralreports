@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaMapMarkerAlt, FaShare, FaDog, FaCat, FaPaw, FaBed, FaStar } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaDog, FaCat, FaPaw, FaStar } from 'react-icons/fa';
 import '../styleComponets/styledComponents.css';
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [copied, setCopied] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ text: '', rating: 0 });
