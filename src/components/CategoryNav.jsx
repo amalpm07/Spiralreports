@@ -48,7 +48,7 @@ const columns = [
     text: "Pet Taxi"
   },
   {
-    link: "https://web.petbacker.com/services?lang=en&amp;location=www.petbacker.com&amp;utm_medium=cms&amp;utm_content=%2F",
+    link: "",
     imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/more.png",
     alt: "pet service near me",
     text: "More"
