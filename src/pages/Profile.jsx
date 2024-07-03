@@ -25,6 +25,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const fileRef = useRef(null);
+  // eslint-disable-next-line no-unused-vars
   const { currentUser, loading, error } = useSelector((state) => state.user) || {};
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
@@ -42,6 +43,11 @@ export default function Profile() {
     if (file) {
       handleFileUpload(file);
     }
+    if (!currentUser?.guid) {
+      console.error('User GUID not available');
+      return;
+    }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
@@ -97,6 +103,7 @@ export default function Profile() {
       dispatch(signOutUserStart());
       const res = await fetch(`https://hibow.in/api/User/LoginDelete?userid=${currentUser.id}`, {
         method: 'DELETE',
+        'Authorization': `Bearer ${currentUser.guid}`
       });
 
       if (res.ok) {

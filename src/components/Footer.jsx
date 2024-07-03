@@ -15,10 +15,10 @@ export default function CompanyFooter() {
           <MDBCol lg='4' className='mb-4 mb-md-0'>
             <h5 className='text-uppercase'>About Us</h5>
             <p>
-              Welcome to Orpits Pvt, your go-to source for all things pet-related. We're dedicated to providing you the very best of pet care products and services, with a focus on quality, customer service, and uniqueness.
+              Welcome to Orpita Services Pvt Ltd, your go-to source for all things pet-related. We're dedicated to providing you the very best of pet care products and services, with a focus on quality, customer service, and uniqueness.
             </p>
           </MDBCol>
-          <MDBCol lg='4' className='mb-4 mb-md-0'>
+          {/* <MDBCol lg='4' className='mb-4 mb-md-0'>
             <h5 className='text-uppercase'>Links</h5>
             <ul className='list-unstyled mb-0'>
               <li>
@@ -34,25 +34,25 @@ export default function CompanyFooter() {
                 <a href='#' className='text-white'>Contact</a>
               </li>
             </ul>
-          </MDBCol>
+          </MDBCol> */}
           <MDBCol lg='4' className='mb-4 mb-md-0'>
             <h5 className='text-uppercase'>Contact Us</h5>
             <ul className='list-unstyled mb-0'>
               <li>
-                <FontAwesomeIcon icon={faMapMarkerAlt} /> Address: 123 Pet Street, PetCity, PetCountry
+                <FontAwesomeIcon icon={faMapMarkerAlt} /> Address: No 2/619 Plot No 203, Engineers Avenue, First Main Road, Keelkattalai, Chennai
               </li>
               <li>
-                <FontAwesomeIcon icon={faPhone} /> Phone: +123 456 7890
+                <FontAwesomeIcon icon={faPhone} /> Phone: +91 73389 28378
               </li>
               <li>
-                <FontAwesomeIcon icon={faEnvelope} /> Email: info@orpits.com
+                <FontAwesomeIcon icon={faEnvelope} /> Email: info@orpitaservices.com
               </li>
             </ul>
           </MDBCol>
         </MDBRow>
       </MDBContainer>
       <div className='text-center p-3' style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-        &copy; {new Date().getFullYear()} Orpits Pvt. All rights reserved.
+        &copy; {new Date().getFullYear()} Orpita Services Pvt Ltd All rights reserved.
       </div>
     </MDBFooter>
   );

@@ -25,19 +25,39 @@ export default function SignUp() {
     landmark: '',
     district: '',
     pincode: '',
-    photo: '', // Initialize photo field as an empty string
+    photo: '',
   });
 
   const [error, setError] = useState(null);
+  const [emailError, setEmailError] = useState(null);
+  const [phoneError, setPhoneError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [id]: type === 'checkbox' ? checked : value,
-    }));
+    if (id === 'phoneNumber') {
+      if (/^\d*$/.test(value) && value.length <= 10) {
+        setFormData((prevData) => ({
+          ...prevData,
+          [id]: value,
+        }));
+      }
+      if (value.length === 10) {
+        setPhoneError(null);
+      }
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [id]: type === 'checkbox' ? checked : value,
+      }));
+    }
+    if (id === 'email') {
+      setEmailError(null); // Reset email error when user types
+    }
+    if (id === 'phoneNumber') {
+      setPhoneError(null); // Reset phone error when user types
+    }
   };
 
   const handleUserTypeChange = (e) => {
@@ -48,12 +68,32 @@ export default function SignUp() {
   };
 
   const validateForm = () => {
-    for (let key in formData) {
-      // Exclude validation for the 'photo' field
-      if (key !== 'photo' && !formData[key]) {
-        return `Please fill out the ${key} field.`;
-      }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\d{10}$/;
+    const pincodeRegex = /^\d{6}$/;
+
+    if (!formData.firstName.trim()) return 'Please enter your first name.';
+    if (!formData.lastName.trim()) return 'Please enter your last name.';
+    if (!formData.userName.trim()) return 'Please enter a username.';
+    if (!formData.usertype.trim()) return 'Please select a user type.';
+    if (!formData.email.trim()) return 'Please enter your email.';
+    if (!emailRegex.test(formData.email)) {
+      setEmailError('Invalid email address.');
+      return 'Please enter a valid email.';
     }
+    if (!formData.password.trim()) return 'Please enter a password.';
+    if (formData.password.length < 6) return 'Password must be at least 6 characters.';
+    if (!formData.phoneNumber.trim()) return 'Please enter your phone number.';
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      setPhoneError('Phone number must be exactly 10 digits.');
+      return 'Please enter a valid 10-digit phone number.';
+    }
+    if (!formData.housename.trim()) return 'Please enter your house name.';
+    if (!formData.landmark.trim()) return 'Please enter your landmark.';
+    if (!formData.district.trim()) return 'Please enter your district.';
+    if (!formData.pincode.trim()) return 'Please enter your pincode.';
+    if (!pincodeRegex.test(formData.pincode)) return 'Please enter a valid 6-digit pincode.';
+
     return null;
   };
 
@@ -71,7 +111,7 @@ export default function SignUp() {
         ...formData,
         phoneNumber: formData.phoneNumber.toString(),
         pincode: formData.pincode.toString(),
-        photo: '', // Ensure photo field is set to empty string
+        photo: '',
       };
 
       const response = await fetch('https://hibow.in/api/User/Add', {
@@ -200,13 +240,16 @@ export default function SignUp() {
               <FaEnvelope className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="email"
-                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${
+                  emailError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'
+                }`}
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
               />
             </div>
+            {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
           </div>
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">
@@ -232,13 +275,16 @@ export default function SignUp() {
               <FaPhone className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${
+                  phoneError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'
+                }`}
                 id="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
               />
             </div>
+            {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
           </div>
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">

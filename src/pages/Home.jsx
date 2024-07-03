@@ -34,13 +34,14 @@ const Home = () => {
           alt="Banner"
         />
         <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white">
-          <div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
+          <div className="relative">
             <h1 className="text-4xl font-bold">Welcome to Service Homes</h1>
             <p className="mt-4 text-lg">Find your ideal service home here</p>
             <Link
               to="/premium-subscription"
-              className="mt-6 bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md transition duration-300"
+              className="absolute mt-6 bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md transition duration-300"
+              style={{ top: '70px', left: '50%', transform: 'translateX(-50%)' }} // Adjust the top value as needed
             >
               Explore Premium
             </Link>

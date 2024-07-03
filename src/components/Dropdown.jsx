@@ -37,10 +37,10 @@ const Dropdown = ({ currentUser }) => {
           <Link to='/profile' className='block px-4 py-2 text-gray-800 hover:bg-gray-200' role='menuitem'>
             Profile
           </Link>
-          <Link to='/settings' className='block px-4 py-2 text-gray-800 hover:bg-gray-200' role='menuitem'>
+          {/* <Link to='/settings' className='block px-4 py-2 text-gray-800 hover:bg-gray-200' role='menuitem'>
             Settings
-          </Link>
-          <button
+          </Link> */}
+          {/* <button
             onClick={() => {
               // Add your logout logic here
               console.log('Logout clicked');
@@ -50,7 +50,7 @@ const Dropdown = ({ currentUser }) => {
             role='menuitem'
           >
             Logout
-          </button>
+          </button> */}
         </div>
       )}
     </div>

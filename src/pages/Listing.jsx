@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaDog, FaCat, FaPaw, FaStar } from 'react-icons/fa';
 import '../styleComponets/styledComponents.css';
+import { useSelector } from 'react-redux';  // Import useSelector hook from react-redux
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
@@ -14,7 +15,7 @@ const Listing = () => {
   const [reviewError, setReviewError] = useState(null);
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
-
+  const currentUser = useSelector((state) => state.user.currentUser);
   const { selectedType, id } = useParams();
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const Listing = () => {
         setListing(data);
       } catch (error) {
         console.error('Error fetching listing:', error);
+        console.log(currentUser)
         setError(error.message);
       } finally {
         setLoading(false);
@@ -67,8 +69,10 @@ const Listing = () => {
     fetchListing();
     fetchQuestions();
     fetchReviews();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedType, id]);
 
+  // eslint-disable-next-line no-unused-vars
   const handleShareClick = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
@@ -207,11 +211,13 @@ const Listing = () => {
 
           {/* Add Book Now button */}
           <button
-            onClick={handleBookNowClick}
-            className='bg-green-600 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-6'
-          >
-            Book Now
-          </button>
+  onClick={handleBookNowClick}
+  className='bg-green-600 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-6'
+  disabled={currentUser && currentUser.usertype === 'provider'} // Check if currentUser exists before accessing usertype
+>
+  Book Now
+</button>
+
 
           {/* Review Section */}
           <div className='mt-10'>

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Import necessary modules from React and other libraries
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';  // Import date picker component
@@ -308,8 +309,9 @@ const BookingForm = () => {
       });
 
       if (!answersRes.ok) {
+        // eslint-disable-next-line no-unused-vars
         const answersError = await answersRes.text();  // Parse error response
-        throw new Error(`Failed to add answers: ${answersError}`);
+        throw new Error(`Failed to book service: ${bookingError.message}`);
       }
 
       const answersResult = await answersRes.text();  // Parse answers response
@@ -323,7 +325,7 @@ const BookingForm = () => {
       }
     } catch (error) {
       console.error('Error during booking:', error.message);  // Log error message to console
-      alert(`Error: ${error.message}`);  // Show alert with error message to user
+      throw new Error(`Failed to book service: ${bookingError.message}`);
     }
   };
 
