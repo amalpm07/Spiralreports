@@ -276,7 +276,8 @@ const BookingForm = () => {
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Token': currentUser.guid  // Replace with your actual token field
         },
         body: JSON.stringify(bookingData)
       });
@@ -303,7 +304,8 @@ const BookingForm = () => {
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Token': currentUser.guid  // Replace with your actual token field
         },
         body: JSON.stringify(answersData)
       });

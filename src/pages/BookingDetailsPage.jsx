@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,7 +16,12 @@ function BookingDetailsPage() {
     // Fetch booking details using the id from useParams()
     const fetchBookingDetails = async () => {
       try {
-        const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByBookingId?bookingId=${id}`);
+        const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByBookingId?bookingId=${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Token': currentUser.token // Replace with your actual token field
+          }
+        });
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
@@ -30,12 +35,16 @@ function BookingDetailsPage() {
     };
 
     fetchBookingDetails();
-  }, [id]);
+  }, [id, currentUser.token]);
 
   const handleCancelBooking = async () => {
     try {
       const res = await fetch(`https://hibow.in/api/Booking/CancelBooking?bookingId=${id}&canceledBy=${currentUser.usertype}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser.token // Replace with your actual token field
+        }
       });
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
@@ -52,6 +61,10 @@ function BookingDetailsPage() {
     try {
       const res = await fetch(`https://hibow.in/api/Booking/ConfirmBooking?bookingId=${id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser.token // Replace with your actual token field
+        }
       });
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);

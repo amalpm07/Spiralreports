@@ -103,7 +103,10 @@ export default function Profile() {
       dispatch(signOutUserStart());
       const res = await fetch(`https://hibow.in/api/User/LoginDelete?userid=${currentUser.id}`, {
         method: 'DELETE',
-        'Authorization': `Bearer ${currentUser.guid}`
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser.guid, // Pass the guid in the header
+        },
       });
 
       if (res.ok) {

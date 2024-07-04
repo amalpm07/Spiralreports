@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from 'react';
 import { Container, Typography, Card, CardContent, CardActions, Button, Grid, Box, TextField } from '@mui/material';
@@ -108,6 +109,12 @@ const PremiumSubscription = () => {
             email,
             mobile,
             totalAmount: bookingDetails.charge,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Token': currentUser.guid, // Replace with your actual token
+            },
           }
         );
 
@@ -129,6 +136,12 @@ const PremiumSubscription = () => {
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_signature: response.razorpay_signature,
+                },
+                {
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Token': currentUser.guid, // Replace with your actual token
+                  },
                 }
               );
 
@@ -144,7 +157,13 @@ const PremiumSubscription = () => {
 
                 const updateDatabaseResponse = await axios.post(
                   'YOUR_SERVER_ENDPOINT_TO_UPDATE_DATABASE',
-                  paymentInfo
+                  paymentInfo,
+                  {
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Token': currentUser.guid, // Replace with your actual token
+                    },
+                  }
                 );
 
                 console.log('Database update response:', updateDatabaseResponse.data);

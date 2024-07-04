@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import OAuth from '../components/OAuth';
 import {
   FaUser,
   FaEnvelope,
@@ -358,7 +357,7 @@ export default function SignUp() {
             {loading ? 'Loading...' : <FaSignInAlt className="mr-2" />}
             Sign Up
           </button>
-          <OAuth className="col-span-1 sm:col-span-2" />
+          {/* <OAuth className="col-span-1 sm:col-span-2" /> */}
         </form>
         <div className="flex justify-center mt-5">
           <p>Have an account?</p>

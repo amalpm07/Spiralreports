@@ -18,18 +18,23 @@ function BookingsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByUserTypeAndId?userType=${currentUser.usertype}&userId=${currentUser.id}`);
-
+      const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByUserTypeAndId?userType=${currentUser.usertype}&userId=${currentUser.id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser.guid, // Assuming currentUser.guid contains the token
+        },
+      });
+  
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
-
+  
       const data = await res.json();
-
+  
       if (!data || !Array.isArray(data)) {
         throw new Error('Invalid data format received');
       }
-
+  
       setUserBookings(data);
     } catch (error) {
       setError(error.message || 'Failed to load bookings');
@@ -38,6 +43,7 @@ function BookingsPage() {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="container mx-auto p-4">

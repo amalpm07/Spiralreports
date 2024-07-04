@@ -1,5 +1,6 @@
-/* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   getDownloadURL,
   getStorage,
@@ -7,13 +8,11 @@ import {
   uploadBytesResumable,
 } from 'firebase/storage';
 import { app } from '../firebase';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
-  const [files, setFiles] = useState([]);
   const navigate = useNavigate();
+  const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
     hostelName: '',
@@ -37,7 +36,13 @@ export default function CreateListing() {
     const fetchQuestions = async () => {
       try {
         const response = await fetch(
-          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${formData.ServiceName}`
+          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${formData.ServiceName}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Token': currentUser.guid, // Pass the guid in the header
+            },
+          }
         );
         const data = await response.json();
         setQuestions(data);
@@ -49,7 +54,7 @@ export default function CreateListing() {
     if (formData.ServiceName) {
       fetchQuestions();
     }
-  }, [formData.ServiceName]);
+  }, [formData.ServiceName, currentUser.token]);
 
   const handleImageSubmit = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -140,15 +145,15 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       if (formData.imageUrls.length < 1) {
         throw new Error('You must upload at least one image');
       }
-  
+
       setLoading(true);
       setError(null);
-  
+
       const {
         hostelName,
         ServiceName,
@@ -161,7 +166,7 @@ export default function CreateListing() {
         imageUrls,
         answers,
       } = formData;
-  
+
       let selectedType = '';
       if (ServiceName === 'boarding') {
         selectedType = 'boarding';
@@ -170,16 +175,16 @@ export default function CreateListing() {
       } else if (ServiceName === 'grooming') {
         selectedType = 'grooming';
       }
-  
+
       const photos = imageUrls.reduce((acc, url, index) => {
         acc[`photo${index + 1}`] = url;
         return acc;
       }, {});
-  
+
       for (let i = imageUrls.length; i < 6; i++) {
         photos[`photo${i + 1}`] = '';
       }
-  
+
       const serviceHomePayload = {
         id: 0,
         userId: currentUser.id,
@@ -193,36 +198,38 @@ export default function CreateListing() {
         description,
         ...photos,
       };
-  
+
       const answersPayload = Object.keys(answers).map((questionId) => ({
         id: 0,
         question_id: questionId,
         customer_id: currentUser.id,
         ans: String(answers[questionId]),
       }));
-  
+
+      const headers = {
+        'Content-Type': 'application/json',
+              'Token': currentUser.guid,
+      };
+
+      // eslint-disable-next-line no-unused-vars
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
         fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify(serviceHomePayload),
         }),
         fetch('https://hibow.in/api/User/AddAnswers', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify(answersPayload),
         }),
       ]);
-  
+
       const serviceHomeText = await serviceHomeRes.text();
       const serviceHomeData = JSON.parse(serviceHomeText);
-  
+
       setLoading(false);
-  
+
       if (serviceHomeData.success === false) {
         setError(serviceHomeData.message);
         window.alert(`Error: ${serviceHomeData.message}`);
