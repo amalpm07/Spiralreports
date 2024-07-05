@@ -1,41 +1,52 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom';
 import { MdLocationOn } from 'react-icons/md';
 
 const ListingItem = ({ listing }) => {
+  const {
+    id,
+    serviceName,
+    hostelName,
+    address,
+    description,
+    photo1,
+    // eslint-disable-next-line no-unused-vars
+    photo2,
+    photo3,
+    photo4,
+    photo5,
+    photo6,
+  } = listing;
+
   return (
     <div className='bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px]'>
-      <Link to={`/listing/${listing._id}`}>
+      <Link to={`/listing/${id}`}>
         <img
-          src={listing.imageUrls[0] || 'https://via.placeholder.com/595x400'}
+          src={photo1 || 'https://via.placeholder.com/595x400'}
           alt='Listing cover'
-          className='h-[320px] sm:h-[220px] w-full object-cover hover:scale-105 transition-scale duration-300'
+          className='h-[220px] sm:h-[320px] w-full object-cover hover:scale-105 transition-scale duration-300'
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://via.placeholder.com/595x400'; // Placeholder image or default image URL
+          }}
         />
         <div className='p-3 flex flex-col gap-2 w-full'>
           <p className='truncate text-lg font-semibold text-slate-700'>
-            {listing.name}
+            {serviceName}
           </p>
           <div className='flex items-center gap-1'>
             <MdLocationOn className='h-4 w-4 text-green-700' />
             <p className='text-sm text-gray-600 truncate w-full'>
-              {listing.address}
+              {address || 'Address not provided'}
             </p>
           </div>
           <p className='text-sm text-gray-600 line-clamp-2'>
-            {listing.description}
+            {description || 'No description available'}
           </p>
           <p className='text-slate-500 mt-2 font-semibold'>
-            ${listing.offer ? listing.discountPrice.toLocaleString('en-US') : listing.regularPrice.toLocaleString('en-US')}
-            {listing.type === 'cat' && ' / month'}
+            {hostelName}
           </p>
-          <div className='text-slate-700 flex gap-4'>
-            <div className='font-bold text-xs'>
-              {listing.bedrooms > 1 ? `${listing.bedrooms} beds ` : `${listing.bedrooms} bed `}
-            </div>
-            <div className='font-bold text-xs'>
-              {listing.bathrooms > 1 ? `${listing.bathrooms} baths ` : `${listing.bathrooms} bath `}
-            </div>
-          </div>
         </div>
       </Link>
     </div>

@@ -45,7 +45,7 @@ export default function CompanyFooter() {
                 <FontAwesomeIcon icon={faPhone} /> Phone: +91 73389 28378
               </li>
               <li>
-                <FontAwesomeIcon icon={faEnvelope} /> Email: info@orpitaservices.com
+                <FontAwesomeIcon icon={faEnvelope} /> Email: admin@leashbench.com
               </li>
             </ul>
           </MDBCol>

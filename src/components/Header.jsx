@@ -53,9 +53,9 @@ export default function Header() {
           </button>
         </form>
         <ul className='flex gap-4'>
-          <Link to='/' className='text-gray-100 hover:text-gray-300'>
+          {/* <Link to='/' className='text-gray-100 hover:text-gray-300'>
             <li className='hidden sm:inline'>Home</li>
-          </Link>
+          </Link> */}
           <Link to='/about' className='text-gray-100 hover:text-gray-300'>
             <li className='hidden sm:inline'>About</li>
           </Link>

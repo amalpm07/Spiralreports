@@ -19,7 +19,7 @@ function BookingDetailsPage() {
         const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByBookingId?bookingId=${id}`, {
           headers: {
             'Content-Type': 'application/json',
-            'Token': currentUser.token // Replace with your actual token field
+            'Token': currentUser.guid // Replace with your actual token field
           }
         });
         if (!res.ok) {
@@ -43,7 +43,7 @@ function BookingDetailsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.token // Replace with your actual token field
+          'Token': currentUser.guid // Replace with your actual token field
         }
       });
       if (!res.ok) {

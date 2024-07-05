@@ -2,6 +2,7 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useOutsideClick } from '../Hooks/useOutsideClick';
+import defaultAvatar from '../assets/avatar.jpg'; // Replace with your default avatar path
 
 const Dropdown = ({ currentUser }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -10,15 +11,19 @@ const Dropdown = ({ currentUser }) => {
   const toggleDropdown = () => {
     setDropdownVisible((prev) => !prev);
   };
-  
+
+  // Render default avatar if currentUser doesn't exist or avatar is not provided
+  const avatarSrc = currentUser?.avatar ? currentUser.avatar : defaultAvatar;
+  const altText = currentUser?.avatar ? 'profile' : 'default profile';
+
   return (
     <div className='relative' ref={dropdownRef}>
       {currentUser ? (
         <img
           onClick={toggleDropdown}
           className='rounded-full h-7 w-7 object-cover cursor-pointer'
-          src={currentUser.avatar}
-          alt='profile'
+          src={avatarSrc}
+          alt={altText}
           aria-haspopup='true'
           aria-expanded={dropdownVisible}
         />

@@ -1,10 +1,13 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from 'react';
 import { Container, Typography, Card, CardContent, CardActions, Button, Grid, Box, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import image1 from '../assets/prebanner1.jpeg';
+import image2 from '../assets/prebanner2.jpeg';
+import image3 from '../assets/prebanner3.jpeg';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(8),
@@ -32,12 +35,6 @@ const CenteredBox = styled(Box)({
   marginTop: '16px',
 });
 
-const Image = styled('img')({
-  width: '100%',
-  borderRadius: '8px',
-  marginBottom: '16px',
-});
-
 const QuoteBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   padding: theme.spacing(2),
@@ -60,10 +57,18 @@ const quotes = [
   "No one appreciates the very special genius of your conversation as much as the dog does.",
 ];
 
+const images = [
+  image1,
+  image2,
+  image3,
+ 
+];
+
 const PremiumSubscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
+  const [mobileError, setMobileError] = useState('');
   const [showInvoice, setShowInvoice] = useState(false);
   const [paymentError, setPaymentError] = useState('');
   const { currentUser } = useSelector((state) => state.user);
@@ -94,12 +99,22 @@ const PremiumSubscription = () => {
     return re.test(String(mobile));
   };
 
+  const handleMobileChange = (e) => {
+    const value = e.target.value;
+    if (/^[0-9]*$/.test(value)) {
+      setMobile(value);
+      setMobileError('');
+    } else {
+      setMobileError('Only numbers are allowed.');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateEmail(email) && validateMobile(mobile)) {
       try {
         const orderResponse = await axios.post(
-          `https://hibow.in/api/Order/Initiate Order?userId=${currentUser.id}`,
+          `https://hibow.in/api/Order/InitiateOrder?userId=${currentUser.id}`,
           {
             Key: 'your_key_here', // Replace with your actual key
             OrderId: 'your_order_id_here', // Replace with your actual order ID
@@ -188,7 +203,14 @@ const PremiumSubscription = () => {
   };
 
   return (
-    <StyledContainer maxWidth="md">
+    <StyledContainer maxWidth="xl">
+<Carousel showThumbs={false} autoPlay infiniteLoop showArrows={true} showStatus={false} showIndicators={true}>
+  {images.map((src, index) => (
+    <div key={index} style={{ maxWidth: '1000px', margin: 'auto' }}>
+      <img src={src} alt={`slide-${index}`} style={{ maxWidth: '100%', height: 'auto' }} />
+    </div>
+  ))}
+</Carousel>
       <Typography variant="h4" gutterBottom align="center" color="primary">
         Select Your Premium Subscription
       </Typography>
@@ -202,10 +224,9 @@ const PremiumSubscription = () => {
               selected={selectedPlan === plan}
               onClick={() => setSelectedPlan(plan)}
             >
-              <Image src={`https://example.com/${plan.toLowerCase()}-plan.jpg`} alt={`${plan} Plan`} />
               <CardContentCentered>
                 <Typography variant="h5" color="secondary">{plan} Plan</Typography>
-                <Typography variant="h6">{`$${plan === 'Basic' ? 10 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
+                <Typography variant="h6">{`${plan === 'Basic' ? 10 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
               </CardContentCentered>
               <CardActionsCentered>
                 <Button
@@ -222,7 +243,7 @@ const PremiumSubscription = () => {
       </Grid>
       {selectedPlan && (
         <CenteredBox>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
             <TextField
               label="Email"
               variant="outlined"
@@ -237,13 +258,18 @@ const PremiumSubscription = () => {
               fullWidth
               margin="normal"
               value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
+              onChange={handleMobileChange}
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 10 }}
+              error={!!mobileError}
+              helperText={mobileError}
             />
             <Button
               type="submit"
               variant="contained"
               color="primary"
               size="large"
+              fullWidth
+              style={{ marginTop: '16px' }}
             >
               Subscribe
             </Button>

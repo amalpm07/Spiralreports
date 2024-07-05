@@ -298,45 +298,41 @@ const fetchReviews = async (serviceHomeId) => {
             </ul>
           )}
         </div>
-
         {currentUser?.usertype !== 'provider' && (
-          <div className='mt-6'>
-            <form onSubmit={handleReviewSubmit}>
-              <div className='flex flex-col'>
-                <label htmlFor='rating' className='text-slate-700'>
-                  Rating:
-                </label>
-                <input
-                  id='rating'
-                  type='number'
-                  value={newReview.rating}
-                  onChange={(e) => setNewReview({ ...newReview, rating: e.target.value })}
-                  className='border p-2 rounded mt-1'
-                  min='0'
-                  max='5'
+        <div className='max-w-4xl mx-auto p-3 my-7'>
+          <h3 className='text-2xl font-semibold mb-4'>Leave a Review</h3>
+          {reviewError && (
+            <p className='text-red-500 mb-4'>{reviewError}</p>
+          )}
+          <form onSubmit={handleReviewSubmit} className='bg-gray-100 rounded-lg p-4'>
+            <textarea
+              value={newReview.text}
+              onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+              className='w-full p-2 border border-gray-300 rounded mb-4'
+              rows='4'
+              placeholder='Write your review...'
+            ></textarea>
+            <div className='flex items-center mb-4'>
+              <span className='mr-2'>Rating:</span>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  className={`text-xl cursor-pointer ${
+                    newReview.rating >= star ? 'text-yellow-400' : 'text-gray-300'
+                  }`}
+                  onClick={() => setNewReview({ ...newReview, rating: star })}
                 />
-              </div>
-              <div className='flex flex-col mt-4'>
-                <label htmlFor='review' className='text-slate-700'>
-                  Review:
-                </label>
-                <textarea
-                  id='review'
-                  value={newReview.text}
-                  onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
-                  className='border p-2 rounded mt-1'
-                />
-              </div>
-              {reviewError && <p className='text-red-600 mt-2'>{reviewError}</p>}
-              <button
-                type='submit'
-                className='bg-blue-600 text-white rounded-lg uppercase hover:opacity-95 p-3 mt-6'
-              >
-                Submit Review
-              </button>
-            </form>
-          </div>
-        )}
+              ))}
+            </div>
+            <button
+              type='submit'
+              className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded'
+            >
+              Submit Review
+            </button>
+          </form>
+        </div>
+      )}
 
         
       </div>
