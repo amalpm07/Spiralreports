@@ -35,7 +35,7 @@ function BookingDetailsPage() {
     };
 
     fetchBookingDetails();
-  }, [id, currentUser.token]);
+  }, [id, currentUser.guid]);
 
   const handleCancelBooking = async () => {
     try {
