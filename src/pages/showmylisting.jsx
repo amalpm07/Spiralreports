@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -7,23 +7,35 @@ function UserListings() {
   const [showListingsError, setShowListingsError] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
 
+  useEffect(() => {
+    // Fetch user listings when component mounts
+    handleShowListings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only fetch once when component mounts
+
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=training&userId=${currentUser.id}`);
+      const res = await fetch(`https://hibow.in/api/Provider/GetServiceHomeByProviderId?providerId=${currentUser.id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser.guid,
+        },
+      });
 
-      // Check if the response status is OK (status code 200-299)
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
+
       const data = await res.json();
-      // Check if the response data indicates a failure
-      if (!data || !data.serviceHome) {
+      console.log('User listings data:', data); // Log data received from API
+      if (!data || !Array.isArray(data) || data.length === 0) {
         setShowListingsError(true);
+        setUserListings([]); // Clear listings if no valid data
         return;
       }
 
-      setUserListings([data.serviceHome]); // Wrap it in an array since it seems to be a single object
+      setUserListings(data); // Set user listings from the API response
     } catch (error) {
       console.error("Error fetching user listings:", error);
       setShowListingsError(true);
@@ -32,11 +44,11 @@ function UserListings() {
 
   const handleListingDelete = async (listingId) => {
     try {
-      // Assuming you have an endpoint for deleting listings
       const res = await fetch(`https://hibow.in/api/DeleteListing/${listingId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Token': currentUser.guid,
         },
       });
 
@@ -80,7 +92,7 @@ function UserListings() {
               </Link>
               <Link
                 className='text-slate-700 font-semibold hover:underline truncate flex-1'
-                to={`/listing/${listing.id}`}
+                to={`/listing/${listing.serviceName}/${currentUser.id}`}
               >
                 <p>{listing.hostelName}</p>
               </Link>
@@ -92,13 +104,20 @@ function UserListings() {
                 >
                   Delete
                 </button>
-                <Link to={`/update-listing/${listing.id}`}>
+                <Link to={`/update-listing/${listing.id}/${listing.serviceName}`}>
                   <button className='text-green-700 uppercase'>Edit</button>
                 </Link>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {/* Display a message if there are no listings */}
+      {!showListingsError && userListings.length === 0 && (
+        <p className='text-center mt-5 text-gray-600'>
+          No listings found.
+        </p>
       )}
     </div>
   );

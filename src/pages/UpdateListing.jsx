@@ -1,168 +1,108 @@
-import { useState, useEffect } from 'react';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
-import { app } from '../firebase';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 export default function UpdateListing() {
   const { currentUser } = useSelector((state) => state.user);
-  const { listingId } = useParams();
+  const { serviceName } = useParams();
   const navigate = useNavigate();
-  const [files, setFiles] = useState([]);
+
   const [formData, setFormData] = useState({
-    imageUrls: [],
+    id: null,
     hostelName: '',
     description: '',
     address: '',
-    ServiceName: '',
-    offer: false,
-    answers: {},
+    photos: [], // Updated to handle array of photos
+    answers: {}, // Updated to store answers for questions dynamically
   });
-  const [imageUploadError, setImageUploadError] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+
   const [questions, setQuestions] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchListing = async () => {
+    const fetchListingAndQuestions = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const res = await fetch(`https://hibow.in/api/Provider/GetListingById?id=${listingId}`);
-        const data = await res.json();
-        
-        if (data.success === false) {
-          console.log(data.message);
-          return;
+        // Fetch listing data
+        const listingResponse = await fetch(
+          `https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${serviceName}&userId=${currentUser.id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Token: currentUser.guid,
+            },
+          }
+        );
+
+        if (!listingResponse.ok) {
+          throw new Error('Failed to fetch listing');
         }
 
+        const listingData = await listingResponse.json();
         const {
+          id,
           hostelName,
           description,
           address,
-          ServiceName,
           photo1,
           photo2,
           photo3,
           photo4,
           photo5,
-          photo6,
-        } = data.serviceHome;
+          photo6
+        } = listingData.serviceHome;
+
+        const preparedAnswers = {};
+        listingData.answer.forEach((item) => {
+          preparedAnswers[item.answer.question_id] = item.answer.ans;
+        });
 
         setFormData({
+          id,
           hostelName,
           description,
           address,
-          ServiceName,
-          imageUrls: [photo1, photo2, photo3, photo4, photo5, photo6].filter(Boolean),
-          answers: {}, // Assuming you fetch answers separately if needed
+          photos: [photo1, photo2, photo3, photo4, photo5, photo6].filter(photo => photo !== ""),
+          answers: preparedAnswers,
         });
 
-        // Fetch questions based on ServiceName
-        await fetchQuestions(ServiceName);
+        // Fetch questions data
+        const questionsResponse = await fetch(
+          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${serviceName}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Token: currentUser.guid,
+            },
+          }
+        );
+
+        if (!questionsResponse.ok) {
+          throw new Error('Failed to fetch questions');
+        }
+
+        const questionsData = await questionsResponse.json();
+        setQuestions(questionsData);
       } catch (error) {
-        console.error('Error fetching listing:', error);
+        console.error('Error fetching data:', error);
+        setError(error.message || 'Failed to fetch data');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchListing();
-  }, [listingId]);
-
-  const fetchQuestions = async (serviceName) => {
-    try {
-      const response = await fetch(
-        `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=${serviceName}`
-      );
-      const data = await response.json();
-      setQuestions(data);
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-    }
-  };
-
-  const handleImageSubmit = () => {
-    if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
-      setUploading(true);
-      setImageUploadError(false);
-      const promises = [];
-
-      for (let i = 0; i < files.length; i++) {
-        promises.push(storeImage(files[i]));
-      }
-      Promise.all(promises)
-        .then((urls) => {
-          setFormData({
-            ...formData,
-            imageUrls: formData.imageUrls.concat(urls),
-          });
-          setImageUploadError(false);
-          setUploading(false);
-        })
-        .catch(() => {
-          setImageUploadError('Image upload failed (2 mb max per image)');
-          setUploading(false);
-        });
-    } else {
-      setImageUploadError('You can only upload 6 images per listing');
-      setUploading(false);
-    }
-  };
-
-  const storeImage = async (file) => {
-    return new Promise((resolve, reject) => {
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + file.name;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(`Upload is ${progress}% done`);
-        },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            resolve(downloadURL);
-          });
-        }
-      );
-    });
-  };
-
-  const handleRemoveImage = (index) => {
-    setFormData({
-      ...formData,
-      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
-    });
-  };
+    fetchListingAndQuestions();
+  }, [serviceName, currentUser.id, currentUser.guid]);
 
   const handleChange = (e) => {
-    const { id, value, type, checked } = e.target;
-
-    if (type === 'checkbox') {
-      setFormData({
-        ...formData,
-        [id]: checked,
-      });
-    } else if (id === 'Provider BoardingQuestions' || id === 'training' || id === 'grooming') {
-      setFormData({
-        ...formData,
-        ServiceName: id,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [id]: value,
-      });
-    }
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
   };
 
   const handleQuestionChange = (questionId) => (e) => {
@@ -176,228 +116,194 @@ export default function UpdateListing() {
     });
   };
 
+  const handlePhotoDelete = (index) => {
+    const updatedPhotos = [...formData.photos];
+    updatedPhotos.splice(index, 1);
+    setFormData({
+      ...formData,
+      photos: updatedPhotos,
+    });
+  };
+
+  const handlePhotoUpload = (e) => {
+    const files = Array.from(e.target.files);
+    // Assuming you want to limit to 6 photos, adjust as necessary
+    const newPhotos = files.map(file => URL.createObjectURL(file)).slice(0, 6);
+    setFormData({
+      ...formData,
+      photos: [...formData.photos, ...newPhotos],
+    });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      if (formData.imageUrls.length < 1) {
-        throw new Error('You must upload at least one image');
-      }
-
       setLoading(true);
       setError(null);
-
-      const { hostelName, ServiceName, address, description, imageUrls, answers } = formData;
-
-      const photos = imageUrls.reduce((acc, url, index) => {
-        acc[`photo${index + 1}`] = url;
-        return acc;
-      }, {});
-
-      for (let i = imageUrls.length; i < 6; i++) {
-        photos[`photo${i + 1}`] = '';
-      }
-
-      const serviceHomePayload = {
-        id: listingId, // Ensure you pass the listingId for update
-        userId: currentUser.id,
-        ServiceName,
-        hostelName,
-        address,
-        description,
-        ...photos,
+  
+      // Prepare update listing data
+      const updateListingData = {
+        id: formData.id,
+        hostelName: formData.hostelName,
+        description: formData.description,
+        address: formData.address,
+        photos: formData.photos,
       };
-
-      const answersPayload = Object.keys(answers).map((questionId) => ({
-        id: 0, // Ensure you set the correct answerId for update if needed
-        question_id: questionId,
+  
+      // Update Listing API call
+      const updateListingResponse = await fetch('https://hibow.in/api/Provider/EditServiceHomeDetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Token: currentUser.guid,
+        },
+        body: JSON.stringify(updateListingData),
+      });
+  
+      if (!updateListingResponse.ok) {
+        throw new Error('Failed to update listing');
+      }
+  
+      // Prepare answers payload
+      const answersPayload = Object.keys(formData.answers).map((questionId) => ({
+        question_id: parseInt(questionId), // Ensure question_id is parsed as integer if required by API
         customer_id: currentUser.id,
-        ans: String(answers[questionId]),
+        ans: formData.answers[questionId],
       }));
-
-      const [serviceHomeRes, addAnswersRes] = await Promise.all([
-        fetch('https://hibow.in/api/Provider/UpdateServiceHomeDetails', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(serviceHomePayload),
-        }),
-        fetch('https://hibow.in/api/User/UpdateAnswers', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(answersPayload),
-        }),
-      ]);
-
-      const serviceHomeData = await serviceHomeRes.json();
-      const addAnswersData = await addAnswersRes.json();
-
-      if (!serviceHomeRes.ok || !serviceHomeData.success) {
-        throw new Error(
-          serviceHomeData.message || 'Failed to update service home details'
-        );
+  
+      // Add Answers API call
+      const addAnswersResponse = await fetch('https://hibow.in/api/User/AddAnswers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Token: currentUser.guid,
+        },
+        body: JSON.stringify({ newAnswers: answersPayload }), // Ensure to wrap in 'newAnswers' if required by API
+      });
+  
+      if (!addAnswersResponse.ok) {
+        throw new Error('Failed to add answers');
       }
-
-      if (!addAnswersRes.ok || !addAnswersData.success) {
-        throw new Error(addAnswersData.message || 'Failed to update answers');
-      }
-
-      navigate(`/`);
+  
+      navigate(`/`); // Redirect to home page after successful update
     } catch (error) {
-      setError(error.message);
+      setError(error.message || 'Failed to update listing');
     } finally {
       setLoading(false);
     }
   };
+  
+  
+  
 
   return (
     <main className='p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg'>
       <h1 className='text-4xl font-bold text-center my-8 text-gray-800'>
         Update Listing
       </h1>
+      {error && <p className='text-red-500'>{error}</p>}
       <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
-        <div className='flex flex-col gap-4'>
-          <input
-            type='text'
-            placeholder='Hostel Name'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='hostelName'
-            maxLength='62'
-            minLength='10'
-            required
-            onChange={handleChange}
-            value={formData.hostelName}
-          />
-          <textarea
-            placeholder='Description'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='description'
-            required
-            onChange={handleChange}
-            value={formData.description}
-          />
-          <input
-            type='text'
-            placeholder='Address'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='address'
-            required
-            onChange={handleChange}
-            value={formData.address}
-          />
-          <div className='flex flex-wrap gap-4 mt-4'>
-            <div className='flex items-center gap-2'>
-              <input
-                type='checkbox'
-                id='Provider BoardingQuestions'
-                className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                onChange={handleChange}
-                checked={formData.ServiceName === 'Provider BoardingQuestions'}
-              />
-              <span className='text-gray-700'>Boarding</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <input
-                type='checkbox'
-                id='training'
-                className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                onChange={handleChange}
-                checked={formData.ServiceName === 'training'}
-              />
-              <span className='text-gray-700'>Training</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <input
-                type='checkbox'
-                id='grooming'
-                className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                onChange={handleChange}
-                checked={formData.ServiceName === 'grooming'}
-              />
-              <span className='text-gray-700'>Grooming</span>
-            </div>
-          </div>
-        </div>
-        <div className='flex flex-col gap-4'>
-          <p className='font-semibold text-gray-800'>
-            Images:
-            <span className='font-normal text-gray-600 ml-2'>
-              The first image will be the cover (max 6)
-            </span>
-          </p>
-          <div className='flex gap-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div>
+            <label htmlFor='hostelName' className='text-gray-700'>
+              Hostel Name
+            </label>
             <input
-              onChange={(e) => setFiles(e.target.files)}
-              className='p-3 border border-gray-300 rounded w-full'
-              type='file'
-              id='images'
-              accept='image/*'
-              multiple
+              type='text'
+              id='hostelName'
+              placeholder='Hostel Name'
+              className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none w-full'
+              maxLength='62'
+              value={formData.hostelName}
+              onChange={handleChange}
+              required
             />
-            <button
-              type='button'
-              disabled={uploading}
-              onClick={handleImageSubmit}
-              className='p-3 bg-green-600 text-white rounded uppercase hover:bg-green-700 disabled:opacity-80'
-            >
-              {uploading ? 'Uploading...' : 'Upload'}
-            </button>
           </div>
-          <p className='text-red-600 text-sm'>{imageUploadError && imageUploadError}</p>
-          {formData.imageUrls.length > 0 && (
-            <div className='flex flex-wrap gap-4 mt-4'>
-              {formData.imageUrls.map((url, index) => (
-                <div key={url} className='flex flex-col items-center'>
-                  <img
-                    src={url}
-                    alt='listing image'
-                    className='w-20 h-20 object-cover rounded-lg shadow'
-                  />
-                  <button
-                    type='button'
-                    onClick={() => handleRemoveImage(index)}
-                    className='mt-2 text-red-600 hover:text-red-800'
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {questions.length > 0 && (
-            <div className='mt-6'>
-              <h2 className='text-xl font-semibold text-gray-800'>Questions</h2>
-              <ul className='list-disc ml-5'>
-                {questions.map((question) => (
-                  <li key={question.id} className='mb-2'>
-                    <div className='text-gray-700'>{question.questions}</div>
-                    <div className='flex flex-col gap-2 mt-2'>
-                      <label className='block'>
-                        <input
-                          type='text'
-                          id={`${question.id}`}
-                          value={formData.answers[question.id] || ''}
-                          onChange={handleQuestionChange(question.id)}
-                          className='p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-                        />
-                      </label>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <div>
+            <label htmlFor='address' className='text-gray-700'>
+              Address
+            </label>
+            <input
+              type='text'
+              id='address'
+              placeholder='Address'
+              className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none w-full'
+              maxLength='80'
+              value={formData.address}
+              onChange={handleChange}
+              required
+            />
+          </div>
         </div>
+
+        <div>
+          <label htmlFor='description' className='text-gray-700'>
+            Description
+          </label>
+          <textarea
+            id='description'
+            placeholder='Description'
+            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none h-36 w-full'
+            maxLength='300'
+            value={formData.description}
+            onChange={handleChange}
+            required
+          ></textarea>
+        </div>
+
+        <div>
+          <h2 className='text-2xl font-semibold'>Photos</h2>
+          <div className='grid grid-cols-1 gap-4'>
+            {formData.photos.map((photo, index) => (
+              <div key={`photo-${index}`} className='flex items-center gap-4'>
+                <img src={photo} alt={`Photo ${index + 1}`} className='w-32 h-32 object-cover rounded-lg' />
+                <button
+                  type='button'
+                  onClick={() => handlePhotoDelete(index)}
+                  className='bg-red-500 text-white py-2 px-4 rounded-lg font-semibold'
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+          <input
+            type='file'
+            id='photoUpload'
+            accept='image/*'
+            multiple
+            onChange={handlePhotoUpload}
+            className='mt-4'
+          />
+        </div>
+
+        <div>
+          <h2 className='text-2xl font-semibold'>Questions</h2>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            {questions.map((question) => (
+              <div key={question.id}>
+                <label htmlFor={`question-${question.id}`} className='text-gray-700'>
+                  {question.questions}
+                </label>
+                <input
+                  type='text'
+                  id={`question-${question.id}`}
+                  className='border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none w-full'
+                  value={formData.answers[question.id] || ''}
+                  onChange={handleQuestionChange(question.id)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
         <button
-          disabled={loading || uploading}
-          className='p-3 bg-blue-600 text-white rounded-lg uppercase hover:bg-blue-700 disabled:opacity-80 mt-6'
+          type='submit'
+          className='bg-blue-500 text-white py-3 rounded-lg font-semibold mt-6 disabled:opacity-50 w-full'
+          disabled={loading}
         >
           {loading ? 'Updating...' : 'Update Listing'}
         </button>
-        {error && <p className='text-red-600 text-sm'>{error}</p>}
       </form>
     </main>
   );

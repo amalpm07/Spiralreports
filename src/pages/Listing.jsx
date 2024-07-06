@@ -45,7 +45,7 @@ const fetchReviews = async (serviceHomeId) => {
         setLoading(true);
         setError(null);
         const res = await fetch(
-          `https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`,
+          `https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${currentUser.id}`,
           {
             headers: {
               'Content-Type': 'application/json',

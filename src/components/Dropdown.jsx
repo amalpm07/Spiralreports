@@ -1,16 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useOutsideClick } from '../Hooks/useOutsideClick';
 import defaultAvatar from '../assets/avatar.jpg'; // Replace with your default avatar path
 
 const Dropdown = ({ currentUser }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownRef = useOutsideClick(() => setDropdownVisible(false));
-  
+  const location = useLocation();
+
   const toggleDropdown = () => {
     setDropdownVisible((prev) => !prev);
   };
+
+  useEffect(() => {
+    setDropdownVisible(false);
+  }, [location]);
 
   // Render default avatar if currentUser doesn't exist or avatar is not provided
   const avatarSrc = currentUser?.avatar ? currentUser.avatar : defaultAvatar;
@@ -65,7 +70,7 @@ const Dropdown = ({ currentUser }) => {
 // Define prop types
 Dropdown.propTypes = {
   currentUser: PropTypes.shape({
-    avatar: PropTypes.string.isRequired,
+    avatar: PropTypes.string,
   }),
 };
 

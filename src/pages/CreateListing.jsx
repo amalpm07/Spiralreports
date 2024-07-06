@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -17,10 +17,7 @@ export default function CreateListing() {
     imageUrls: [],
     hostelName: '',
     description: '',
-    houseName: '',
-    city: '',
-    district: '',
-    state: '',
+    address: '', // Combined address field
     phoneNumber: '',
     ServiceName: '',
     offer: false,
@@ -157,10 +154,7 @@ export default function CreateListing() {
       const {
         hostelName,
         ServiceName,
-        houseName,
-        city,
-        district,
-        state,
+        address,
         phoneNumber,
         description,
         imageUrls,
@@ -190,10 +184,7 @@ export default function CreateListing() {
         userId: currentUser.id,
         ServiceName: selectedType,
         hostelName,
-        houseName,
-        city,
-        district,
-        state,
+        address, // Use the combined address field
         phoneNumber,
         description,
         ...photos,
@@ -208,7 +199,7 @@ export default function CreateListing() {
 
       const headers = {
         'Content-Type': 'application/json',
-              'Token': currentUser.guid,
+        'Token': currentUser.guid,
       };
 
       // eslint-disable-next-line no-unused-vars
@@ -273,39 +264,12 @@ export default function CreateListing() {
           />
           <input
             type='text'
-            placeholder='House Name'
+            placeholder='Full Address'
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='houseName'
+            id='address'
             required
             onChange={handleChange}
-            value={formData.houseName}
-          />
-          <input
-            type='text'
-            placeholder='City'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='city'
-            required
-            onChange={handleChange}
-            value={formData.city}
-          />
-          <input
-            type='text'
-            placeholder='District'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='district'
-            required
-            onChange={handleChange}
-            value={formData.district}
-          />
-          <input
-            type='text'
-            placeholder='State'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='state'
-            required
-            onChange={handleChange}
-            value={formData.state}
+            value={formData.address}
           />
           <input
             type='text'
@@ -374,7 +338,9 @@ export default function CreateListing() {
               {uploading ? 'Uploading...' : 'Upload'}
             </button>
           </div>
-          <p className='text-red-600 text-sm'>{imageUploadError && imageUploadError}</p>
+          <p className='text-red-600 text-sm'>
+            {imageUploadError && imageUploadError}
+          </p>
           {formData.imageUrls.length > 0 && (
             <div className='flex flex-wrap gap-4 mt-4'>
               {formData.imageUrls.map((url, index) => (

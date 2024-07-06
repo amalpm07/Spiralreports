@@ -16,8 +16,8 @@ import Listing from './pages/Listing';
 import Search from './pages/Search';
 import Booking from './pages/Booking';
 import Payment from './pages/Payment';
-import ShowMyBookings from './pages/ShowMyBookings';
-import ShowMyListing from './pages/ShowMyListing';
+import ShowMyBookings from './pages/showmybookings';
+import ShowMyListing from './pages/showmylisting';
 import BookingDetailsPage from './pages/BookingDetailsPage';
 import PremiumSubscription from './pages/PremiumSubscription '; // Corrected import path
 import BookingModule from './pages/BookingModule';
@@ -36,7 +36,7 @@ function App() {
           <Route path='/about' element={<About />} />
           <Route path='/profile' element={<Profile />} />
           <Route path='/create-listing' element={<CreateListing />} />
-          <Route path='/update-listing/:listingId' element={<UpdateListing />} />
+          <Route path='/update-listing/:listingId/:serviceName' element={<UpdateListing />} />
           <Route path='/listing/:listingId' element={<Listing />} />
           <Route path='/listing/:selectedType/:id' element={<Listing />} />
           <Route path='/search' element={<Search />} />
