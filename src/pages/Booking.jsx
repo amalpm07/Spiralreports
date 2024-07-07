@@ -223,7 +223,12 @@ const BookingForm = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch('https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=boarding');
+        const response = await fetch('https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=boarding', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Token': currentUser.guid  // Replace with your actual token field
+          }
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch questions');
         }
@@ -233,9 +238,10 @@ const BookingForm = () => {
         console.error('Error fetching questions:', error);
       }
     };
-
+  
     fetchQuestions();  // Call fetchQuestions function on component mount
-  }, []);  // Empty dependency array ensures useEffect runs only once on mount
+  }, []);
+    // Empty dependency array ensures useEffect runs only once on mount
 
   // Function to handle proceed button click event
   const handleProceedClick = async () => {
@@ -245,7 +251,7 @@ const BookingForm = () => {
         setDateError('Check-out date must be after check-in date');
         return;
       }
-
+  
       const currentDate = new Date();  // Get current date and time
       // Construct booking data object
       const bookingData = {
@@ -269,9 +275,9 @@ const BookingForm = () => {
           ans: String(answers[questionId]),
         }))
       };
-
+  
       console.log('Booking data:', bookingData);  // Log booking data to console
-
+  
       // Send POST request to book service
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
@@ -281,15 +287,14 @@ const BookingForm = () => {
         },
         body: JSON.stringify(bookingData)
       });
-
+  
       if (!bookingRes.ok) {
-        const bookingError = await bookingRes.text();  // Parse error response
-        throw new Error(`Failed to book service: ${bookingError.message}`);
+        throw new Error('Failed to book service');
       }
-
+  
       const bookingResult = await bookingRes.json();  // Parse booking response
       console.log('Booking response:', bookingResult);  // Log booking response
-
+  
       // Create array of answers data from answers state object
       const answersData = Object.keys(answers).map((questionId) => ({
         id: 0,
@@ -297,9 +302,9 @@ const BookingForm = () => {
         customer_id: currentUser.id,
         ans: String(answers[questionId]),
       }));
-
+  
       console.log('Answers data:', answersData);  // Log answers data
-
+  
       // Send POST request to add answers
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
@@ -309,26 +314,25 @@ const BookingForm = () => {
         },
         body: JSON.stringify(answersData)
       });
-
+  
       if (!answersRes.ok) {
-        // eslint-disable-next-line no-unused-vars
-        const answersError = await answersRes.text();  // Parse error response
-        throw new Error(`Failed to book service: ${bookingError.message}`);
+        throw new Error('Failed to add answers');
       }
-
+  
       const answersResult = await answersRes.text();  // Parse answers response
       console.log('Answers response:', answersResult);  // Log answers response
-
+  
       // Navigate to payment page if booking and adding answers successful
-      if (bookingResult.id && answersResult.includes('Successfully added')) {
-        navigate('/payment', { state: { bookingResponse: bookingResult } });
-      } else {
-        throw new Error('Booking or adding answers failed');
-      }
+      navigate('/payment', { state: { bookingResponse: bookingResult } });
+  
     } catch (error) {
-      console.error('Error during booking:', error.message);  // Log error message to console
-      throw new Error(`Failed to book service: ${bookingError.message}`);
+      console.error('Error during booking:', error.message);
+      // Handle error gracefully, you can log it or set an error state to display to the user
+      // Optionally, throw the error again to propagate it or handle it further up in the component tree
+      throw new Error(`Failed to book service: ${error.message}`);
     }
+  
+  
   };
 
   // Function to handle answer change for text input questions

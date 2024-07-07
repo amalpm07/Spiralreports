@@ -114,7 +114,7 @@ const PremiumSubscription = () => {
     if (validateEmail(email) && validateMobile(mobile)) {
       try {
         const orderResponse = await axios.post(
-          `https://hibow.in/api/Order/InitiateOrder?userId=${currentUser.id}`,
+          `https://hibow.in/api/Order/Initiate Order?userId=${currentUser.id}`,
           {
             Key: 'your_key_here', // Replace with your actual key
             OrderId: 'your_order_id_here', // Replace with your actual order ID

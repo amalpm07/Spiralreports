@@ -45,7 +45,7 @@ const fetchReviews = async (serviceHomeId) => {
         setLoading(true);
         setError(null);
         const res = await fetch(
-          `https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${currentUser.id}`,
+          `https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -269,6 +269,14 @@ const fetchReviews = async (serviceHomeId) => {
             })}
           </ul>
         </div>
+        <div className='mt-4'>
+        <button
+          onClick={handleBookNowClick}
+          className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded'
+        >
+          Book Now
+        </button>
+      </div>
         <div className='mt-10'>
           <h2 className='text-2xl font-semibold'>Reviews</h2>
           {reviews.length === 0 ? (
