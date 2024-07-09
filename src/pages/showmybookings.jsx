@@ -61,7 +61,7 @@ function BookingsPage() {
               <p>Service Name: {booking.serviceName}</p>
               <p>Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
               <p>Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
-              <p>Charge: ${`${booking.charge.toFixed(2)}`}</p>
+              <p>Charge: {`${booking.charge.toFixed(2)}`}</p>
             </Link>
           ))
         ) : (
