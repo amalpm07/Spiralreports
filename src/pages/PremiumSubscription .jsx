@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from 'react';
 import { Container, Typography, Card, CardContent, CardActions, Button, Grid, Box, TextField } from '@mui/material';
 import { styled } from '@mui/system';
@@ -14,6 +15,7 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   paddingBottom: theme.spacing(8),
 }));
 
+// eslint-disable-next-line no-unused-vars
 const StyledCard = styled(Card)(({ theme, selected }) => ({
   transition: 'transform 0.3s, border-color 0.3s',
   transform: selected ? 'scale(1.05)' : 'scale(1)',
@@ -76,7 +78,7 @@ const PremiumSubscription = () => {
   const bookingDetails = {
     CustomerId: currentUser.id,
     customerName: currentUser.userName,
-    charge: selectedPlan === 'Basic' ? 10 : selectedPlan === 'Standard' ? 20 : 30,
+    charge: selectedPlan === 'Basic' ? 1 : selectedPlan === 'Standard' ? 20 : 30,
   };
 
   useEffect(() => {
@@ -146,7 +148,7 @@ const PremiumSubscription = () => {
           handler: async (response) => {
             try {
               const verifyResponse = await axios.post(
-                'https://localhost:44359/Order/PaymentVerification',
+                'https://hibow.in/api/Order/PaymentVerification',
                 {
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_order_id: response.razorpay_order_id,
@@ -226,7 +228,7 @@ const PremiumSubscription = () => {
             >
               <CardContentCentered>
                 <Typography variant="h5" color="secondary">{plan} Plan</Typography>
-                <Typography variant="h6">{`${plan === 'Basic' ? 10 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
+                <Typography variant="h6">{`${plan === 'Basic' ? 1 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
               </CardContentCentered>
               <CardActionsCentered>
                 <Button

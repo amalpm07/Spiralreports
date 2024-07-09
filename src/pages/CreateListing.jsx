@@ -226,7 +226,7 @@ export default function CreateListing() {
         window.alert(`Error: ${serviceHomeData.message}`);
       } else {
         window.alert('Listing created successfully!');
-        navigate(`/listing/${ServiceName}/${serviceHomeData.id}`);
+        navigate(`/listing/${ServiceName}/${currentUser.id}`);
       }
     } catch (error) {
       setError(error.message);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios'; // Import axios for HTTP requests
+import { useSelector } from 'react-redux';
 
 const PaymentPageWrapper = styled.div`
   max-width: 600px;
@@ -48,7 +49,8 @@ const PaymentPage = () => {
   const [emailError, setEmailError] = useState('');
   const [mobileError, setMobileError] = useState('');
   const [paymentError, setPaymentError] = useState('');
-  const [showInvoice, setShowInvoice] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState(null);
+  const { currentUser } = useSelector((state) => state.user);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -87,21 +89,26 @@ const PaymentPage = () => {
       try {
         // Step 1: Create an order on your server
         const orderResponse = await axios.post(
-          `https://hibow.in/api/Order/Initiate Order?userId=${bookingDetails.providerId}`,
+          `https://hibow.in/api/Order/Initiate Order?providerId=${bookingDetails.providerId}`, // Update endpoint to correct one
           {
+            userId: bookingDetails.providerId, // Ensure userId is passed correctly
             customername: bookingDetails.customerName,
             email,
             mobile,
             totalAmount: bookingDetails.charge,
+            currency: 'INR', // Replace with actual currency if applicable
+            key: 'YOUR_RAZORPAY_KEY', // Replace with actual key
+            transactionId: 'YOUR_TRANSACTION_ID', // Replace with actual transaction ID
+            orderId: 'YOUR_ORDER_ID', // Replace with actual order ID
           }
         );
-
+  
         const { orderId, key } = orderResponse.data;
-
-        // Step 2: Configure Razer Pay options
+  
+        // Step 2: Configure Razorpay options
         const options = {
           key, // Use the extracted key from orderResponse
-          amount: orderResponse.totalAmount, // Amount in smallest currency unit (INR here)
+          amount: bookingDetails.charge * 100, // Amount in smallest currency unit (INR here)
           currency: 'INR', // Your currency
           order_id: orderId, // Order ID from your server
           name: 'Your Company Name',
@@ -111,34 +118,37 @@ const PaymentPage = () => {
             // Step 3: Verify the payment on your server
             try {
               const verifyResponse = await axios.post(
-                'YOUR_SERVER_ENDPOINT_TO_VERIFY_PAYMENT',
+                'https://hibow.in/api/Order/PaymentVerification',
                 {
-                  paymentId: response.razorpay_payment_id,
-                  orderId: response.razorpay_order_id,
-                  signature: response.razorpay_signature,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                },
+                {
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Token': currentUser.guid, // Replace with your actual token
+                  },
                 }
               );
-
+  
               if (verifyResponse.data.success) {
                 // Handle successful payment
                 console.log('Payment successful:', verifyResponse.data);
-                // Show invoice after successful payment
-                setShowInvoice(true);
-
-                // Step 4: Update database with payment information
-                const paymentInfo = {
-                  orderId: response.razorpay_order_id,
+                // Set payment details to state
+                setPaymentDetails({
                   paymentId: response.razorpay_payment_id,
-                  amount: orderResponse.totalAmount,
-                  // Include other relevant information as needed
-                };
-
-                const updateDatabaseResponse = await axios.post(
-                  'YOUR_SERVER_ENDPOINT_TO_UPDATE_DATABASE',
-                  paymentInfo
-                );
-
-                console.log('Database update response:', updateDatabaseResponse.data);
+                  orderId: response.razorpay_order_id,
+                  signature: response.razorpay_signature,
+                  customerName: bookingDetails.customerName,
+                  serviceName: bookingDetails.serviceName,
+                  bookingDate: bookingDetails.bookingDate,
+                  serviceFromDate: bookingDetails.serviceFromDate,
+                  serviceToDate: bookingDetails.serviceToDate,
+                  charge: bookingDetails.charge,
+                  email,
+                  mobile,
+                });
               } else {
                 throw new Error('Payment verification failed');
               }
@@ -156,8 +166,8 @@ const PaymentPage = () => {
             color: '#3399cc',
           },
         };
-
-        // Step 5: Open the Razer Pay payment window
+  
+        // Step 4: Open the Razorpay payment window
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       } catch (error) {
@@ -181,11 +191,15 @@ const PaymentPage = () => {
       }
     }
   };
+  
+  
+  
+  
 
   return (
     <PaymentPageWrapper>
       <h2>Payment Page</h2>
-      {bookingDetails && (
+      {bookingDetails && !paymentDetails && (
         <PaymentForm onSubmit={handleSubmit}>
           <FormGroup>
             <Label>Customer Name</Label>
@@ -237,16 +251,20 @@ const PaymentPage = () => {
           </FormGroup>
         </PaymentForm>
       )}
-      {showInvoice && (
+      {paymentDetails && (
         <div>
           <h3>Invoice</h3>
-          <p><strong>Customer Name:</strong> {bookingDetails.customerName}</p>
-          <p><strong>Service Name:</strong> {bookingDetails.serviceName}</p>
-          <p><strong>Booking Date:</strong> {formatDate(bookingDetails.bookingDate)}</p>
-          <p><strong>Service From Date:</strong> {formatDate(bookingDetails.serviceFromDate)}</p>
-          <p><strong>Service To Date:</strong> {formatDate(bookingDetails.serviceToDate)}</p>
-          <p><strong>Charge:</strong> {bookingDetails.charge}</p>
-          {/* Add more details as needed */}
+          <p><strong>Customer Name:</strong> {paymentDetails.customerName}</p>
+          <p><strong>Service Name:</strong> {paymentDetails.serviceName}</p>
+          <p><strong>Booking Date:</strong> {formatDate(paymentDetails.bookingDate)}</p>
+          <p><strong>Service From Date:</strong> {formatDate(paymentDetails.serviceFromDate)}</p>
+          <p><strong>Service To Date:</strong> {formatDate(paymentDetails.serviceToDate)}</p>
+          <p><strong>Charge:</strong> {paymentDetails.charge}</p>
+          <p><strong>Email:</strong> {paymentDetails.email}</p>
+          <p><strong>Mobile:</strong> {paymentDetails.mobile}</p>
+          <p><strong>Payment ID:</strong> {paymentDetails.paymentId}</p>
+          <p><strong>Order ID:</strong> {paymentDetails.orderId}</p>
+          <p><strong>Transaction ID:</strong> {paymentDetails.transactionId}</p>
         </div>
       )}
     </PaymentPageWrapper>

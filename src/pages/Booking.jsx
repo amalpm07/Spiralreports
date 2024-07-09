@@ -240,6 +240,7 @@ const BookingForm = () => {
     };
   
     fetchQuestions();  // Call fetchQuestions function on component mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
     // Empty dependency array ensures useEffect runs only once on mount
 
@@ -258,7 +259,7 @@ const BookingForm = () => {
         customer_id: currentUser.id,
         customerName: currentUser?.userName || "Guest",
         providerId: listing?.serviceHome?.userId,
-        serviceName: listing?.serviceHome?.serviceName,
+        serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
         bookingDate: currentDate.toISOString(),
         serviceFromDate: checkInDate.toISOString(),
         serviceToDate: checkOutDate.toISOString(),
@@ -275,6 +276,7 @@ const BookingForm = () => {
           ans: String(answers[questionId]),
         }))
       };
+      
   
       console.log('Booking data:', bookingData);  // Log booking data to console
   

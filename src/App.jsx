@@ -21,6 +21,7 @@ import ShowMyListing from './pages/showmylisting';
 import BookingDetailsPage from './pages/BookingDetailsPage';
 import PremiumSubscription from './pages/PremiumSubscription '; // Corrected import path
 import BookingModule from './pages/BookingModule';
+import PaymentStatus from './pages/PaymentStatus';
 const theme = createTheme();
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path='/showmylisting' element={<ShowMyListing />} />
           <Route path='/booking/:id' element={<BookingDetailsPage />} />
           <Route path='/premium-subscription' element={<PremiumSubscription />} />
+          <Route path='/PaymentStatus' element={<PaymentStatus />}/>
           <Route element={<PrivateRoute />} /> {/* Protected routes */}
         </Routes>
         <Footer />
