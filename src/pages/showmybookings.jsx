@@ -54,7 +54,7 @@ function BookingsPage() {
             <Link
               key={booking.id}
               to={`/booking/${booking.id}`} // Navigate to booking details page with booking ID
-              className="border border-gray-200 rounded-lg p-6 block hover:bg-gray-50"
+              className="relative border border-gray-200 rounded-lg p-6 block hover:bg-gray-50"
             >
               <p className="font-semibold">Booking ID: {booking.id}</p>
               <p>Customer Name: {booking.customerName}</p>
@@ -62,6 +62,16 @@ function BookingsPage() {
               <p>Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
               <p>Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
               <p>Charge: {`${booking.charge.toFixed(2)}`}</p>
+              {booking.isConfirmed && (
+                <p className="text-green-600 font-semibold absolute bottom-4 right-4">
+                  Confirmed
+                </p>
+              )}
+              {booking.isCancelled && (
+                <p className="text-red-600 font-semibold absolute bottom-4 right-4">
+                  Cancelled
+                </p>
+              )}
             </Link>
           ))
         ) : (

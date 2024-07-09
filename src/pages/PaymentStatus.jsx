@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
+import  { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styleComponets/styledComponents.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

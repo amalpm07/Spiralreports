@@ -1,8 +1,8 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 function BookingDetailsPage() {
   const { id } = useParams();
@@ -11,6 +11,7 @@ function BookingDetailsPage() {
   const [popupMessage, setPopupMessage] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
+  const [isBookingCancelled, setIsBookingCancelled] = useState(false);
 
   useEffect(() => {
     // Fetch booking details using the id from useParams()
@@ -27,8 +28,9 @@ function BookingDetailsPage() {
         }
         const data = await res.json();
         setBookingDetails(data);
-        // Update the isBookingConfirmed state based on the fetched data
+        // Update the isBookingConfirmed and isBookingCancelled state based on fetched data
         setIsBookingConfirmed(data.isConfirmed);
+        setIsBookingCancelled(data.isCancelled); // Assuming data.isCancelled is returned from API
       } catch (error) {
         console.error('An error occurred while fetching booking details:', error);
       }
@@ -49,8 +51,13 @@ function BookingDetailsPage() {
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
-      setPopupMessage("Booking successfully canceled.");
+      // Update the database first, then update local state
+      // eslint-disable-next-line no-undef
+      await fetchBookingDetails(); // Fetch updated details to reflect the cancellation
+      setPopupMessage("Booking successfully cancelled.");
       setShowPopup(true);
+      setIsBookingCancelled(true);
+      setIsBookingConfirmed(false); // Ensure isBookingConfirmed is false after cancellation
     } catch (error) {
       setPopupMessage(`An error occurred: ${error.message}`);
       setShowPopup(true);
@@ -63,15 +70,19 @@ function BookingDetailsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.token // Replace with your actual token field
+          'Token': currentUser.guid // Replace with your actual token field
         }
       });
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
+      // Update the database first, then update local state
+      // eslint-disable-next-line no-undef
+      await fetchBookingDetails(); // Fetch updated details to reflect the confirmation
       setPopupMessage("Booking successfully confirmed.");
       setShowPopup(true);
       setIsBookingConfirmed(true);
+      setIsBookingCancelled(false); // Ensure isBookingCancelled is false after confirmation
     } catch (error) {
       setPopupMessage(`An error occurred: ${error.message}`);
       setShowPopup(true);
@@ -101,7 +112,7 @@ function BookingDetailsPage() {
           <p><strong>Charge:</strong> {bookingDetails.charge}</p>
         </div>
         <div className="flex justify-end space-x-4 mt-4">
-          {!isBookingConfirmed ? (
+          {!isBookingConfirmed && !isBookingCancelled ? (
             <>
               <button
                 className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300"
@@ -116,10 +127,15 @@ function BookingDetailsPage() {
                 Confirm
               </button>
             </>
-          ) : (
+          ) : isBookingConfirmed ? (
             <div className="flex items-center space-x-2">
               <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 text-2xl" />
               <p className="text-green-500 text-xl font-semibold">Confirmed</p>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <FontAwesomeIcon icon={faTimesCircle} className="text-red-500 text-2xl" />
+              <p className="text-red-500 text-xl font-semibold">Cancelled</p>
             </div>
           )}
         </div>
