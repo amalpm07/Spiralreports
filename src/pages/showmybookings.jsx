@@ -10,9 +10,10 @@ function BookingsPage() {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    // Fetch user bookings when component mounts
-    handleShowBookings();
-  }, []);
+    if (currentUser) {
+      handleShowBookings();
+    }
+  }, [currentUser]);
 
   const handleShowBookings = async () => {
     setLoading(true);
@@ -24,18 +25,18 @@ function BookingsPage() {
           'Token': currentUser.guid, // Assuming currentUser.guid contains the token
         },
       });
-  
+
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
-  
+
       const data = await res.json();
-  
-      if (!data || !Array.isArray(data)) {
+
+      if (!data || !Array.isArray(data.booking)) {
         throw new Error('Invalid data format received');
       }
-  
-      setUserBookings(data);
+
+      setUserBookings(data.booking);
     } catch (error) {
       setError(error.message || 'Failed to load bookings');
       console.error('An error occurred while fetching bookings:', error);
@@ -43,7 +44,6 @@ function BookingsPage() {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="container mx-auto p-4">
@@ -75,13 +75,13 @@ function BookingsPage() {
       {error && <p className="mt-8 text-center text-red-600">{error}</p>}
 
       {/* Show button to fetch bookings */}
-      {!loading && userBookings.length === 0 && (
+      {!loading && userBookings.length === 0 && !error && (
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-8 mx-auto block"
           onClick={handleShowBookings}
           disabled={loading}
         >
-          {loading ? 'Loading...' : 'Show My Bookings'}
+          Show My Bookings
         </button>
       )}
     </div>
