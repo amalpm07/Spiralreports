@@ -6,13 +6,16 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://hibow.in/api',
-        secure: false,
+        target: 'https://hibow.in',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },
   },
+  plugins: [
+    react() // Include @vitejs/plugin-react-swc for React compilation with SWC
+  ],
   optimizeDeps: {
-    include: ['@emotion/is-prop-valid'], // Ensure @emotion/is-prop-valid is included in the optimization
+    include: ['clsx'], // Ensure clsx is included in optimization
   },
-  plugins: [react()],
 });
