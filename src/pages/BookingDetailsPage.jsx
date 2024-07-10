@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
@@ -13,29 +13,27 @@ function BookingDetailsPage() {
   const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
   const [isBookingCancelled, setIsBookingCancelled] = useState(false);
 
-  useEffect(() => {
-    // Fetch booking details using the id from useParams()
-    const fetchBookingDetails = async () => {
-      try {
-        const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByBookingId?bookingId=${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Token': currentUser.guid // Replace with your actual token field
-          }
-        });
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
+  const fetchBookingDetails = async () => {
+    try {
+      const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByBookingId?bookingId=${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser.guid
         }
-        const data = await res.json();
-        setBookingDetails(data);
-        // Update the isBookingConfirmed and isBookingCancelled state based on fetched data
-        setIsBookingConfirmed(data.isConfirmed);
-        setIsBookingCancelled(data.isCancelled); // Assuming data.isCancelled is returned from API
-      } catch (error) {
-        console.error('An error occurred while fetching booking details:', error);
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
       }
-    };
+      const data = await res.json();
+      setBookingDetails(data);
+      setIsBookingConfirmed(data.isConfirmed);
+      setIsBookingCancelled(data.isCancelled);
+    } catch (error) {
+      console.error('An error occurred while fetching booking details:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchBookingDetails();
   }, [id, currentUser.guid]);
 
@@ -45,19 +43,17 @@ function BookingDetailsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid // Replace with your actual token field
+          'Token': currentUser.guid
         }
       });
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
-      // Update the database first, then update local state
-      // eslint-disable-next-line no-undef
-      await fetchBookingDetails(); // Fetch updated details to reflect the cancellation
+      await fetchBookingDetails();
       setPopupMessage("Booking successfully cancelled.");
       setShowPopup(true);
       setIsBookingCancelled(true);
-      setIsBookingConfirmed(false); // Ensure isBookingConfirmed is false after cancellation
+      setIsBookingConfirmed(false);
     } catch (error) {
       setPopupMessage(`An error occurred: ${error.message}`);
       setShowPopup(true);
@@ -70,19 +66,17 @@ function BookingDetailsPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid // Replace with your actual token field
+          'Token': currentUser.guid
         }
       });
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
-      // Update the database first, then update local state
-      // eslint-disable-next-line no-undef
-      await fetchBookingDetails(); // Fetch updated details to reflect the confirmation
+      await fetchBookingDetails();
       setPopupMessage("Booking successfully confirmed.");
       setShowPopup(true);
       setIsBookingConfirmed(true);
-      setIsBookingCancelled(false); // Ensure isBookingCancelled is false after confirmation
+      setIsBookingCancelled(false);
     } catch (error) {
       setPopupMessage(`An error occurred: ${error.message}`);
       setShowPopup(true);
@@ -112,27 +106,46 @@ function BookingDetailsPage() {
           <p><strong>Charge:</strong> {bookingDetails.charge}</p>
         </div>
         <div className="flex justify-end space-x-4 mt-4">
-          {!isBookingConfirmed && !isBookingCancelled ? (
-            <>
-              <button
-                className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300"
-                onClick={handleCancelBooking}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 transition duration-300"
-                onClick={handleConfirmBooking}
-              >
-                Confirm
-              </button>
-            </>
-          ) : isBookingConfirmed ? (
+          {!isBookingConfirmed && !isBookingCancelled && (
+            currentUser.usertype === 'provider' ? (
+              <>
+                <button
+                  className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300"
+                  onClick={handleCancelBooking}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 transition duration-300"
+                  onClick={handleConfirmBooking}
+                >
+                  Confirm
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-300"
+                  onClick={handleCancelBooking}
+                >
+                  Cancel
+                </button>
+                <Link
+                  to={`/edit-booking/${id}`}
+                  className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
+                >
+                  Edit
+                </Link>
+              </>
+            )
+          )}
+          {isBookingConfirmed && (
             <div className="flex items-center space-x-2">
               <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 text-2xl" />
               <p className="text-green-500 text-xl font-semibold">Confirmed</p>
             </div>
-          ) : (
+          )}
+          {isBookingCancelled && (
             <div className="flex items-center space-x-2">
               <FontAwesomeIcon icon={faTimesCircle} className="text-red-500 text-2xl" />
               <p className="text-red-500 text-xl font-semibold">Cancelled</p>

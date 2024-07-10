@@ -10,10 +10,9 @@ function BookingsPage() {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (currentUser) {
-      handleShowBookings();
-    }
-  }, [currentUser]);
+    // Fetch user bookings when component mounts
+    handleShowBookings();
+  }, []);
 
   const handleShowBookings = async () => {
     setLoading(true);
@@ -32,11 +31,20 @@ function BookingsPage() {
 
       const data = await res.json();
 
-      if (!data || !Array.isArray(data.booking)) {
+      // Log the received data for debugging
+      console.log('Received booking details:', data);
+
+      // Check if data is in the expected format
+      if (!data || (!Array.isArray(data) && !Array.isArray(data.booking))) {
         throw new Error('Invalid data format received');
       }
 
-      setUserBookings(data.booking);
+      // Set the bookings based on user type
+      if (Array.isArray(data)) {
+        setUserBookings(data); // Customer response
+      } else if (Array.isArray(data.booking)) {
+        setUserBookings(data.booking); // Provider response
+      }
     } catch (error) {
       setError(error.message || 'Failed to load bookings');
       console.error('An error occurred while fetching bookings:', error);
@@ -54,24 +62,14 @@ function BookingsPage() {
             <Link
               key={booking.id}
               to={`/booking/${booking.id}`} // Navigate to booking details page with booking ID
-              className="relative border border-gray-200 rounded-lg p-6 block hover:bg-gray-50"
+              className="border border-gray-200 rounded-lg p-6 block hover:bg-gray-50"
             >
               <p className="font-semibold">Booking ID: {booking.id}</p>
               <p>Customer Name: {booking.customerName}</p>
               <p>Service Name: {booking.serviceName}</p>
               <p>Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
               <p>Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
-              <p>Charge: {`${booking.charge.toFixed(2)}`}</p>
-              {booking.isConfirmed && (
-                <p className="text-green-600 font-semibold absolute bottom-4 right-4">
-                  Confirmed
-                </p>
-              )}
-              {booking.isCancelled && (
-                <p className="text-red-600 font-semibold absolute bottom-4 right-4">
-                  Cancelled
-                </p>
-              )}
+              <p>Charge: ${`${booking.charge.toFixed(2)}`}</p>
             </Link>
           ))
         ) : (
@@ -85,13 +83,13 @@ function BookingsPage() {
       {error && <p className="mt-8 text-center text-red-600">{error}</p>}
 
       {/* Show button to fetch bookings */}
-      {!loading && userBookings.length === 0 && !error && (
+      {!loading && userBookings.length === 0 && (
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-8 mx-auto block"
           onClick={handleShowBookings}
           disabled={loading}
         >
-          Show My Bookings
+          {loading ? 'Loading...' : 'Show My Bookings'}
         </button>
       )}
     </div>

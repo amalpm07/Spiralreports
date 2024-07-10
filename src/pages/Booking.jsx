@@ -256,7 +256,7 @@ const BookingForm = () => {
       const currentDate = new Date();  // Get current date and time
       // Construct booking data object
       const bookingData = {
-        customer_id: currentUser.id,
+        customerid: currentUser.id,
         customerName: currentUser?.userName || "Guest",
         providerId: listing?.serviceHome?.userId,
         serviceName: listing?.serviceHome?.serviceName || "Default Service Name",

@@ -19,25 +19,24 @@ const Listing = () => {
   const { selectedType, id } = useParams();
 
   // Define fetchReviews function with headers
-const fetchReviews = async (serviceHomeId) => {
-  try {
-    const res = await fetch(`https://hibow.in/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Token': currentUser.guid, // Assuming currentUser.guid contains the token
-      },
-    });
-    if (!res.ok) {
-      throw new Error('Failed to fetch reviews');
+  const fetchReviews = async (serviceHomeId) => {
+    try {
+      const res = await fetch(`https://hibow.in/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser.guid, // Assuming currentUser.guid contains the token
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch reviews');
+      }
+      const data = await res.json();
+      setReviews(data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      setReviews([]);
     }
-    const data = await res.json();
-    setReviews(data);
-  } catch (error) {
-    console.error('Error fetching reviews:', error);
-    setReviews([]);
-  }
-};
-
+  };
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -270,13 +269,15 @@ const fetchReviews = async (serviceHomeId) => {
           </ul>
         </div>
         <div className='mt-4'>
-        <button
-          onClick={handleBookNowClick}
-          className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded'
-        >
-          Book Now
-        </button>
-      </div>
+          {currentUser?.usertype === 'Customer' && (
+            <button
+              onClick={handleBookNowClick}
+              className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded'
+            >
+              Book Now
+            </button>
+          )}
+        </div>
         <div className='mt-10'>
           <h2 className='text-2xl font-semibold'>Reviews</h2>
           {reviews.length === 0 ? (
@@ -306,8 +307,9 @@ const fetchReviews = async (serviceHomeId) => {
             </ul>
           )}
         </div>
-        {currentUser?.usertype !== 'provider' && (
-        <div className='max-w-4xl mx-auto p-3 my-7'>
+        {/* Leave a Review section */}
+      {currentUser?.usertype !== 'provider' && (
+        <div className='mt-8 border-t pt-6'>
           <h3 className='text-2xl font-semibold mb-4'>Leave a Review</h3>
           {reviewError && (
             <p className='text-red-500 mb-4'>{reviewError}</p>

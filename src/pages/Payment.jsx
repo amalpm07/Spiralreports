@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import axios from 'axios'; // Import axios for HTTP requests
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 
 const PaymentPageWrapper = styled.div`
@@ -42,6 +42,7 @@ const formatDate = (dateString) => {
 
 const PaymentPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const bookingDetails = location.state?.bookingResponse;
 
   const [email, setEmail] = useState('');
@@ -84,38 +85,35 @@ const PaymentPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validate email and mobile here before proceeding
+
     if (validateEmail(email) && validateMobile(mobile)) {
       try {
-        // Step 1: Create an order on your server
         const orderResponse = await axios.post(
-          `https://hibow.in/api/Order/Initiate Order?providerId=${bookingDetails.providerId}`, // Update endpoint to correct one
+         `https://hibow.in/api/Order/Initiate Order?providerId=${bookingDetails.providerId}`,
           {
-            userId: bookingDetails.providerId, // Ensure userId is passed correctly
-            customername: bookingDetails.customerName,
+            userId: bookingDetails.providerId,
+            customerName: bookingDetails.customerName,
             email,
             mobile,
             totalAmount: bookingDetails.charge,
-            currency: 'INR', // Replace with actual currency if applicable
-            key: 'YOUR_RAZORPAY_KEY', // Replace with actual key
-            transactionId: 'YOUR_TRANSACTION_ID', // Replace with actual transaction ID
-            orderId: 'YOUR_ORDER_ID', // Replace with actual order ID
+            currency: 'INR',
+            key: 'YOUR_RAZORPAY_KEY',
+            transactionId: 'YOUR_TRANSACTION_ID',
+            orderId: 'YOUR_ORDER_ID',
           }
         );
-  
+
         const { orderId, key } = orderResponse.data;
-  
-        // Step 2: Configure Razorpay options
+
         const options = {
-          key, // Use the extracted key from orderResponse
-          amount: bookingDetails.charge * 100, // Amount in smallest currency unit (INR here)
-          currency: 'INR', // Your currency
-          order_id: orderId, // Order ID from your server
+          key,
+          amount: bookingDetails.charge * 100,
+          currency: 'INR',
+          order_id: orderId,
           name: 'Your Company Name',
           description: 'Product Description',
-          image: 'https://example.com/logo.png', // Your company logo URL
+          image: 'https://example.com/logo.png',
           handler: async (response) => {
-            // Step 3: Verify the payment on your server
             try {
               const verifyResponse = await axios.post(
                 'https://hibow.in/api/Order/PaymentVerification',
@@ -127,15 +125,12 @@ const PaymentPage = () => {
                 {
                   headers: {
                     'Content-Type': 'application/json',
-                    'Token': currentUser.guid, // Replace with your actual token
+                    'Token': currentUser.guid,
                   },
                 }
               );
-  
-              if (verifyResponse.data.success) {
-                // Handle successful payment
-                console.log('Payment successful:', verifyResponse.data);
-                // Set payment details to state
+
+              if (verifyResponse.data.isPaymentSuccessfull) {
                 setPaymentDetails({
                   paymentId: response.razorpay_payment_id,
                   orderId: response.razorpay_order_id,
@@ -149,6 +144,11 @@ const PaymentPage = () => {
                   email,
                   mobile,
                 });
+
+                navigate('/paymentstatus', {
+                  state: { orderId: orderId }
+                });
+                
               } else {
                 throw new Error('Payment verification failed');
               }
@@ -166,8 +166,7 @@ const PaymentPage = () => {
             color: '#3399cc',
           },
         };
-  
-        // Step 4: Open the Razorpay payment window
+
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       } catch (error) {
@@ -182,7 +181,6 @@ const PaymentPage = () => {
         }
       }
     } else {
-      // Display error messages or handle invalid input
       if (!validateEmail(email)) {
         setEmailError('Please enter a valid email address');
       }
@@ -191,10 +189,6 @@ const PaymentPage = () => {
       }
     }
   };
-  
-  
-  
-  
 
   return (
     <PaymentPageWrapper>
