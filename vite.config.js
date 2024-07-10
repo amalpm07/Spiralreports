@@ -11,6 +11,8 @@ export default defineConfig({
       },
     },
   },
-
+  optimizeDeps: {
+    include: ['@emotion/is-prop-valid'], // Ensure @emotion/is-prop-valid is included in the optimization
+  },
   plugins: [react()],
 });
