@@ -194,7 +194,7 @@ export default function SignUp() {
               <FaUser className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="userName"
                 value={formData.userName}
                 onChange={handleChange}

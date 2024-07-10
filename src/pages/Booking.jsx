@@ -298,24 +298,26 @@ const BookingForm = () => {
       console.log('Booking response:', bookingResult);  // Log booking response
   
       // Create array of answers data from answers state object
-      const answersData = Object.keys(answers).map((questionId) => ({
-        id: 0,
-        question_id: parseInt(questionId),
-        customer_id: currentUser.id,
-        ans: String(answers[questionId]),
-      }));
-  
-      console.log('Answers data:', answersData);  // Log answers data
-  
-      // Send POST request to add answers
-      const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Token': currentUser.guid  // Replace with your actual token field
-        },
-        body: JSON.stringify(answersData)
-      });
+// Construct answers data object in the correct format
+const answersData = {
+  newAnswers: Object.keys(answers).map((questionId) => ({
+    id: 0, // Replace with actual ID if applicable
+    question_id: parseInt(questionId),
+    customer_id: currentUser.id,
+    ans: String(answers[questionId]),
+  }))
+};
+
+// Send POST request to add answers
+const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Token': currentUser.guid  // Replace with your actual token field
+  },
+  body: JSON.stringify(answersData)
+});
+
   
       if (!answersRes.ok) {
         throw new Error('Failed to add answers');
@@ -338,12 +340,31 @@ const BookingForm = () => {
   };
 
   // Function to handle answer change for text input questions
-  const handleAnswerChange = (questionId, answer) => {
+// Function to handle answer change for text input questions
+const handleAnswerChange = (questionId, answer) => {
+  // Check if the questionId corresponds to the 3rd question (index 2 in array)
+  if (questionId === questions[2]?.id) {
+    // Validate that the answer is a number
+    if (!isNaN(answer)) {
+      setAnswers(prevAnswers => ({
+        ...prevAnswers,
+        [questionId]: answer
+      }));
+    } else {
+      // Optionally, handle invalid input (e.g., show error message)
+      // For example, set an error state or display a message to the user
+      console.error('Answer must be a number for question 3');
+      // Optionally set an error state or show a message to the user
+    }
+  } else {
+    // For other questions, update the answers state as usual
     setAnswers(prevAnswers => ({
       ...prevAnswers,
       [questionId]: answer
     }));
-  };
+  }
+};
+
 
   // Function to handle checkbox change for checkbox questions
   const handleCheckboxChange = (questionId, option) => {
@@ -366,126 +387,124 @@ const BookingForm = () => {
   // Return JSX for BookingForm component
   return (
     <BookingFormWrapper>
-      <GlobalStyle />  {/* Apply global styles */}
-      {/* JSX for Check-In date picker */}
-      <FormElement label="Check - In" icon={FiCalendar}>
-        <DatepickerWrapper
-          selected={checkInDate}
-          onChange={date => {
-            setCheckInDate(date);
-            if (date >= checkOutDate) {
-              setCheckOutDate(new Date(date.setDate(date.getDate() + 1)));
-            }
+    <GlobalStyle /> {/* Apply global styles */}
+  
+    {/* JSX for Check-In date picker */}
+    <FormElement label="Check - In" icon={FiCalendar}>
+      <DatepickerWrapper
+        selected={checkInDate}
+        onChange={(date) => {
+          setCheckInDate(date);
+          if (date >= checkOutDate) {
+            setCheckOutDate(new Date(date.setDate(date.getDate() + 1)));
+          }
+          setDateError('');
+        }}
+        dateFormat="MM/dd/yyyy"
+        className="form-control"
+        customInput={<Input type="text" readOnly />} // Custom input component for date picker
+      />
+    </FormElement>
+  
+    {/* JSX for Check-Out date picker */}
+    <FormElement label="Check - Out" icon={FiCalendar}>
+      <DatepickerWrapper
+        selected={checkOutDate}
+        onChange={(date) => {
+          setCheckOutDate(date);
+          if (date <= checkInDate) {
+            setDateError('Check-out date must be after check-in date');
+          } else {
             setDateError('');
-          }}
-          dateFormat="MM/dd/yyyy"
-          className="form-control"
-          customInput={<Input type="text" readOnly />}  // Custom input component for date picker
-        />
-      </FormElement>
-
-      {/* JSX for Check-Out date picker */}
-      <FormElement label="Check - Out" icon={FiCalendar}>
-        <DatepickerWrapper
-          selected={checkOutDate}
-          onChange={date => {
-            setCheckOutDate(date);
-            if (date <= checkInDate) {
-              setDateError('Check-out date must be after check-in date');
-            } else {
-              setDateError('');
-            }
-          }}
-          dateFormat="MM/dd/yyyy"
-          className="form-control"
-          customInput={<Input type="text" readOnly />}  // Custom input component for date picker
-        />
-        {/* Display error message if dateError state is not empty */}
-        {dateError && <p style={{ color: 'red' }}>{dateError}</p>}
-      </FormElement>
-
-      {/* Mapping over questions array to render form elements */}
-      {questions && questions.map((question, index) => (
+          }
+        }}
+        dateFormat="MM/dd/yyyy"
+        className="form-control"
+        customInput={<Input type="text" readOnly />} // Custom input component for date picker
+      />
+      {/* Display error message if dateError state is not empty */}
+      {dateError && <p style={{ color: 'red' }}>{dateError}</p>}
+    </FormElement>
+  
+    {/* Mapping over questions array to render form elements */}
+    {questions &&
+      questions.map((question, index) => (
         <React.Fragment key={question.id}>
           <FormElement label={question.questions} />
           {/* Render checkbox group for index 0 and 3 */}
           {index === 0 ? (
-              // Render radio buttons for index 0 questions
-              // Render radio buttons for index 0 questions
-<CheckboxGroup>
-  <label>
-    <input
-      type="radio"
-      checked={answers[question.id] === 'dog'}
-      onChange={() => handleCheckboxChange(question.id, 'dog')}
-    />
-    DOG
-  </label>
-  <label>
-    <input
-      type="radio"
-      checked={answers[question.id] === 'cat'}
-      onChange={() => handleCheckboxChange(question.id, 'cat')}
-    />
-    CAT
-  </label>
-  <label>
-    <input
-      type="radio"
-      checked={answers[question.id] === 'bird'}
-      onChange={() => handleCheckboxChange(question.id, 'bird')}
-    />
-    BIRD
-  </label>
-</CheckboxGroup>
-
-            ) : index === 3 ? (
-              // Render radio buttons for index 3 questions
-              <CheckboxGroup>
-                <label>
-                  <input
-                    type="radio"
-                    checked={answers[question.id] === 'Small'}
-                    onChange={() => handleCheckboxChange(question.id, 'Small')}
-                  />
-                  Small
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    checked={answers[question.id] === 'Medium'}
-                    onChange={() => handleCheckboxChange(question.id, 'Medium')}
-                  />
-                  Medium
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    checked={answers[question.id] === 'Large'}
-                    onChange={() => handleCheckboxChange(question.id, 'Large')}
-                  />
-                  Large
-                </label>
-              </CheckboxGroup>
-            ) : (
-              // Default to text input for other questions
-              <Input
-                type="text"
-                value={answers[question.id] || ''}
-                onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-              />
-            )}
+            <CheckboxGroup>
+              <label>
+                <input
+                  type="radio"
+                  checked={answers[question.id] === 'dog'}
+                  onChange={() => handleCheckboxChange(question.id, 'dog')}
+                />
+                DOG
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={answers[question.id] === 'cat'}
+                  onChange={() => handleCheckboxChange(question.id, 'cat')}
+                />
+                CAT
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={answers[question.id] === 'bird'}
+                  onChange={() => handleCheckboxChange(question.id, 'bird')}
+                />
+                BIRD
+              </label>
+            </CheckboxGroup>
+          ) : index === 3 ? (
+            <CheckboxGroup>
+              <label>
+                <input
+                  type="radio"
+                  checked={answers[question.id] === 'Small'}
+                  onChange={() => handleCheckboxChange(question.id, 'Small')}
+                />
+                Small
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={answers[question.id] === 'Medium'}
+                  onChange={() => handleCheckboxChange(question.id, 'Medium')}
+                />
+                Medium
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={answers[question.id] === 'Large'}
+                  onChange={() => handleCheckboxChange(question.id, 'Large')}
+                />
+                Large
+              </label>
+            </CheckboxGroup>
+          ) : (
+            // Default to text input for other questions
+            <Input
+              type="text"
+              value={answers[question.id] || ''}
+              onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+            />
+          )}
         </React.Fragment>
       ))}
-
-      {/* JSX for Proceed button */}
-      <FormElement>
-        <Button onClick={handleProceedClick}>Proceed</Button>
-      </FormElement>
-
-      {/* Display SuccessPopup component if showSuccess state is true */}
-      {showSuccess && <SuccessPopup onClose={() => setShowSuccess(false)} />}
-    </BookingFormWrapper>
+  
+    {/* JSX for Proceed button */}
+    <FormElement>
+      <Button onClick={handleProceedClick}>Proceed</Button>
+    </FormElement>
+  
+    {/* Display SuccessPopup component if showSuccess state is true */}
+    {showSuccess && <SuccessPopup onClose={() => setShowSuccess(false)} />}
+  </BookingFormWrapper>
   );
 };
 
@@ -505,17 +524,18 @@ const FormElement = ({ label, icon: IconComponent, children }) => (
 
 // PropTypes validation for FormElement component props
 FormElement.propTypes = {
-  label: PropTypes.string,  // label prop should be a string
-  icon: PropTypes.elementType,  // icon prop should be a valid React component
-  children: PropTypes.node,  // children prop should be a valid React node
+  label: PropTypes.string, // label prop should be a string
+  icon: PropTypes.elementType, // icon prop should be a valid React component
+  children: PropTypes.node, // children prop should be a valid React node
 };
+
 
 // SuccessPopup component for displaying success message with animation
 const SuccessPopup = ({ onClose }) => {
   const animation = useSpring({
     opacity: 1,
     transform: 'translateY(0)',
-    from: { opacity: 0, transform: 'translateY(-50px)' },  // Animation from 50px above final position
+    from: { opacity: 0, transform: 'translateY(-50px)' }, // Animation from 50px above final position
   });
 
   return (

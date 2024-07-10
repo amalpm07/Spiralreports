@@ -29,22 +29,23 @@ const Home = () => {
       {/* Banner Section */}
       <section className="relative bg-gray-800">
         <img
-          className="w-full h-64 object-cover"
-          src=''// Use the imported image variable here
+          className="w-full h-64 md:h-96 object-cover"
+          src='' // Use the imported image variable here
           alt="Banner"
         />
         <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
-          <div className="relative">
-            <h1 className="text-4xl font-bold">Welcome to Service Homes</h1>
-            <p className="mt-4 text-lg">Find your ideal service home here</p>
-            <Link
-              to="/premium-subscription"
-              className="absolute mt-6 bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md transition duration-300"
-              style={{ top: '70px', left: '50%', transform: 'translateX(-50%)' }} // Adjust the top value as needed
-            >
-              Explore Premium
-            </Link>
+          <div className="relative max-w-xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold">Welcome to Service Homes</h1>
+            <p className="mt-4 text-lg md:text-xl">Find your ideal service home here</p>
+            <div className="mt-6">
+              <Link
+                to="/premium-subscription"
+                className="bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md transition duration-300"
+              >
+                Explore Premium
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -57,11 +58,10 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {serviceHomes.map((home) => (
             <Link
-            key={home.id} // Ensure the key is unique
-            to={`/listing/${home.serviceName}/${home.userId}`}
-            className="group block rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-          >
-          
+              key={home.id} // Ensure the key is unique
+              to={`/listing/${home.serviceName}/${home.userId}`}
+              className="group block rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+            >
               <div className="relative w-full h-48">
                 <img
                   className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
