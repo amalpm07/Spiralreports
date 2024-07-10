@@ -103,7 +103,7 @@ export default function SignUp() {
       setError(validationError);
       return;
     }
-
+  
     setLoading(true);
     try {
       const userModel = {
@@ -112,7 +112,7 @@ export default function SignUp() {
         pincode: formData.pincode.toString(),
         photo: '',
       };
-
+  
       const response = await fetch('https://hibow.in/api/User/Add', {
         method: 'POST',
         headers: {
@@ -120,19 +120,23 @@ export default function SignUp() {
         },
         body: JSON.stringify(userModel),
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         try {
           const errorJson = JSON.parse(errorText);
-          setError(errorJson.message);
+          if (errorJson.error === "user name sree already exists!!") {
+            setError('Username already exists.');
+          } else {
+            setError(errorJson.error || 'Failed to sign up.');
+          }
         } catch {
           setError(errorText);
         }
         setLoading(false);
         return;
       }
-
+  
       alert('Sign up successful! Please sign in with your credentials.');
       setLoading(false);
       setError(null);
@@ -143,7 +147,8 @@ export default function SignUp() {
       setError(error.message || 'Failed to add user');
     }
   };
-
+  
+  
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4 sm:p-6">
       <div className="p-4 sm:p-8 bg-white shadow-2xl rounded-lg max-w-2xl w-full">
