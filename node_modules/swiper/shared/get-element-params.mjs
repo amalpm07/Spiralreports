@@ -1,4 +1,4 @@
-import { e as extend, i as isObject, c as attrToProp, p as paramsList } from './update-swiper.mjs';
+import { e as extend, c as attrToProp, p as paramsList } from './update-swiper.mjs';
 import { d as defaults } from './swiper-core.mjs';
 
 const formatValue = val => {
@@ -40,9 +40,7 @@ function getParams(element, propName, propValue) {
   if (typeof propName === 'string' && typeof propValue !== 'undefined') {
     attrsList.push({
       name: propName,
-      value: isObject(propValue) ? {
-        ...propValue
-      } : propValue
+      value: propValue
     });
   }
   attrsList.forEach(attr => {
@@ -61,11 +59,11 @@ function getParams(element, propName, propValue) {
       const name = attrToProp(attr.name);
       if (!allowedParams.includes(name)) return;
       const value = formatValue(attr.value);
-      if (passedParams[name] && modulesParamsList.includes(attr.name) && !isObject(value)) {
+      if (passedParams[name] && modulesParamsList.includes(attr.name)) {
         if (passedParams[name].constructor !== Object) {
           passedParams[name] = {};
         }
-        passedParams[name].enabled = !!value;
+        passedParams[name].enabled = value;
       } else {
         passedParams[name] = value;
       }
