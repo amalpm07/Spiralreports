@@ -308,7 +308,7 @@ const Listing = () => {
           )}
         </div>
         {/* Leave a Review section */}
-      {currentUser?.usertype !== 'provider' && (
+      {currentUser?.usertype !== 'Provider' && (
         <div className='mt-8 border-t pt-6'>
           <h3 className='text-2xl font-semibold mb-4'>Leave a Review</h3>
           {reviewError && (
