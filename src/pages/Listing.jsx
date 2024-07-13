@@ -48,7 +48,7 @@ const Listing = () => {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Token': currentUser.guid, // Pass the guid in the header
+              // Pass the guid in the header
             },
           }
         );
@@ -72,7 +72,7 @@ const Listing = () => {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Token': currentUser.guid, // Pass the guid in the header
+              // 'Token': currentUser.guid, // Pass the guid in the header
             },
           }
         );
@@ -269,7 +269,7 @@ const Listing = () => {
           </ul>
         </div>
         <div className='mt-4'>
-          {currentUser?.usertype === 'Customer'|| 'user' && (
+          {currentUser?.usertype !== 'provider' && (
             <button
               onClick={handleBookNowClick}
               className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded'

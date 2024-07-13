@@ -216,8 +216,8 @@ export default function SignUp() {
                 <input
                   type="radio"
                   name="usertype"
-                  value="provider"
-                  checked={formData.usertype === 'provider'}
+                  value="Provider"
+                  checked={formData.usertype === 'Provider'}
                   onChange={handleUserTypeChange}
                   className="form-radio h-4 w-4 text-blue-600"
                 />
