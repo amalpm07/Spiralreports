@@ -227,12 +227,12 @@ export default function SignUp() {
                 <input
                   type="radio"
                   name="usertype"
-                  value="user"
-                  checked={formData.usertype === 'user'}
+                  value="Customer"
+                  checked={formData.usertype === 'Customer'}
                   onChange={handleUserTypeChange}
                   className="form-radio h-4 w-4 text-blue-600"
                 />
-                <span className="ml-2 text-gray-700">User</span>
+                <span className="ml-2 text-gray-700">Customer</span>
               </label>
             </div>
           </div>
