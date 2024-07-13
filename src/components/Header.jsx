@@ -53,16 +53,16 @@ export default function Header() {
           </button>
         </form>
         <ul className='flex gap-4'>
-          {/* <Link to='/' className='text-gray-100 hover:text-gray-300'>
-            <li className='hidden sm:inline'>Home</li>
-          </Link> */}
           <Link to='/about' className='text-gray-100 hover:text-gray-300'>
             <li className='hidden sm:inline'>About</li>
           </Link>
           {currentUser ? (
             <Dropdown currentUser={currentUser} />
           ) : (
-            <Link to='/sign-in' className='text-gray-100 hover:text-gray-300'>Sign in</Link>
+            <>
+              <Link to='/sign-in' className='text-gray-100 hover:text-gray-300'>Sign In</Link>
+              <Link to='/sign-up' className='text-gray-100 hover:text-gray-300'>Sign Up</Link>
+            </>
           )}
           <div className='flex items-center'>
             {/* Additional content can go here */}
