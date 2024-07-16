@@ -23,20 +23,21 @@ const Dropdown = ({ currentUser }) => {
 
   return (
     <div className='relative' ref={dropdownRef}>
-      {currentUser ? (
-        <img
-          onClick={toggleDropdown}
-          className='rounded-full h-7 w-7 object-cover cursor-pointer'
-          src={avatarSrc}
-          alt={altText}
-          aria-haspopup='true'
-          aria-expanded={dropdownVisible}
-        />
-      ) : (
-        <Link to='/sign-in' className='text-slate-700 hover:underline'>
-          Sign in
-        </Link>
-      )}
+      <div className="flex items-center" onClick={toggleDropdown}>
+        {currentUser ? (
+          <img
+            className='rounded-full h-7 w-7 object-cover cursor-pointer'
+            src={avatarSrc}
+            alt={altText}
+            aria-haspopup='true'
+            aria-expanded={dropdownVisible}
+          />
+        ) : (
+          <Link to='/sign-in' className='text-slate-700 hover:underline'>
+            Sign in
+          </Link>
+        )}
+      </div>
       {dropdownVisible && (
         <div
           className='absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-10 transition-opacity duration-200 ease-in-out'
@@ -44,6 +45,9 @@ const Dropdown = ({ currentUser }) => {
           aria-orientation='vertical'
           aria-labelledby='profile-menu'
         >
+          <span className="block px-4 py-2 text-gray-800 text-center font-bold uppercase">
+            {currentUser.userName}
+          </span>
           <Link to='/profile' className='block px-4 py-2 text-gray-800 hover:bg-gray-200' role='menuitem'>
             Profile
           </Link>
@@ -71,6 +75,7 @@ const Dropdown = ({ currentUser }) => {
 Dropdown.propTypes = {
   currentUser: PropTypes.shape({
     avatar: PropTypes.string,
+    userName: PropTypes.string.isRequired,
   }),
 };
 

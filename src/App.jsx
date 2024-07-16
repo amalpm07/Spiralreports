@@ -22,6 +22,7 @@ import BookingDetailsPage from './pages/BookingDetailsPage';
 import PremiumSubscription from './pages/PremiumSubscription '; // Corrected import path
 import BookingModule from './pages/BookingModule';
 import PaymentStatus from './pages/PaymentStatus';
+import Contact from './components/Contact'
 const theme = createTheme();
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
           <Route path='/BookingModule' element={<BookingModule />} />
           <Route path='/booking' element={<Booking />} />
           <Route path='/payment' element={<Payment />} />
+          <Route path='/contact' element={<Contact />}/>
           <Route path='/showmybookings' element={<ShowMyBookings />} />
           <Route path='/showmylisting' element={<ShowMyListing />} />
           <Route path='/booking/:id' element={<BookingDetailsPage />} />

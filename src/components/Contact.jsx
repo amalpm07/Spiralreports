@@ -1,52 +1,103 @@
-// import { useEffect, useState } from 'react';
-// import { Link } from 'react-router-dom';
+import { useState } from "react";
+import PropTypes from "prop-types";
+import { MdMessage } from "react-icons/md";
+import { FaPhoneAlt } from "react-icons/fa";
+import { HiMail } from "react-icons/hi";
+import '../styleComponets/styledComponents.css';
+import contact from '../assets/contact.svg';
 
-// export default function Contact({ listing }) {
-//   const [landlord, setLandlord] = useState(null);
-//   const [message, setMessage] = useState('');
-//   const onChange = (e) => {
-//     setMessage(e.target.value);
-//   };
+const Button = ({ isOutline, icon, text, ...rest }) => {
+  return (
+    <button
+      {...rest}
+      className={`contactForm-button ${isOutline ? 'contactForm-outline_btn' : 'contactForm-primary_btn'}`}
+    >
+      {icon && <span className="contactForm-icon">{icon}</span>}
+      {text}
+    </button>
+  );
+};
 
-//   useEffect(() => {
-//     const fetchLandlord = async () => {
-//       try {
-//         const res = await fetch(`/api/user/${listing.userRef}`);
-//         const data = await res.json();
-//         setLandlord(data);
-//       } catch (error) {
-//         console.log(error);
-//       }
-//     };
-//     fetchLandlord();
-//   }, [listing.userRef]);
-//   return (
-//     <>
-//       {landlord && (
-//         <div className='flex flex-col gap-2'>
-//           <p>
-//             Contact <span className='font-semibold'>{landlord.username}</span>{' '}
-//             for{' '}
-//             <span className='font-semibold'>{listing.name.toLowerCase()}</span>
-//           </p>
-//           <textarea
-//             name='message'
-//             id='message'
-//             rows='2'
-//             value={message}
-//             onChange={onChange}
-//             placeholder='Enter your message here...'
-//             className='w-full border p-3 rounded-lg'
-//           ></textarea>
+Button.propTypes = {
+  isOutline: PropTypes.bool,
+  icon: PropTypes.element,
+  text: PropTypes.string.isRequired,
+};
 
-//           <Link
-//           to={`mailto:${landlord.email}?subject=Regarding ${listing.name}&body=${message}`}
-//           className='bg-slate-700 text-white text-center p-3 uppercase rounded-lg hover:opacity-95'
-//           >
-//             Send Message          
-//           </Link>
-//         </div>
-//       )}
-//     </>
-//   );
-// }
+Button.defaultProps = {
+  isOutline: false,
+  icon: null,
+};
+
+const ContactForm = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    text: "",
+  });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(formData);
+  };
+
+  return (
+    <section className="contactForm-container">
+      <div className="contactForm-contact_form">
+        <div className="contactForm-top_btn">
+          <Button text="VIA SUPPORT CHAT" icon={<MdMessage fontSize="24px" />} />
+          <Button text="VIA CALL" icon={<FaPhoneAlt fontSize="24px" />} />
+        </div>
+        <div className="contactForm-email_btn">
+          <Button isOutline={true} text="VIA EMAIL FORM" icon={<HiMail fontSize="24px" />} />
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="contactForm-form_control">
+            <label htmlFor="name">Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="contactForm-form_control">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="contactForm-form_control">
+            <label htmlFor="text">Text</label>
+            <textarea
+              name="text"
+              rows="8"
+              value={formData.text}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="contactForm-submit_btn">
+            <Button text="SUBMIT" />
+          </div>
+        </form>
+      </div>
+      <div className="contactForm-contact_image">
+        <img src={contact} alt="Contact" />
+      </div>
+    </section>
+  );
+};
+
+export default ContactForm;

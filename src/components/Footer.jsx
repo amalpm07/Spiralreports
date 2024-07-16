@@ -1,10 +1,11 @@
-/* eslint-disable react/no-unescaped-entities */
 // CompanyFooter.jsx
 
+/* eslint-disable react/no-unescaped-entities */
 // eslint-disable-next-line no-unused-vars
 import { MDBFooter, MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 import '../styleComponets/styledComponents.css';
 
 export default function CompanyFooter() {
@@ -36,18 +37,20 @@ export default function CompanyFooter() {
             </ul>
           </MDBCol> */}
           <MDBCol lg='4' className='mb-4 mb-md-0'>
-            <h5 className='text-uppercase'>Contact Us</h5>
-            <ul className='list-unstyled mb-0'>
-              <li>
-                <FontAwesomeIcon icon={faMapMarkerAlt} /> Address: No 2/619 Plot No 203, Engineers Avenue, First Main Road, Keelkattalai, Chennai
-              </li>
-              <li>
-                <FontAwesomeIcon icon={faPhone} /> Phone: +91 73389 28378
-              </li>
-              <li>
-                <FontAwesomeIcon icon={faEnvelope} /> Email: admin@leashbench.com
-              </li>
-            </ul>
+            <Link to="/contact" className="text-white">
+              <h5 className='text-uppercase'>Contact Us</h5>
+              <ul className='list-unstyled mb-0'>
+                <li>
+                  <FontAwesomeIcon icon={faMapMarkerAlt} /> Address: No 2/619 Plot No 203, Engineers Avenue, First Main Road, Keelkattalai, Chennai
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faPhone} /> Phone: +91 73389 28378
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faEnvelope} /> Email: admin@leashbench.com
+                </li>
+              </ul>
+            </Link>
           </MDBCol>
         </MDBRow>
       </MDBContainer>

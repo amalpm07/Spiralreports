@@ -1,108 +1,101 @@
 /* eslint-disable react/no-unescaped-entities */
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
 import {
   signInStart,
   signInSuccess,
   signInFailure,
 } from '../redux/user/userSlice';
 import OAuth from '../components/OAuth';
-import { motion } from 'framer-motion'; // Import framer-motion for animations
 
-export default function SignIn() {
+const SignIn = () => {
   const [formData, setFormData] = useState({ userName: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const { loading } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+
     try {
       dispatch(signInStart());
 
       const url = new URL('https://hibow.in/api/User/Login');
       url.searchParams.append('userName', formData.userName);
       url.searchParams.append('password', formData.password);
-      
+
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
-      if (response.ok) {
-        const data = await response.json();
-        dispatch(signInSuccess(data)); // Assuming data contains user information
-        setSuccess('Sign in successful!');
 
-        // Determine the type of user
-        const userType = data.usertype; // Assuming 'usertype' is the property indicating user type
-        const hasListing = data.hasListing;
-        // Redirect based on user type and pass user details
-        if (userType === 'provider') {
-          if (hasListing === false) {
-            navigate('/create-listing', { state: { user: data } }); // Redirect to create listing page and pass user details
-          } else {
-            navigate('/profile', { state: { user: data } }); // Redirect to profile page and pass user details
-          }
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 401 && errorData.error === 'User already logged in') {
+          throw new Error('User is already logged in');
         } else {
-          navigate('/', { state: { user: data } }); // Redirect to the home page and pass user details
+          throw new Error(errorData.message || 'Failed to sign in');
         }
-      } else if (response.status === 400) {
-        const data = await response.json();
-        if (data.message === 'User does not exist') {
-          throw new Error('User does not exist');
-        } else {
-          throw new Error(data.message || 'Failed to sign in');
-        }
+      }
+
+      const data = await response.json();
+      dispatch(signInSuccess(data));
+      setSuccess('Sign in successful!');
+
+      const userType = data.usertype;
+      const hasListing = data.hasListing;
+
+      if (userType === 'provider') {
+        navigate(hasListing ? '/profile' : '/create-listing', { state: { user: data } });
       } else {
-        throw new Error('Failed to sign in');
+        navigate('/', { state: { user: data } });
       }
     } catch (error) {
+      console.error('Error signing in:', error);
       dispatch(signInFailure(error.message || 'Failed to sign in'));
       setError(error.message || 'Failed to sign in');
     }
   };
-  
+
   return (
-    <motion.div // Add motion div for animations
-      initial={{ opacity: 0, y: -20 }} // Initial animation
-      animate={{ opacity: 1, y: 0 }} // Animation on load
-      transition={{ duration: 0.5 }} // Animation duration
-      className='p-3 max-w-lg mx-auto'
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="p-3 max-w-lg mx-auto"
     >
-      <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+      <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
-          type='text'
-          placeholder='Username'
-          className='border p-3 rounded-lg'
-          id='userName'
+          type="text"
+          placeholder="Username"
+          className="border p-3 rounded-lg"
+          id="userName"
           value={formData.userName}
           onChange={handleChange}
         />
         <input
-          type='password'
-          placeholder='Password'
-          className='border p-3 rounded-lg'
-          id='password'
+          type="password"
+          placeholder="Password"
+          className="border p-3 rounded-lg"
+          id="password"
           value={formData.password}
           onChange={handleChange}
         />
         <motion.button
+          type="submit"
           disabled={loading}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -110,18 +103,28 @@ export default function SignIn() {
             loading ? 'opacity-80 cursor-not-allowed' : 'hover:opacity-95'
           }`}
         >
-          Sign In
+          {loading ? 'Signing In...' : 'Sign In'}
         </motion.button>
         <OAuth />
       </form>
-      <div className='flex gap-2 mt-5'>
+      <div className="flex gap-2 mt-5">
         <p>Don't have an account?</p>
-        <Link to='/sign-up'>
-          <span className='text-blue-700'>Sign up</span>
+        <Link to="/sign-up">
+          <span className="text-blue-700">Sign up</span>
         </Link>
       </div>
-      {error && <p className='text-red-500 mt-5'>User doesnot Exist</p>}
-      {success && <p className='text-green-500 mt-5'>{success}</p>}
+      {error && (
+        <p className="text-red-500 mt-5 text-center">
+          {error === 'User is already logged in' ? (
+            <span>User is already logged in. Please log out to sign in again.</span>
+          ) : (
+            <span>{error === 'Failed to sign in' ? 'Failed to sign in. Please check your credentials.' : error}</span>
+          )}
+        </p>
+      )}
+      {success && <p className="text-green-500 mt-5 text-center">{success}</p>}
     </motion.div>
   );
-}
+};
+
+export default SignIn;

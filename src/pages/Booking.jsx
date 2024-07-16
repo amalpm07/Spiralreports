@@ -226,7 +226,7 @@ const BookingForm = () => {
         const response = await fetch('https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=boarding', {
           headers: {
             'Content-Type': 'application/json',
-            'Token': currentUser.guid  // Replace with your actual token field
+            // 'Token': currentUser.guid  // Replace with your actual token field
           }
         });
         if (!response.ok) {
