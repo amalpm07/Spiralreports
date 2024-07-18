@@ -672,4 +672,103 @@ body {
   }
 }
 
+/* BookingForm.css */
+
+/* Unique identifier for BookingForm component */
+.bookingFormWrapper-unique {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 0px 10px 40px rgba(50, 50, 50, 0.1);
+  background-color: #fff;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+@media (max-width: 768px) {
+  .bookingFormWrapper-unique {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bookingFormWrapper-unique {
+    padding: 10px;
+  }
+}
+
+.formGroup-unique {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 768px) {
+  .formGroup-unique {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.span-unique {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  color: #666666;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+@media (min-width: 768px) {
+  .span-unique {
+    margin-right: 20px;
+    min-width: 120px;
+  }
+}
+
+.input-unique {
+  border: 1px solid #e1e1e1;
+  padding: 10px 15px;
+  border-radius: 5px;
+  height: 50px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 16px;
+  width: 100%;
+}
+
+.input-unique:focus {
+  outline: none;
+  border-color: #00d690;
+  box-shadow: 0 0 5px rgba(0, 214, 144, 0.5);
+}
+
+.input-unique::placeholder {
+  color: #ccc;
+}
+
+.button-unique {
+  padding: 10px 20px;
+  background-color: #00d690;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  margin: 10px 0;
+  width: 100%;
+  max-width: 200px;
+}
+
+.button-unique:hover {
+  background-color: #00b57d;
+}
+
+.button-unique:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 
