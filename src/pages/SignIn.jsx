@@ -57,7 +57,7 @@ const SignIn = () => {
       const userType = data.usertype;
       const hasListing = data.hasListing;
 
-      if (userType === 'provider') {
+      if (userType === 'Provider') {
         navigate(hasListing ? '/profile' : '/create-listing', { state: { user: data } });
       } else {
         navigate('/', { state: { user: data } });

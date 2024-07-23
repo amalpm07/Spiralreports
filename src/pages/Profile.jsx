@@ -200,7 +200,7 @@ export default function Profile() {
           >
             Bookings
           </Link>
-          {currentUser && currentUser.usertype === 'provider' && (
+          {currentUser && currentUser.usertype === 'Provider' && (
             <>
               <Link
                 to="/create-listing"
