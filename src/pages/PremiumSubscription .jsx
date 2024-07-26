@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from 'react';
 import { Container, Typography, Card, CardContent, CardActions, Button, Grid, Box, TextField } from '@mui/material';
 import { styled } from '@mui/system';
@@ -15,7 +14,6 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   paddingBottom: theme.spacing(8),
 }));
 
-// eslint-disable-next-line no-unused-vars
 const StyledCard = styled(Card)(({ theme, selected }) => ({
   transition: 'transform 0.3s, border-color 0.3s',
   transform: selected ? 'scale(1.05)' : 'scale(1)',
@@ -63,7 +61,6 @@ const images = [
   image1,
   image2,
   image3,
- 
 ];
 
 const PremiumSubscription = () => {
@@ -73,11 +70,12 @@ const PremiumSubscription = () => {
   const [mobileError, setMobileError] = useState('');
   const [showInvoice, setShowInvoice] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
 
   const bookingDetails = {
-    CustomerId: currentUser.id,
-    customerName: currentUser.userName,
+    CustomerId: currentUser ? currentUser.id : '',
+    customerName: currentUser ? currentUser.userName : '',
     charge: selectedPlan === 'Basic' ? 1 : selectedPlan === 'Standard' ? 20 : 30,
   };
 
@@ -139,7 +137,7 @@ const PremiumSubscription = () => {
 
         const options = {
           key,
-          amount: orderResponse.totalAmount,
+          amount: bookingDetails.charge * 100, // Convert amount to the smallest currency unit
           currency: 'INR',
           order_id: orderId,
           name: 'Your Company Name',
@@ -157,7 +155,7 @@ const PremiumSubscription = () => {
                 {
                   headers: {
                     'Content-Type': 'application/json',
-                    'Token': currentUser.guid, // Replace with your actual token
+                    'Token': currentUser.guid,
                   },
                 }
               );
@@ -178,7 +176,7 @@ const PremiumSubscription = () => {
                   {
                     headers: {
                       'Content-Type': 'application/json',
-                      'Token': currentUser.guid, // Replace with your actual token
+                      'Token': currentUser.guid,
                     },
                   }
                 );
@@ -198,21 +196,39 @@ const PremiumSubscription = () => {
         rzp.open();
       } catch (error) {
         console.error('Error initiating payment:', error);
+        setPaymentError('Payment initiation failed');
       }
     } else {
       setPaymentError('Please enter a valid email and mobile number');
     }
   };
 
+  const handlePlanClick = (plan) => {
+    if (!currentUser) {
+      setShowLoginPopup(true);
+    } else {
+      setSelectedPlan(plan);
+    }
+  };
+
+  const handleLoginPopupClose = () => {
+    setShowLoginPopup(false);
+  };
+
+  const handleLoginPopupYes = () => {
+    setShowLoginPopup(false);
+    window.location.href = '/sign-in'; // Redirect to sign-in page
+  };
+
   return (
     <StyledContainer maxWidth="xl">
-<Carousel showThumbs={false} autoPlay infiniteLoop showArrows={true} showStatus={false} showIndicators={true}>
-  {images.map((src, index) => (
-    <div key={index} style={{ maxWidth: '1000px', margin: 'auto' }}>
-      <img src={src} alt={`slide-${index}`} style={{ maxWidth: '100%', height: 'auto' }} />
-    </div>
-  ))}
-</Carousel>
+      <Carousel showThumbs={false} autoPlay infiniteLoop showArrows={true} showStatus={false} showIndicators={true}>
+        {images.map((src, index) => (
+          <div key={index} style={{ maxWidth: '1000px', margin: 'auto' }}>
+            <img src={src} alt={`slide-${index}`} style={{ maxWidth: '100%', height: 'auto' }} />
+          </div>
+        ))}
+      </Carousel>
       <Typography variant="h4" gutterBottom align="center" color="primary">
         Select Your Premium Subscription
       </Typography>
@@ -224,7 +240,7 @@ const PremiumSubscription = () => {
           <Grid item xs={12} sm={6} md={4} key={plan}>
             <StyledCard
               selected={selectedPlan === plan}
-              onClick={() => setSelectedPlan(plan)}
+              onClick={() => handlePlanClick(plan)}
             >
               <CardContentCentered>
                 <Typography variant="h5" color="secondary">{plan} Plan</Typography>
@@ -234,7 +250,7 @@ const PremiumSubscription = () => {
                 <Button
                   variant={selectedPlan === plan ? 'contained' : 'outlined'}
                   color="primary"
-                  onClick={() => setSelectedPlan(plan)}
+                  onClick={() => handlePlanClick(plan)}
                 >
                   Select
                 </Button>
@@ -291,6 +307,35 @@ const PremiumSubscription = () => {
           <Typography variant="body1">
             Your subscription has been activated.
           </Typography>
+        </CenteredBox>
+      )}
+      {showLoginPopup && (
+        <CenteredBox>
+          <Box
+            sx={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              padding: 3,
+              backgroundColor: 'white',
+              border: '1px solid #ccc',
+              boxShadow: 3,
+              zIndex: 1000,
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Please log in to access premium subscription features.
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Button variant="contained" color="primary" onClick={handleLoginPopupYes} sx={{ mr: 2 }}>
+                Yes
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={handleLoginPopupClose}>
+                No
+              </Button>
+            </Box>
+          </Box>
         </CenteredBox>
       )}
       <CenteredBox>
