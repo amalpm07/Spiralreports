@@ -31,7 +31,7 @@ const SignIn = () => {
       dispatch(signInStart());
 
       const url = new URL('https://hibow.in/api/User/Login');
-      url.searchParams.append('userName', formData.userName);
+      url.searchParams.append('userName', formData.userName); // Changed from userName
       url.searchParams.append('password', formData.password);
 
       const response = await fetch(url.toString(), {
@@ -78,14 +78,15 @@ const SignIn = () => {
     >
       <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Username"
-          className="border p-3 rounded-lg"
-          id="userName"
-          value={formData.userName}
-          onChange={handleChange}
-        />
+      <input
+  type="text"
+  placeholder="Email or Phone Number" // Changed from Username
+  className="border p-3 rounded-lg"
+  id="userName" // Changed from userName
+  value={formData.userName} // Changed from userName
+  onChange={handleChange}
+/>
+
         <input
           type="password"
           placeholder="Password"
