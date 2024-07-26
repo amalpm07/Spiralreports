@@ -190,19 +190,19 @@ export default function CreateListing() {
         ...photos,
       };
 
-      const answersPayload = Object.keys(answers).map((questionId) => ({
-        id: 0,
-        question_id: questionId,
-        customer_id: currentUser.id,
-        ans: String(answers[questionId]),
-      }));
+      const answersPayload = {
+        Answers: Object.keys(answers).map((questionId) => ({
+          question_id: parseInt(questionId, 10), // Ensure question_id is numeric
+          customer_id: currentUser.id,
+          ans: String(answers[questionId]),
+        })),
+      };
 
       const headers = {
         'Content-Type': 'application/json',
         'Token': currentUser.guid,
       };
 
-      // eslint-disable-next-line no-unused-vars
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
         fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
@@ -217,16 +217,22 @@ export default function CreateListing() {
       ]);
 
       const serviceHomeText = await serviceHomeRes.text();
-      const serviceHomeData = JSON.parse(serviceHomeText);
+      const serviceHomeData = serviceHomeText ? JSON.parse(serviceHomeText) : {};
+
+      const addAnswersText = await addAnswersRes.text();
+      const addAnswersData = addAnswersText ? JSON.parse(addAnswersText) : {};
 
       setLoading(false);
 
-      if (serviceHomeData.success === false) {
-        setError(serviceHomeData.message);
-        window.alert(`Error: ${serviceHomeData.message}`);
-      } else {
+      if (serviceHomeData.success && addAnswersData.success) {
+        // Both APIs succeeded
         window.alert('Listing created successfully!');
         navigate(`/listing/${ServiceName}/${currentUser.id}`);
+      } else {
+        // Handle case where either API call failed
+        const errorMessage = serviceHomeData.message || addAnswersData.message || 'Unknown error occurred';
+        setError(errorMessage);
+        window.alert(`Error: ${errorMessage}`);
       }
     } catch (error) {
       setError(error.message);
@@ -391,7 +397,7 @@ export default function CreateListing() {
         >
           {loading ? 'Creating...' : 'Create listing'}
         </button>
-        {error && <p className='text-red-600 text-sm'>unable to create </p>}
+        {error && <p className='text-red-600 text-sm'>Error: {error}</p>}
       </form>
     </main>
   );
