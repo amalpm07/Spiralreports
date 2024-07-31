@@ -23,6 +23,7 @@ import PremiumSubscription from './pages/PremiumSubscription '; // Corrected imp
 import BookingModule from './pages/BookingModule';
 import PaymentStatus from './pages/PaymentStatus';
 import Contact from './components/Contact'
+import Bookings from './pages/Bookings'
 const theme = createTheme();
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
           <Route path='/search' element={<Search />} />
           <Route path='/BookingModule' element={<BookingModule />} />
           <Route path='/booking' element={<Booking />} />
+          <Route path='/bookings' element={<Bookings />} />
           <Route path='/payment' element={<Payment />} />
           <Route path='/contact' element={<Contact />}/>
           <Route path='/showmybookings' element={<ShowMyBookings />} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -6,14 +6,12 @@ import { FiCalendar } from 'react-icons/fi';
 import styled, { createGlobalStyle } from 'styled-components';
 import CustomDatePicker from '../components/CustomDatePicker';
 
-const Checkbox = ({ checked, onChange, label }) => {
-  return (
-    <label>
-      <input type="checkbox" checked={checked} onChange={onChange} />
-      {label}
-    </label>
-  );
-};
+const Checkbox = ({ checked, onChange, label, name }) => (
+  <label htmlFor={name}>
+    <input id={name} type="checkbox" checked={checked} onChange={onChange} />
+    {label}
+  </label>
+);
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -101,6 +99,17 @@ const Button = styled.button`
   }
 `;
 
+const DatePicker = ({ selected, onChange, minDate, placeholder }) => (
+  <CustomDatePicker
+    selected={selected}
+    onChange={onChange}
+    dateFormat="MM/dd/yyyy"
+    className="form-control"
+    placeholderText={placeholder}
+    minDate={minDate}
+  />
+);
+
 const BookingForm = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -142,26 +151,25 @@ console.log(listing);
     fetchQuestions();
   }, []);
 
-  const handleProceedTodatepicker = () => {
+  const handleProceedTodatepicker = useCallback(() => {
     if (!email || !phoneNumber) {
       setError('Please enter both email and phone number');
       return;
     }
-
     setCurrentSection(2);
-  };
+  }, [email, phoneNumber]);
 
-  const handleProceedToQuestions = () => {
-    setCurrentSection(3);
-  };
+  const handleProceedToQuestions = useCallback(() => {
+    setCurrentSection(2);
+  }, []);
 
-  const handleProceedClick = async () => {
+  const handleProceedClick = useCallback(async () => {
     try {
       if (checkOutDate <= checkInDate) {
         setDateError('Check-out date must be after check-in date');
         return;
       }
-  
+
       const currentDate = new Date();
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
@@ -183,35 +191,7 @@ console.log(listing);
           ans: String(answers[questionId]),
         }))
       };
-  
-      if (!currentUser) {
-        const userAdd = {
-          email,
-          phoneNumber
-        };
-  
-        const addUserRes = await fetch('https://hibow.in/api/User/Add', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(userAdd)
-        });
-  
-        if (!addUserRes.ok) {
-          throw new Error('Failed to add user');
-        }
-  
-        const userData = await addUserRes.json();
-        dispatch({ type: 'SET_CURRENT_USER', payload: userData }); // Update currentUser state with the fetched user data
-  
-        // Update bookingData with the guest user's details
-        bookingData = {
-          ...bookingData,
-          customer_id: userData.id, // Assuming userData.id is provided by the API response
-        };
-      }
-  
+
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
@@ -219,25 +199,26 @@ console.log(listing);
         },
         body: JSON.stringify({
           bookingModel: bookingData,
-          userType: currentUser ? "Customer" : "guest" // Set userType based on currentUser existence
+          userType: currentUser ? "Customer" : "guest"
         })
       });
-  
+
       if (!bookingRes.ok) {
         throw new Error('Failed to book service');
       }
-  
+
       const bookingResult = await bookingRes.json();
-  
+      const userData = await addUserRes.json();
+      dispatch({ type: 'SET_CURRENT_USER', payload: userData }); // Update currentUser state with the fetched user data
       const answersData = {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
           question_id: parseInt(questionId),
-          customer_id: currentUser?.id ||  userData.id, // Use 0 for guest user
+          customer_id: currentUser?.id || 0,
           ans: String(answers[questionId]),
         }))
       };
-  
+
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
         headers: {
@@ -245,82 +226,44 @@ console.log(listing);
         },
         body: JSON.stringify(answersData)
       });
-  
+
       if (!answersRes.ok) {
         throw new Error('Failed to add answers');
       }
-  
-      const answersResult = await answersRes.text();
-  
+
       navigate('/payment', { state: { bookingResponse: bookingResult } });
-  
+
     } catch (error) {
       setError(error.message);
     }
-  };
+  }, [checkInDate, checkOutDate, answers, currentUser, listing, navigate]);
 
-  const handleAnswerChange = (questionId, answer) => {
+  const handleAnswerChange = useCallback((questionId, answer) => {
     setAnswers(prevAnswers => ({
       ...prevAnswers,
       [questionId]: answer
     }));
-  };
+  }, []);
 
-  const handleCheckboxChange = (e, value) => {
+  const handleCheckboxChange = useCallback((e, value) => {
     const isChecked = e.target.checked;
     const questionId = e.target.name;
 
-    if (isChecked) {
-      const updatedAnswers = {
-        ...answers,
-        [questionId]: [value],
-      };
-      setAnswers(updatedAnswers);
-    } else {
-      const updatedAnswers = {
-        ...answers,
-        [questionId]: [],
-      };
-      setAnswers(updatedAnswers);
-    }
-  };
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
+      [questionId]: isChecked ? [value] : []
+    }));
+  }, []);
 
   return (
     <BookingFormWrapper>
       <GlobalStyle />
+
       {currentSection === 1 && (
         <>
           <FormGroup>
-            <Span>Email</Span>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your Email"
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Span>Phone Number</Span>
-            <Input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter your phone number"
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Button onClick={handleProceedTodatepicker}>Proceed</Button>
-          </FormGroup>
-        </>
-      )}
-
-      {(currentSection === 2) && (
-        <>
-          <FormGroup>
             <Span><FiCalendar /> Check-In</Span>
-            <CustomDatePicker
+            <DatePicker
               selected={checkInDate}
               onChange={(date) => {
                 setCheckInDate(date);
@@ -330,16 +273,14 @@ console.log(listing);
                   setDateError('');
                 }
               }}
-              dateFormat="MM/dd/yyyy"
-              className="form-control"
-              placeholderText="Select check-in date"
-              minDate={new Date()} // Disable past dates
+              minDate={new Date()}
+              placeholder="Select check-in date"
             />
           </FormGroup>
 
           <FormGroup>
             <Span><FiCalendar /> Check-Out</Span>
-            <CustomDatePicker
+            <DatePicker
               selected={checkOutDate}
               onChange={(date) => {
                 setCheckOutDate(date);
@@ -349,21 +290,19 @@ console.log(listing);
                   setDateError('');
                 }
               }}
-              dateFormat="MM/dd/yyyy"
-              className="form-control"
-              placeholderText="Select check-out date"
-              minDate={checkInDate} // Disable past dates and dates before check-in date
+              minDate={checkInDate}
+              placeholder="Select check-out date"
             />
             {dateError && <p style={{ color: 'red', marginTop: '5px' }}>{dateError}</p>}
           </FormGroup>
-  
+
           <FormGroup>
-            <Button onClick={handleProceedToQuestions} disabled={loading}>Proceed</Button>
+            <Button onClick={handleProceedToQuestions} disabled={loading}>next</Button>
           </FormGroup>
         </>
       )}
 
-      {( currentSection === 3) && (
+      {currentSection === 2 && (
         <>
           <FormGroup>
             {loading ? (
@@ -464,7 +403,7 @@ console.log(listing);
 };
 
 BookingForm.propTypes = {
-  // Add prop types if required
+  // Define prop types if needed
 };
 
 export default BookingForm;
