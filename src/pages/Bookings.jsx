@@ -169,7 +169,7 @@ console.log(listing);
         setDateError('Check-out date must be after check-in date');
         return;
       }
-
+  
       const currentDate = new Date();
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
@@ -191,7 +191,8 @@ console.log(listing);
           ans: String(answers[questionId]),
         }))
       };
-
+  
+      // Book the service
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
@@ -202,14 +203,14 @@ console.log(listing);
           userType: currentUser ? "Customer" : "guest"
         })
       });
-
+  
       if (!bookingRes.ok) {
         throw new Error('Failed to book service');
       }
-
+  
       const bookingResult = await bookingRes.json();
-      const userData = await addUserRes.json();
-      dispatch({ type: 'SET_CURRENT_USER', payload: userData }); // Update currentUser state with the fetched user data
+  
+      // Save answers
       const answersData = {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
@@ -218,7 +219,7 @@ console.log(listing);
           ans: String(answers[questionId]),
         }))
       };
-
+  
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
         headers: {
@@ -226,17 +227,19 @@ console.log(listing);
         },
         body: JSON.stringify(answersData)
       });
-
+  
       if (!answersRes.ok) {
         throw new Error('Failed to add answers');
       }
-
+  
+      // Navigate to the payment page with booking result
       navigate('/payment', { state: { bookingResponse: bookingResult } });
-
+  
     } catch (error) {
       setError(error.message);
     }
   }, [checkInDate, checkOutDate, answers, currentUser, listing, navigate]);
+  
 
   const handleAnswerChange = useCallback((questionId, answer) => {
     setAnswers(prevAnswers => ({
