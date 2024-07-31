@@ -11,7 +11,7 @@ function BookingsPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [visibleCategory, setVisibleCategory] = useState('all'); // State to manage the visible category
+  const [visibleCategory, setVisibleCategory] = useState('all');
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -71,66 +71,44 @@ function BookingsPage() {
     setVisibleCategory(category);
   };
 
-  // Determine which bookings to show based on `visibleCategory`
   const displayedBookings = visibleCategory === 'all'
     ? Object.values(bookings).flat()
     : bookings[visibleCategory];
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-3xl font-semibold mb-8 text-center">My Bookings</h2>
+    <div className="container mx-auto p-4 md:p-6">
+      <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center text-gray-800">My Bookings</h2>
 
-      <div className="mb-6 flex justify-center flex-wrap space-x-4">
-        <button
-          className={`py-2 px-4 rounded-lg transition-colors ${visibleCategory === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-          onClick={() => handleCategoryChange('all')}
-        >
-          All Bookings
-        </button>
-        <button
-          className={`py-2 px-4 rounded-lg transition-colors ${visibleCategory === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-          onClick={() => handleCategoryChange('pending')}
-        >
-          Pending Bookings
-        </button>
-        <button
-          className={`py-2 px-4 rounded-lg transition-colors ${visibleCategory === 'confirmed' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-          onClick={() => handleCategoryChange('confirmed')}
-        >
-          Confirmed Bookings
-        </button>
-        <button
-          className={`py-2 px-4 rounded-lg transition-colors ${visibleCategory === 'completed' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-          onClick={() => handleCategoryChange('completed')}
-        >
-          Completed Bookings
-        </button>
-        <button
-          className={`py-2 px-4 rounded-lg transition-colors ${visibleCategory === 'cancelled' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600 hover:text-white`}
-          onClick={() => handleCategoryChange('cancelled')}
-        >
-          Cancelled Bookings
-        </button>
+      <div className="mb-6 flex flex-wrap justify-center gap-2 md:gap-4">
+        {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(category => (
+          <button
+            key={category}
+            className={`py-3 px-6 rounded-full text-sm md:text-base font-medium transition-colors ${visibleCategory === category ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-800 shadow-sm'} hover:bg-blue-700 hover:text-white`}
+            onClick={() => handleCategoryChange(category)}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)} Bookings
+          </button>
+        ))}
       </div>
 
-      {loading && <p className="text-center">Loading...</p>}
-      {error && <p className="text-center text-red-600">{error}</p>}
+      {loading && <p className="text-center text-blue-600 font-medium">Loading...</p>}
+      {error && <p className="text-center text-red-600 font-medium">{error}</p>}
 
-      <div className="space-y-8">
+      <div className="space-y-4 md:space-y-8">
         {displayedBookings.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {displayedBookings.map((booking) => (
               <Link
                 key={booking.id}
                 to={`/booking/${booking.id}`}
-                className="border border-gray-200 rounded-lg p-6 block hover:bg-gray-50 transition-colors"
+                className="border border-gray-300 rounded-lg shadow-lg p-4 bg-white hover:bg-gray-50 transition-colors"
               >
-                <p className="font-semibold">Booking ID: {booking.id}</p>
-                <p>Customer Name: {booking.customerName}</p>
-                <p>Service Name: {booking.serviceName}</p>
-                <p>Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
-                <p>Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
-                <p>Charge: ${booking.charge.toFixed(2)}</p>
+                <p className="font-semibold text-lg">Booking ID: {booking.id}</p>
+                <p className="text-gray-700">Customer Name: {booking.customerName}</p>
+                <p className="text-gray-700">Service Name: {booking.serviceName}</p>
+                <p className="text-gray-700">Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
+                <p className="text-gray-700">Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
+                <p className="text-gray-700">Charge: ${booking.charge.toFixed(2)}</p>
               </Link>
             ))}
           </div>
@@ -142,7 +120,7 @@ function BookingsPage() {
 
         {!loading && displayedBookings.length === 0 && visibleCategory === 'all' && (
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-8 mx-auto block"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-full mx-auto block font-medium shadow-md"
             onClick={handleShowBookings}
             disabled={loading}
           >
