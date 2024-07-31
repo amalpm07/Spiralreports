@@ -232,7 +232,9 @@ const Listing = () => {
             ))}
         </div>
 
-        <ServicesAndRates />
+        <div className='block lg:hidden mt-6'>
+          
+        </div>
 
         <div className='mt-6'>
           <ul className='mt-3 space-y-4'>
@@ -275,6 +277,8 @@ const Listing = () => {
             })}
           </ul>
         </div>
+
+       
 
         <div className='mt-4'>
           {currentUser?.usertype !== 'Provider' && (
