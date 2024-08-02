@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Container, Row, Col } from 'react-bootstrap';
 import banner from '../assets/banner.jpeg';
 
+// Styled-components for responsiveness and improved design
 const BannerSection = styled.section`
   position: relative;
   overflow: hidden;
@@ -14,7 +15,7 @@ const BannerSection = styled.section`
 
   img {
     width: 100%;
-    height: 50vh; /* Adjusted for better responsiveness */
+    height: 50vh;
     object-fit: cover;
     filter: brightness(60%);
     transition: transform 0.6s ease-in-out;
@@ -56,29 +57,53 @@ const BannerSection = styled.section`
     h1 {
       font-size: 1.5rem;
       margin: 0;
-      background: linear-gradient(45deg, #755AA6, #6a4b85); /* Gradient background for highlight */
+      background: linear-gradient(45deg, #755AA6, #6a4b85);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Enhanced text shadow */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
       padding: 0.5rem;
       border-radius: 5px;
       animation: fadeInText 1s ease-out;
+      
+      @media (min-width: 576px) {
+        font-size: 2rem; /* Small tablets and larger phones */
+      }
+
+      @media (min-width: 768px) {
+        font-size: 2.5rem; /* Tablets and larger screens */
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 3rem; /* Desktops and larger screens */
+      }
     }
 
     p {
       font-size: 0.875rem;
       margin-top: 0.5rem;
-      background: rgba(0, 0, 0, 0.4); /* Background color for better readability */
+      background: rgba(0, 0, 0, 0.4);
       padding: 0.5rem;
       border-radius: 5px;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
       animation: fadeInText 1s ease-out;
+
+      @media (min-width: 576px) {
+        font-size: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 1.25rem;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 1.5rem;
+      }
     }
 
     .cta-button {
-      background: #755AA6; /* Updated button background color */
+      background: #755AA6;
       color: white;
-      padding: 15px 30px;
+      padding: 12px 24px;
       border-radius: 50px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       text-transform: uppercase;
@@ -91,23 +116,23 @@ const BannerSection = styled.section`
       z-index: 3;
 
       &:hover {
-        background: #6a4b85; /* Updated hover color */
+        background: #6a4b85;
         transform: scale(1.05);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
       }
 
       &:active {
-        background: #755AA6; /* Same color for active state */
+        background: #755AA6;
         transform: scale(1);
       }
 
       @media (max-width: 768px) {
-        padding: 12px 25px;
+        padding: 10px 20px;
         font-size: 0.875rem;
       }
 
       @media (max-width: 480px) {
-        padding: 10px 20px;
+        padding: 8px 16px;
         font-size: 0.75rem;
       }
     }
@@ -137,7 +162,7 @@ const BannerSection = styled.section`
 
   @media (max-width: 767px) {
     .content {
-      animation: none; /* Disable animation for mobile view */
+      animation: none;
     }
   }
 `;
@@ -149,12 +174,12 @@ const SectionTitle = styled.h1`
   color: #333;
   text-align: center;
 
-  @media (min-width: 768px) {
-    font-size: 2.5rem;
+  @media (min-width: 576px) {
+    font-size: 2.5rem; /* Small tablets and larger phones */
   }
 
-  @media (min-width: 1024px) {
-    font-size: 3rem;
+  @media (min-width: 768px) {
+    font-size: 3rem; /* Tablets and larger screens */
   }
 `;
 
@@ -164,12 +189,12 @@ const SectionText = styled.p`
   margin-bottom: 1.5rem;
   text-align: center;
 
-  @media (min-width: 768px) {
-    font-size: 1.25rem;
+  @media (min-width: 576px) {
+    font-size: 1.25rem; /* Small tablets and larger phones */
   }
 
-  @media (min-width: 1024px) {
-    font-size: 1.5rem;
+  @media (min-width: 768px) {
+    font-size: 1.5rem; /* Tablets and larger screens */
   }
 `;
 
@@ -178,15 +203,29 @@ const AppButtons = styled.div`
   gap: 10px;
   margin-top: 1rem;
   justify-content: center;
+  flex-wrap: wrap;
 `;
 
 const AppButtonImage = styled.img`
-  width: 150px;
+  width: 120px;
   height: auto;
+
+  @media (max-width: 768px) {
+    width: 100px;
+  }
+
+  @media (max-width: 480px) {
+    width: 80px;
+  }
 `;
 
 const ImageWrapper = styled.div`
   text-align: center;
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 `;
 
 const Highlight = styled.span`
@@ -283,9 +322,11 @@ const Home = () => {
               <AppButtons>
                 <AppButtonImage
                   src="https://www.expodine.com/new/img/images/f_download_btn01.png"
+                  alt="Download App from App Store"
                 />
                 <AppButtonImage
                   src="https://th.bing.com/th/id/R.53a0a9e80cf44c7fd882eaa1839b6602?rik=ENH6JK32UtKSag&riu=http%3a%2f%2fwww.quotemaker.in%2fassets%2fimages%2fQgoogle.png&ehk=Yx7X%2bYwtB7XC56tug%2boAQUqg2zBDwkdosUY1MSqtWMA%3d&risl=&pid=ImgRaw&r=0"
+                  alt="Download App from Google Play"
                 />
               </AppButtons>
             </Col>
