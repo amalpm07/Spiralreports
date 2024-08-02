@@ -6,9 +6,17 @@ import { FiCalendar } from 'react-icons/fi';
 import styled, { createGlobalStyle } from 'styled-components';
 import CustomDatePicker from '../components/CustomDatePicker';
 
+// Styled components
 const Checkbox = ({ checked, onChange, label, name }) => (
   <label htmlFor={name}>
-    <input id={name} type="checkbox" checked={checked} onChange={onChange} />
+    <input
+      id={name}
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      name={name}
+      value={label}
+    />
     {label}
   </label>
 );
@@ -99,6 +107,7 @@ const Button = styled.button`
   }
 `;
 
+// DatePicker component
 const DatePicker = ({ selected, onChange, minDate, placeholder }) => (
   <CustomDatePicker
     selected={selected}
@@ -110,6 +119,7 @@ const DatePicker = ({ selected, onChange, minDate, placeholder }) => (
   />
 );
 
+// BookingForm component
 const BookingForm = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -126,7 +136,7 @@ const BookingForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
-console.log(listing);
+
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
@@ -188,7 +198,7 @@ console.log(listing);
           id: 0,
           question_id: parseInt(questionId),
           customer_id: currentUser?.id || 0, // Use 0 for guest user
-          ans: String(answers[questionId]),
+          ans: answers[questionId] || '', // Handle empty answers
         }))
       };
   
@@ -216,7 +226,7 @@ console.log(listing);
           id: 0,
           question_id: parseInt(questionId),
           customer_id: currentUser?.id || 0,
-          ans: String(answers[questionId]),
+          ans: answers[questionId] || '',
         }))
       };
   
@@ -240,7 +250,6 @@ console.log(listing);
     }
   }, [checkInDate, checkOutDate, answers, currentUser, listing, navigate]);
   
-
   const handleAnswerChange = useCallback((questionId, answer) => {
     setAnswers(prevAnswers => ({
       ...prevAnswers,
@@ -248,13 +257,11 @@ console.log(listing);
     }));
   }, []);
 
-  const handleCheckboxChange = useCallback((e, value) => {
-    const isChecked = e.target.checked;
-    const questionId = e.target.name;
-
+  const handleCheckboxChange = useCallback((e) => {
+    const { name, value, checked } = e.target;
     setAnswers(prevAnswers => ({
       ...prevAnswers,
-      [questionId]: isChecked ? [value] : []
+      [name]: checked ? value : '' // Ensure only one option is selected
     }));
   }, []);
 
@@ -300,7 +307,7 @@ console.log(listing);
           </FormGroup>
 
           <FormGroup>
-            <Button onClick={handleProceedToQuestions} disabled={loading}>next</Button>
+            <Button onClick={handleProceedToQuestions} disabled={loading}>Next</Button>
           </FormGroup>
         </>
       )}
@@ -322,20 +329,20 @@ console.log(listing);
                         <Checkbox
                           label="Dog"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Dog') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Dog')}
+                          checked={answers[question.id] === 'Dog'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Cat"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Cat') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Cat')}
+                          checked={answers[question.id] === 'Cat'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Bird"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Bird') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Bird')}
+                          checked={answers[question.id] === 'Bird'}
+                          onChange={handleCheckboxChange}
                         />
                       </>
                     ) : index === 2 ? (
@@ -343,20 +350,20 @@ console.log(listing);
                         <Checkbox
                           label="Young"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Young') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Young')}
+                          checked={answers[question.id] === 'Young'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Adult"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Adult') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Adult')}
+                          checked={answers[question.id] === 'Adult'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Senior"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Senior') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Senior')}
+                          checked={answers[question.id] === 'Senior'}
+                          onChange={handleCheckboxChange}
                         />
                       </>
                     ) : index === 3 ? (
@@ -364,20 +371,20 @@ console.log(listing);
                         <Checkbox
                           label="Small"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Small') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Small')}
+                          checked={answers[question.id] === 'Small'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Medium"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Medium') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Medium')}
+                          checked={answers[question.id] === 'Medium'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Large"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Large') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Large')}
+                          checked={answers[question.id] === 'Large'}
+                          onChange={handleCheckboxChange}
                         />
                       </>
                     ) : (
