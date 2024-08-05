@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import { FaMapMarkerAlt, FaDog, FaCat, FaPaw, FaStar, FaTrash } from 'react-icons/fa';
 import Spinner from 'react-bootstrap/Spinner'; // Import Spinner component
 import '../styleComponets/styledComponents.css';
@@ -180,6 +182,7 @@ const Listing = () => {
   const renderListingDetails = () => {
     const acceptedPetTypes =
       listing?.answer.find((item) => item.answer.question_id === 33)?.answer.ans.split(', ') || [];
+    // eslint-disable-next-line no-unused-vars
     const petTypeIcons = {
       Dogs: <FaDog className='text-xl' />,
       Cats: <FaCat className='text-xl' />,

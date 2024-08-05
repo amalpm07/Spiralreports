@@ -1,0 +1,95 @@
+/* Base styles for the services container */
+.services-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .services-header h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .services-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .service-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #f9f9f9;
+  }
+  
+  .service-item h4 {
+    font-size: 1.25rem;
+  }
+  
+  .service-price {
+    font-weight: bold;
+    color: green;
+  }
+  
+  .btn-book, .btn-reservation {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .services-info p {
+    margin-top: 20px;
+    font-size: 1rem;
+  }
+  
+  .payment-methods {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .payment-icon {
+    color: #333;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .services-body {
+      flex-direction: column;
+    }
+  
+    .service-item {
+      text-align: center;
+    }
+  
+    .payment-methods {
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .services-header h3 {
+      font-size: 1.25rem;
+    }
+  
+    .service-item h4 {
+      font-size: 1.125rem;
+    }
+  
+    .service-price {
+      font-size: 0.875rem;
+    }
+  
+    .btn-book, .btn-reservation {
+      padding: 8px 12px;
+    }
+  
+    .services-info p {
+      font-size: 0.875rem;
+    }
+  }
+  

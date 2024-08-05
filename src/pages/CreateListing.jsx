@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +18,7 @@ export default function CreateListing() {
     imageUrls: [],
     hostelName: '',
     description: '',
-    address: '', // Combined address field
+    address: '',
     phoneNumber: '',
     ServiceName: '',
     offer: false,
@@ -37,7 +38,7 @@ export default function CreateListing() {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Token': currentUser.guid, // Pass the guid in the header
+              'Token': currentUser.guid,
             },
           }
         );
@@ -184,7 +185,7 @@ export default function CreateListing() {
         userId: currentUser.id,
         ServiceName: selectedType,
         hostelName,
-        address, // Use the combined address field
+        address,
         phoneNumber,
         description,
         ...photos,
@@ -192,7 +193,7 @@ export default function CreateListing() {
 
       const answersPayload = {
         Answers: Object.keys(answers).map((questionId) => ({
-          question_id: parseInt(questionId, 10), // Ensure question_id is numeric
+          question_id: parseInt(questionId, 10),
           customer_id: currentUser.id,
           ans: String(answers[questionId]),
         })),
@@ -225,11 +226,9 @@ export default function CreateListing() {
       setLoading(false);
 
       if (serviceHomeData.success && addAnswersData.success) {
-        // Both APIs succeeded
         window.alert('Listing created successfully!');
         navigate(`/listing/${ServiceName}/${currentUser.id}`);
       } else {
-        // Handle case where either API call failed
         const errorMessage = serviceHomeData.message || addAnswersData.message || 'Unknown error occurred';
         setError(errorMessage);
         window.alert(`Error: ${errorMessage}`);
@@ -339,7 +338,7 @@ export default function CreateListing() {
               type='button'
               disabled={uploading}
               onClick={handleImageSubmit}
-              className='p-3 bg-green-600 text-white rounded uppercase hover:bg-green-700 disabled:opacity-80'
+              className='p-3 bg-[#6d4c7d] text-white rounded uppercase hover:bg-[#755AA6] disabled:opacity-80'
             >
               {uploading ? 'Uploading...' : 'Upload'}
             </button>
@@ -393,7 +392,7 @@ export default function CreateListing() {
         </div>
         <button
           disabled={loading || uploading}
-          className='p-3 bg-blue-600 text-white rounded-lg uppercase hover:bg-blue-700 disabled:opacity-80 mt-6'
+          className='p-3 bg-[#755AA6] text-white rounded-lg uppercase hover:bg-[#6d4c7d] disabled:opacity-80 mt-6'
         >
           {loading ? 'Creating...' : 'Create listing'}
         </button>

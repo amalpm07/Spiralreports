@@ -1,16 +1,12 @@
 import PropTypes from 'prop-types';
-import '../styleComponets/styledComponents.css';
+import '../styleComponets/CategoryMetaNav.css';
 
 const CategoryMetaNav = () => (
-  <div className="container">
-    <div className="category-meta-nav">
-      <div className="curved-div">
-        <div className="row">
-          {columns.map((column, index) => (
-            <Column key={index} {...column} />
-          ))}
-        </div>
-      </div>
+  <div className="category-meta-nav">
+    <div className="container">
+      {columns.map((column, index) => (
+        <Column key={index} {...column} />
+      ))}
     </div>
   </div>
 );
@@ -38,7 +34,7 @@ const columns = [
     link: "",
     imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/dog-walking.png",
     alt: "dog walking near me",
-    text: "pet store"
+    text: "Pet Store"
   },
   {
     link: "",
@@ -54,21 +50,22 @@ const columns = [
   }
 ];
 
-const Column = ({ link, imgUrl, alt, text }) => {
-  const handleClick = (e) => {
-    e.preventDefault(); // Prevent default navigation behavior
-    // Optionally, you can add custom functionality here
-  };
-
-  return (
-    <div className="col">
-      <a href={link} target="_blank" rel="noreferrer" className="link-dark column-content" onClick={handleClick}>
-        <img src={imgUrl} alt={alt} width="40" />
-        <p>{text}</p>
-      </a>
-    </div>
-  );
-};
+const Column = ({ link, imgUrl, alt, text }) => (
+  <div className="column">
+    <a
+      href={link}
+      target="_blank"
+      rel="noreferrer"
+      className="card"
+      aria-label={text}
+    >
+      <img src={imgUrl} alt={alt} className="card-image" />
+      <div className="card-content">
+        <p className="card-text">{text}</p>
+      </div>
+    </a>
+  </div>
+);
 
 Column.propTypes = {
   link: PropTypes.string.isRequired,
