@@ -83,7 +83,7 @@ function BookingsPage() {
         {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(category => (
           <button
             key={category}
-            className={`py-3 px-6 rounded-full text-sm md:text-base font-medium transition-colors ${visibleCategory === category ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-200 text-gray-800 shadow-sm'} hover:bg-blue-700 hover:text-white`}
+            className={`py-3 px-6 rounded-full text-sm md:text-base font-medium transition-colors ${visibleCategory === category ? 'bg-[#755AA6] text-white shadow-md' : 'bg-gray-200 text-gray-800 shadow-sm'} hover:bg-[#6d4c7d] hover:text-white`}
             onClick={() => handleCategoryChange(category)}
           >
             {category.charAt(0).toUpperCase() + category.slice(1)} Bookings
@@ -91,7 +91,7 @@ function BookingsPage() {
         ))}
       </div>
 
-      {loading && <p className="text-center text-blue-600 font-medium">Loading...</p>}
+      {loading && <p className="text-center text-[#755AA6] font-medium">Loading...</p>}
       {error && <p className="text-center text-red-600 font-medium">{error}</p>}
 
       <div className="space-y-4 md:space-y-8">
@@ -116,16 +116,6 @@ function BookingsPage() {
           <p className="text-lg text-gray-600 mt-4 text-center">
             {loading ? 'Loading...' : `No ${visibleCategory} bookings found.`}
           </p>
-        )}
-
-        {!loading && displayedBookings.length === 0 && visibleCategory === 'all' && (
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-full mx-auto block font-medium shadow-md"
-            onClick={handleShowBookings}
-            disabled={loading}
-          >
-            {loading ? 'Loading...' : 'Show My Bookings'}
-          </button>
         )}
       </div>
     </div>

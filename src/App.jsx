@@ -53,6 +53,7 @@ function App() {
           <Route path='/booking/:id' element={<BookingDetailsPage />} />
           <Route path='/premium-subscription' element={<PremiumSubscription />} />
           <Route path='/PaymentStatus' element={<PaymentStatus />}/>
+         
           <Route element={<PrivateRoute />} /> {/* Protected routes */}
         </Routes>
         <Footer />

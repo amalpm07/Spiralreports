@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
@@ -86,8 +88,8 @@ const Input = styled.input`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #00d690;
-  color: #fff;
+  background-color: #755AA6; /* New background color */
+  color: #fff; /* Text color */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -98,11 +100,12 @@ const Button = styled.button`
   max-width: 200px;
 
   &:hover {
-    background-color: #00b57d;
+    background-color: #5e4791; /* Slightly darker shade for hover effect */
   }
 
   &:disabled {
-    background-color: #ccc;
+    background-color: #d0bfe0; /* Lighter shade for disabled state */
+    color: #a1a1a1; /* Text color when disabled */
     cursor: not-allowed;
   }
 `;

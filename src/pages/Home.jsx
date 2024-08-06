@@ -1,10 +1,11 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaGoogle, FaFacebook, FaCheckCircle } from 'react-icons/fa';
 import CategoryMetaNav from '../components/CategoryNav';
 import styled from 'styled-components';
 import { Container, Row, Col } from 'react-bootstrap';
-import banner from '../assets/banner.jpeg';
+import banner from '../assets/banner3.png';
 
 // Styled-components for responsiveness and improved design
 const BannerSection = styled.section`
@@ -39,7 +40,7 @@ const BannerSection = styled.section`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.5); /* Darker overlay for better contrast */
     z-index: 1;
   }
 
@@ -52,7 +53,11 @@ const BannerSection = styled.section`
     color: white;
     z-index: 2;
     padding: 0 1rem;
-    animation: fadeInContent 1.5s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centers content vertically */
+    animation: fadeInContent 1s ease-out;
 
     h1 {
       font-size: 1.5rem;
@@ -81,7 +86,7 @@ const BannerSection = styled.section`
     p {
       font-size: 0.875rem;
       margin-top: 0.5rem;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.6); /* Darker background for better readability */
       padding: 0.5rem;
       border-radius: 5px;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
@@ -141,11 +146,11 @@ const BannerSection = styled.section`
   @keyframes fadeInContent {
     from {
       opacity: 0;
-      transform: scale(0.9);
+      transform: translate(-50%, -45%) scale(0.95);
     }
     to {
       opacity: 1;
-      transform: scale(1);
+      transform: translate(-50%, -50%) scale(1);
     }
   }
 

@@ -6,6 +6,7 @@ import { FiCalendar } from 'react-icons/fi';
 import styled, { createGlobalStyle } from 'styled-components';
 import CustomDatePicker from '../components/CustomDatePicker';
 
+// Styled components
 const Checkbox = ({ checked, onChange, label }) => {
   return (
     <label>
@@ -80,8 +81,8 @@ const Input = styled.input`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #00d690;
-  color: #fff;
+  background-color: #007bff; /* Default background color */
+  color: #fff; /* Default text color */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -92,11 +93,12 @@ const Button = styled.button`
   max-width: 200px;
 
   &:hover {
-    background-color: #00b57d;
+    background-color: #0056b3; /* Background color on hover */
   }
 
   &:disabled {
-    background-color: #ccc;
+    background-color: #cccccc; /* Background color when disabled */
+    color: #666666; /* Text color when disabled */
     cursor: not-allowed;
   }
 `;
@@ -117,7 +119,7 @@ const BookingForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
-console.log(listing);
+
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
@@ -363,7 +365,7 @@ console.log(listing);
         </>
       )}
 
-      {( currentSection === 3) && (
+      {(currentSection === 3) && (
         <>
           <FormGroup>
             {loading ? (

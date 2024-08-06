@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 import { FaCcVisa, FaCcMastercard, FaPaypal, FaCcAmex } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
