@@ -24,6 +24,7 @@ import BookingModule from './pages/BookingModule';
 import PaymentStatus from './pages/PaymentStatus';
 import Contact from './components/Contact'
 import Bookings from './pages/Bookings'
+import petBoarding from './pages/boardinglist'
 const theme = createTheme();
 
 function App() {
@@ -53,6 +54,7 @@ function App() {
           <Route path='/booking/:id' element={<BookingDetailsPage />} />
           <Route path='/premium-subscription' element={<PremiumSubscription />} />
           <Route path='/PaymentStatus' element={<PaymentStatus />}/>
+          <Route path='/pet-Boarding' element={<petBoarding />}/>
           <Route element={<PrivateRoute />} /> {/* Protected routes */}
         </Routes>
         <Footer />

@@ -1,85 +1,119 @@
+/* CategoryMetaNav.css */
+
 /* Container styling */
 .category-meta-nav {
-    padding: 20px;
-    background-color: #f9f9f9;
-    display: flex;
-    justify-content: center;
-  }
-  
+  padding: 20px;
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping for smaller screens */
+  gap: 20px; /* Space between items */
+  max-width: 1200px;
+  width: 100%;
+  margin: 0; /* Reset margin for centering */
+  box-sizing: border-box; /* Include padding and border in element's total width */
+}
+
+/* Column styling */
+.column {
+  flex: 1 1 calc(20% - 20px); /* Adjust to fit 5 items with margin */
+  max-width: calc(20% - 20px);
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width */
+}
+
+/* Card styling */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 15px; /* Add padding to card content */
+  margin-bottom: 20px; /* Ensure consistent spacing at the bottom */
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Card image styling */
+.card-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-top: 15px;
+}
+
+/* Card content styling */
+.card-content {
+  padding: 15px;
+  text-align: center;
+}
+
+.card-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin: 0; /* Ensure no extra space around text */
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
   .container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px; /* Add space between items */
-    max-width: 1200px;
+    gap: 15px; /* Reduced space between items for medium screens */
   }
-  
-  /* Column styling */
+
   .column {
-    flex: 1 1 calc(33.333% - 20px); /* Adjust based on the number of columns */
-    max-width: calc(33.333% - 20px);
-    box-sizing: border-box;
+    flex: 1 1 calc(45% - 15px); /* Two columns per row for medium screens */
+    max-width: calc(45% - 15px);
   }
-  
-  /* Card styling */
-  .card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: #333;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .container {
+    gap: 10px; /* Reduced space between items for small screens */
   }
-  
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+
+  .column {
+    flex: 1 1 calc(100% - 10px); /* Full width for small screens */
+    max-width: calc(100% - 10px);
   }
-  
-  /* Card image styling */
+
   .card-image {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    margin-top: 15px;
+    width: 50px;
+    height: 50px;
   }
-  
-  /* Card content styling */
-  .card-content {
-    padding: 15px;
-    text-align: center;
-  }
-  
+
   .card-text {
-    font-size: 16px;
-    font-weight: 500;
-    color: #333;
+    font-size: 14px;
   }
-  
-  /* Responsive Design */
-  @media (max-width: 1024px) {
-    .column {
-      flex: 1 1 calc(50% - 20px);
-      max-width: calc(50% - 20px);
-    }
+}
+
+@media (max-width: 480px) {
+  .container {
+    gap: 5px; /* Reduced space between items for very small screens */
   }
-  
-  @media (max-width: 768px) {
-    .column {
-      flex: 1 1 100%;
-      max-width: 100%;
-    }
-  
-    .card-image {
-      width: 50px;
-      height: 50px;
-    }
-  
-    .card-text {
-      font-size: 14px;
-    }
+
+  .card {
+    padding: 10px;
   }
-  
+
+  .card-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-text {
+    font-size: 12px;
+  }
+}

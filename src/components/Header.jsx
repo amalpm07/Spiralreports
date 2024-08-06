@@ -2,10 +2,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Dropdown from './Dropdown';
 import siteIcon from '../assets/leashbench.jpeg';
+import { FaSearch } from 'react-icons/fa'; // Import search icon from react-icons
 
 export default function Header() {
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
+
+  const handleSearchClick = () => {
+    navigate('/search'); // Navigate to search page
+  };
 
   return (
     <header className='bg-white text-black shadow-md'>
@@ -17,10 +22,17 @@ export default function Header() {
             <span className='text-black'>bench</span>
           </h1>
         </Link>
-        <nav className='flex gap-4'>
+        <nav className='flex items-center gap-4'>
           <Link to='/about' className='text-black hover:text-gray-600'>
             <span className='hidden sm:inline'>About</span>
           </Link>
+          <button 
+            onClick={handleSearchClick} 
+            className='flex items-center text-black hover:text-gray-600'
+          >
+            <FaSearch className='mr-1' />
+            <span className='hidden sm:inline'>Search</span>
+          </button>
           {currentUser ? (
             <Dropdown currentUser={currentUser} />
           ) : (
