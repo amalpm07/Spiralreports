@@ -227,7 +227,6 @@ const Listing = () => {
               />
             ))}
         </div>
-    <ServicesAndRates/>
         <div className='questions-section'>
           <ul className='questions-list'>
             {questions.map((question) => {
