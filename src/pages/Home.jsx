@@ -1,7 +1,241 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import CategoryMetaNav from '../components/CategoryNav';
 import { FaGoogle, FaFacebook, FaCheckCircle } from 'react-icons/fa';
+import CategoryMetaNav from '../components/CategoryNav';
+import styled from 'styled-components';
+import { Container, Row, Col } from 'react-bootstrap';
+import banner from '../assets/banner3.png';
+
+// Styled-components for responsiveness and improved design
+const BannerSection = styled.section`
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: auto;
+
+  img {
+    width: 100%;
+    height: 50vh;
+    object-fit: cover;
+    filter: brightness(60%);
+    transition: transform 0.6s ease-in-out;
+
+    @media (min-width: 768px) {
+      height: 60vh;
+    }
+
+    @media (min-width: 1024px) {
+      height: 70vh;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Darker overlay for better contrast */
+    z-index: 1;
+  }
+
+  .content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 2;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centers content vertically */
+    animation: fadeInContent 1s ease-out;
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 0;
+      background: linear-gradient(45deg, #755AA6, #6a4b85);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+      padding: 0.5rem;
+      border-radius: 5px;
+      animation: fadeInText 1s ease-out;
+      
+      @media (min-width: 576px) {
+        font-size: 2rem; /* Small tablets and larger phones */
+      }
+
+      @media (min-width: 768px) {
+        font-size: 2.5rem; /* Tablets and larger screens */
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 3rem; /* Desktops and larger screens */
+      }
+    }
+
+    p {
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      background: rgba(0, 0, 0, 0.6); /* Darker background for better readability */
+      padding: 0.5rem;
+      border-radius: 5px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      animation: fadeInText 1s ease-out;
+
+      @media (min-width: 576px) {
+        font-size: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 1.25rem;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 1.5rem;
+      }
+    }
+
+    .cta-button {
+      background: #755AA6;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      z-index: 3;
+
+      &:hover {
+        background: #6a4b85;
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      }
+
+      &:active {
+        background: #755AA6;
+        transform: scale(1);
+      }
+
+      @media (max-width: 768px) {
+        padding: 10px 20px;
+        font-size: 0.875rem;
+      }
+
+      @media (max-width: 480px) {
+        padding: 8px 16px;
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  @keyframes fadeInContent {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -45%) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes fadeInText {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .content {
+      animation: none;
+    }
+  }
+`;
+
+const SectionTitle = styled.h1`
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #333;
+  text-align: center;
+
+  @media (min-width: 576px) {
+    font-size: 2.5rem; /* Small tablets and larger phones */
+  }
+
+  @media (min-width: 768px) {
+    font-size: 3rem; /* Tablets and larger screens */
+  }
+`;
+
+const SectionText = styled.p`
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+  text-align: center;
+
+  @media (min-width: 576px) {
+    font-size: 1.25rem; /* Small tablets and larger phones */
+  }
+
+  @media (min-width: 768px) {
+    font-size: 1.5rem; /* Tablets and larger screens */
+  }
+`;
+
+const AppButtons = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-top: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
+const AppButtonImage = styled.img`
+  width: 120px;
+  height: auto;
+
+  @media (max-width: 768px) {
+    width: 100px;
+  }
+
+  @media (max-width: 480px) {
+    width: 80px;
+  }
+`;
+
+const ImageWrapper = styled.div`
+  text-align: center;
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+`;
+
+const Highlight = styled.span`
+  color: #007bff;
+`;
 
 const Home = () => {
   const [serviceHomes, setServiceHomes] = useState([]);
@@ -27,28 +261,17 @@ const Home = () => {
   return (
     <div>
       {/* Banner Section */}
-      <section className="relative bg-gray-800">
-        <img
-          className="w-full h-64 md:h-96 object-cover"
-          src='' // Use the imported image variable here
-          alt="Banner"
-        />
-        <div className="absolute inset-0 bg-gray-900 opacity-50"></div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4">
-          <div className="relative max-w-xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold">Welcome to Service Homes</h1>
-            <p className="mt-4 text-lg md:text-xl">Find your ideal service home here</p>
-            <div className="mt-6">
-              <Link
-                to="/premium-subscription"
-                className="bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 rounded-lg shadow-md transition duration-300"
-              >
-                Explore Premium
-              </Link>
-            </div>
-          </div>
+      <BannerSection>
+        <img src={banner} alt="Banner" />
+        <div className="overlay"></div>
+        <div className="content">
+          <h1>"Discover a New World for Your Pet"</h1>
+          <p>"Experience the ultimate in pet care and comfort. Where every pet's journey begins with love and exceptional service."</p>
+          <Link to="/premium-subscription" className="cta-button">
+            Explore Premium
+          </Link>
         </div>
-      </section>
+      </BannerSection>
 
       {/* Main Content */}
       <CategoryMetaNav />
@@ -58,7 +281,7 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {serviceHomes.map((home) => (
             <Link
-              key={home.id} // Ensure the key is unique
+              key={home.id}
               to={`/listing/${home.serviceName}/${home.userId}`}
               className="group block rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
@@ -76,27 +299,49 @@ const Home = () => {
                 <p className="mt-1 text-sm text-gray-600 truncate">
                   {home.address}
                 </p>
-                {/* Verification Status */}
                 <div className="mt-2 flex items-center space-x-2">
-                  {/* Google Verification */}
                   <div className="flex items-center space-x-1">
                     <FaGoogle className={home.isGoogleVerified ? "text-gray-800" : "text-gray-300"} />
-                    {home.isGoogleVerified ? (
-                      <FaCheckCircle className="text-green-500" />
-                    ) : null}
+                    {home.isGoogleVerified && <FaCheckCircle className="text-green-500" />}
                   </div>
-                  {/* Facebook Verification */}
                   <div className="flex items-center space-x-1">
                     <FaFacebook className={home.isFacebookVerified ? "text-gray-800" : "text-gray-300"} />
-                    {home.isFacebookVerified ? (
-                      <FaCheckCircle className="text-green-500" />
-                    ) : null}
+                    {home.isFacebookVerified && <FaCheckCircle className="text-green-500" />}
                   </div>
                 </div>
               </div>
             </Link>
           ))}
         </div>
+      </div>
+
+      {/* Pet Service Section */}
+      <div>
+        <Container fluid style={{ backgroundColor: '#f8f9fa', padding: '5% 10%' }}>
+          <Row className="align-items-center">
+            <Col xs={12} md={6} style={{ marginBottom: '2rem' }}>
+              <SectionTitle>Find Trusted <Highlight>Pet Services</Highlight> Near You</SectionTitle>
+              <SectionText>
+                Discover reliable pet sitters, groomers, and dog walkers with ease. Read reviews, compare prices, and book the best services for your furry friends.
+              </SectionText>
+              <AppButtons>
+                <AppButtonImage
+                  src="https://www.expodine.com/new/img/images/f_download_btn01.png"
+                  alt="Download App from App Store"
+                />
+                <AppButtonImage
+                  src="https://th.bing.com/th/id/R.53a0a9e80cf44c7fd882eaa1839b6602?rik=ENH6JK32UtKSag&riu=http%3a%2f%2fwww.quotemaker.in%2fassets%2fimages%2fQgoogle.png&ehk=Yx7X%2bYwtB7XC56tug%2boAQUqg2zBDwkdosUY1MSqtWMA%3d&risl=&pid=ImgRaw&r=0"
+                  alt="Download App from Google Play"
+                />
+              </AppButtons>
+            </Col>
+            <Col xs={12} md={6}>
+              <ImageWrapper>
+                <img className="img-fluid" src="https://www.dogster.com/wp-content/uploads/2022/10/GoDog-Training-App.jpg" alt="Pet Services" />
+              </ImageWrapper>
+            </Col>
+          </Row>
+        </Container>
       </div>
     </div>
   );

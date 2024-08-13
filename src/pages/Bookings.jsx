@@ -1,7 +1,6 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -10,14 +9,19 @@ import styled, { createGlobalStyle } from 'styled-components';
 import CustomDatePicker from '../components/CustomDatePicker';
 
 // Styled components
-const Checkbox = ({ checked, onChange, label }) => {
-  return (
-    <label>
-      <input type="checkbox" checked={checked} onChange={onChange} />
-      {label}
-    </label>
-  );
-};
+const Checkbox = ({ checked, onChange, label, name }) => (
+  <label htmlFor={name}>
+    <input
+      id={name}
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      name={name}
+      value={label}
+    />
+    {label}
+  </label>
+);
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -84,8 +88,8 @@ const Input = styled.input`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #007bff; /* Default background color */
-  color: #fff; /* Default text color */
+  background-color: #755AA6; /* New background color */
+  color: #fff; /* Text color */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -96,16 +100,29 @@ const Button = styled.button`
   max-width: 200px;
 
   &:hover {
-    background-color: #0056b3; /* Background color on hover */
+    background-color: #5e4791; /* Slightly darker shade for hover effect */
   }
 
   &:disabled {
-    background-color: #cccccc; /* Background color when disabled */
-    color: #666666; /* Text color when disabled */
+    background-color: #d0bfe0; /* Lighter shade for disabled state */
+    color: #a1a1a1; /* Text color when disabled */
     cursor: not-allowed;
   }
 `;
 
+// DatePicker component
+const DatePicker = ({ selected, onChange, minDate, placeholder }) => (
+  <CustomDatePicker
+    selected={selected}
+    onChange={onChange}
+    dateFormat="MM/dd/yyyy"
+    className="form-control"
+    placeholderText={placeholder}
+    minDate={minDate}
+  />
+);
+
+// BookingForm component
 const BookingForm = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -147,20 +164,19 @@ const BookingForm = () => {
     fetchQuestions();
   }, []);
 
-  const handleProceedTodatepicker = () => {
+  const handleProceedTodatepicker = useCallback(() => {
     if (!email || !phoneNumber) {
       setError('Please enter both email and phone number');
       return;
     }
-
     setCurrentSection(2);
-  };
+  }, [email, phoneNumber]);
 
-  const handleProceedToQuestions = () => {
-    setCurrentSection(3);
-  };
+  const handleProceedToQuestions = useCallback(() => {
+    setCurrentSection(2);
+  }, []);
 
-  const handleProceedClick = async () => {
+  const handleProceedClick = useCallback(async () => {
     try {
       if (checkOutDate <= checkInDate) {
         setDateError('Check-out date must be after check-in date');
@@ -185,38 +201,11 @@ const BookingForm = () => {
           id: 0,
           question_id: parseInt(questionId),
           customer_id: currentUser?.id || 0, // Use 0 for guest user
-          ans: String(answers[questionId]),
+          ans: answers[questionId] || '', // Handle empty answers
         }))
       };
   
-      if (!currentUser) {
-        const userAdd = {
-          email,
-          phoneNumber
-        };
-  
-        const addUserRes = await fetch('https://hibow.in/api/User/Add', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(userAdd)
-        });
-  
-        if (!addUserRes.ok) {
-          throw new Error('Failed to add user');
-        }
-  
-        const userData = await addUserRes.json();
-        dispatch({ type: 'SET_CURRENT_USER', payload: userData }); // Update currentUser state with the fetched user data
-  
-        // Update bookingData with the guest user's details
-        bookingData = {
-          ...bookingData,
-          customer_id: userData.id, // Assuming userData.id is provided by the API response
-        };
-      }
-  
+      // Book the service
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
@@ -224,7 +213,7 @@ const BookingForm = () => {
         },
         body: JSON.stringify({
           bookingModel: bookingData,
-          userType: currentUser ? "Customer" : "guest" // Set userType based on currentUser existence
+          userType: currentUser ? "Customer" : "guest"
         })
       });
   
@@ -234,12 +223,13 @@ const BookingForm = () => {
   
       const bookingResult = await bookingRes.json();
   
+      // Save answers
       const answersData = {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
           question_id: parseInt(questionId),
-          customer_id: currentUser?.id ||  userData.id, // Use 0 for guest user
-          ans: String(answers[questionId]),
+          customer_id: currentUser?.id || 0,
+          ans: answers[questionId] || '',
         }))
       };
   
@@ -255,77 +245,38 @@ const BookingForm = () => {
         throw new Error('Failed to add answers');
       }
   
-      const answersResult = await answersRes.text();
-  
+      // Navigate to the payment page with booking result
       navigate('/payment', { state: { bookingResponse: bookingResult } });
   
     } catch (error) {
       setError(error.message);
     }
-  };
-
-  const handleAnswerChange = (questionId, answer) => {
+  }, [checkInDate, checkOutDate, answers, currentUser, listing, navigate]);
+  
+  const handleAnswerChange = useCallback((questionId, answer) => {
     setAnswers(prevAnswers => ({
       ...prevAnswers,
       [questionId]: answer
     }));
-  };
+  }, []);
 
-  const handleCheckboxChange = (e, value) => {
-    const isChecked = e.target.checked;
-    const questionId = e.target.name;
-
-    if (isChecked) {
-      const updatedAnswers = {
-        ...answers,
-        [questionId]: [value],
-      };
-      setAnswers(updatedAnswers);
-    } else {
-      const updatedAnswers = {
-        ...answers,
-        [questionId]: [],
-      };
-      setAnswers(updatedAnswers);
-    }
-  };
+  const handleCheckboxChange = useCallback((e) => {
+    const { name, value, checked } = e.target;
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
+      [name]: checked ? value : '' // Ensure only one option is selected
+    }));
+  }, []);
 
   return (
     <BookingFormWrapper>
       <GlobalStyle />
+
       {currentSection === 1 && (
         <>
           <FormGroup>
-            <Span>Email</Span>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your Email"
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Span>Phone Number</Span>
-            <Input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter your phone number"
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Button onClick={handleProceedTodatepicker}>Proceed</Button>
-          </FormGroup>
-        </>
-      )}
-
-      {(currentSection === 2) && (
-        <>
-          <FormGroup>
             <Span><FiCalendar /> Check-In</Span>
-            <CustomDatePicker
+            <DatePicker
               selected={checkInDate}
               onChange={(date) => {
                 setCheckInDate(date);
@@ -335,16 +286,14 @@ const BookingForm = () => {
                   setDateError('');
                 }
               }}
-              dateFormat="MM/dd/yyyy"
-              className="form-control"
-              placeholderText="Select check-in date"
-              minDate={new Date()} // Disable past dates
+              minDate={new Date()}
+              placeholder="Select check-in date"
             />
           </FormGroup>
 
           <FormGroup>
             <Span><FiCalendar /> Check-Out</Span>
-            <CustomDatePicker
+            <DatePicker
               selected={checkOutDate}
               onChange={(date) => {
                 setCheckOutDate(date);
@@ -354,21 +303,19 @@ const BookingForm = () => {
                   setDateError('');
                 }
               }}
-              dateFormat="MM/dd/yyyy"
-              className="form-control"
-              placeholderText="Select check-out date"
-              minDate={checkInDate} // Disable past dates and dates before check-in date
+              minDate={checkInDate}
+              placeholder="Select check-out date"
             />
             {dateError && <p style={{ color: 'red', marginTop: '5px' }}>{dateError}</p>}
           </FormGroup>
-  
+
           <FormGroup>
-            <Button onClick={handleProceedToQuestions} disabled={loading}>Proceed</Button>
+            <Button onClick={handleProceedToQuestions} disabled={loading}>Next</Button>
           </FormGroup>
         </>
       )}
 
-      {(currentSection === 3) && (
+      {currentSection === 2 && (
         <>
           <FormGroup>
             {loading ? (
@@ -385,20 +332,20 @@ const BookingForm = () => {
                         <Checkbox
                           label="Dog"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Dog') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Dog')}
+                          checked={answers[question.id] === 'Dog'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Cat"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Cat') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Cat')}
+                          checked={answers[question.id] === 'Cat'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Bird"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Bird') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Bird')}
+                          checked={answers[question.id] === 'Bird'}
+                          onChange={handleCheckboxChange}
                         />
                       </>
                     ) : index === 2 ? (
@@ -406,20 +353,20 @@ const BookingForm = () => {
                         <Checkbox
                           label="Young"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Young') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Young')}
+                          checked={answers[question.id] === 'Young'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Adult"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Adult') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Adult')}
+                          checked={answers[question.id] === 'Adult'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Senior"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Senior') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Senior')}
+                          checked={answers[question.id] === 'Senior'}
+                          onChange={handleCheckboxChange}
                         />
                       </>
                     ) : index === 3 ? (
@@ -427,20 +374,20 @@ const BookingForm = () => {
                         <Checkbox
                           label="Small"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Small') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Small')}
+                          checked={answers[question.id] === 'Small'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Medium"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Medium') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Medium')}
+                          checked={answers[question.id] === 'Medium'}
+                          onChange={handleCheckboxChange}
                         />
                         <Checkbox
                           label="Large"
                           name={question.id}
-                          checked={answers[question.id]?.includes('Large') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Large')}
+                          checked={answers[question.id] === 'Large'}
+                          onChange={handleCheckboxChange}
                         />
                       </>
                     ) : (
@@ -469,7 +416,7 @@ const BookingForm = () => {
 };
 
 BookingForm.propTypes = {
-  // Add prop types if required
+  // Define prop types if needed
 };
 
 export default BookingForm;

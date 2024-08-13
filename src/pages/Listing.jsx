@@ -1,15 +1,18 @@
-import { useEffect, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaMapMarkerAlt, FaDog, FaCat, FaPaw, FaStar, FaTrash } from 'react-icons/fa';
-import '../styleComponets/styledComponents.css';
+import { FaMapMarkerAlt, FaDog, FaCat, FaPaw, FaStar, FaTrash, FaCcVisa, FaCcMastercard, FaPaypal, FaCcAmex } from 'react-icons/fa';
+import Spinner from 'react-bootstrap/Spinner'; // Import Spinner component
+import '../styleComponets/listing.css';
 import { useSelector } from 'react-redux';
+import dogImg from '../assets/dog.png';
+import placeholderProfilePic from '../assets/avatar.jpg';
 
 const Listing = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const [copied, setCopied] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ text: '', rating: 0 });
   const [reviewError, setReviewError] = useState(null);
@@ -18,13 +21,12 @@ const Listing = () => {
   const { currentUser } = useSelector((state) => state.user);
   const { selectedType, id } = useParams();
 
-  // Define fetchReviews function with headers
-  const fetchReviews = async (serviceHomeId) => {
+  const fetchReviews = useCallback(async (serviceHomeId) => {
     try {
       const res = await fetch(`https://hibow.in/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid, // Assuming currentUser.guid contains the token
+          'Token': currentUser?.guid || '',
         },
       });
       if (!res.ok) {
@@ -36,81 +38,62 @@ const Listing = () => {
       console.error('Error fetching reviews:', error);
       setReviews([]);
     }
+  }, [currentUser]);
+
+  const fetchListing = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch listing');
+      }
+      const data = await res.json();
+      setListing(data);
+    } catch (error) {
+      console.error('Error fetching listing:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await fetch(`https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${selectedType}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch questions');
+      }
+      const data = await response.json();
+      setQuestions(data);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
   };
 
   useEffect(() => {
-    const fetchListing = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(
-          `https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              // Pass the guid in the header
-            },
-          }
-        );
-        if (!res.ok) {
-          throw new Error('Failed to fetch listing');
-        }
-        const data = await res.json();
-        setListing(data);
-      } catch (error) {
-        console.error('Error fetching listing:', error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch(
-          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${selectedType}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              // 'Token': currentUser.guid, // Pass the guid in the header
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error('Failed to fetch questions');
-        }
-        const data = await response.json();
-        setQuestions(data);
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
-    };
-
     if (id && selectedType) {
       fetchListing();
       fetchQuestions();
     }
-  }, [selectedType, id, currentUser]);
+  }, [selectedType, id]);
 
   useEffect(() => {
-    if (listing && listing.serviceHome && listing.serviceHome.id) {
+    if (listing?.serviceHome?.id) {
       fetchReviews(listing.serviceHome.id);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listing]);
+  }, [listing, fetchReviews]);
 
-  // eslint-disable-next-line no-unused-vars
-  const handleShareClick = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  };
-
-  // eslint-disable-next-line no-unused-vars
   const handleBookNowClick = () => {
-    navigate('/booking', { state: { listing } });
+    navigate(currentUser ? '/bookings' : '/booking', { state: { listing } });
   };
 
   const handleReviewSubmit = async (e) => {
@@ -132,10 +115,10 @@ const Listing = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid, // Pass the guid in the header
+          'Token': currentUser.guid,
         },
         body: JSON.stringify({
-          serviceHomeId: listing.serviceHome.id,
+          serviceHomeId: listing?.serviceHome?.id,
           customerId: currentUser.id,
           customerName: currentUser.userName,
           reviewMessage: newReview.text,
@@ -143,11 +126,11 @@ const Listing = () => {
           postedDate: new Date().toISOString(),
         }),
       });
-      const data = await res.json();
       if (!res.ok) {
         throw new Error('Failed to submit review');
       }
-      setReviews([...reviews, data]);
+      const data = await res.json();
+      setReviews((prevReviews) => [...prevReviews, data]);
       setNewReview({ text: '', rating: 0 });
       setReviewError(null);
     } catch (error) {
@@ -162,29 +145,26 @@ const Listing = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid, // Pass the guid in the header
+          'Token': currentUser.guid,
         },
       });
       if (!res.ok) {
         throw new Error('Failed to delete review');
       }
-      setReviews(reviews.filter((review) => review.id !== reviewId));
+      setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
     } catch (error) {
       console.error('Error deleting review:', error);
     }
   };
 
   const renderStars = (rating) => {
-    const stars = [];
-    for (let i = 0; i < rating; i++) {
-      stars.push(<FaStar key={i} className='text-yellow-400' />);
-    }
-    return stars;
+    return Array.from({ length: 5 }, (_, i) => (
+      <FaStar key={i} className={i < rating ? 'text-yellow-400' : 'text-gray-300'} />
+    ));
   };
 
   const renderListingDetails = () => {
-    const acceptedPetTypes =
-      listing?.answer.find((item) => item.answer.question_id === 33)?.answer.ans.split(', ') || [];
+    const acceptedPetTypes = listing?.answer?.find((item) => item.answer.question_id === 33)?.answer.ans.split(', ') || [];
     const petTypeIcons = {
       Dogs: <FaDog className='text-xl' />,
       Cats: <FaCat className='text-xl' />,
@@ -192,8 +172,7 @@ const Listing = () => {
       'Guinea Pigs': <FaPaw className='text-xl' />,
     };
 
-    const acceptedPetSizes =
-      listing?.answer.find((item) => item.answer.question_id === 34)?.answer.ans.split(', ') || [];
+    const acceptedPetSizes = listing?.answer?.find((item) => item.answer.question_id === 34)?.answer.ans.split(', ') || [];
     const petSizeIcons = {
       '1-5kg': <FaPaw className='text-xl' />,
       '5-10kg': <FaPaw className='text-xl' />,
@@ -201,61 +180,69 @@ const Listing = () => {
     };
 
     return (
-      <div className='flex flex-col max-w-4xl mx-auto p-3 my-7 gap-4'>
-        <p className='text-2xl font-semibold'>
-          {listing?.serviceHome.hostelName}
-        </p>
-        <p className='flex items-center mt-6 gap-2 text-slate-600 text-sm'>
-          <FaMapMarkerAlt className='text-green-700' />
-          {listing?.serviceHome.address}
-        </p>
-        <p className='text-slate-800'>
-          <span className='font-semibold text-black'>Description - </span>
-          {listing?.serviceHome.description}
+      <div className='listing-details'>
+        {/* Profile */}
+        <div className='profile-section'>
+          <img
+            src={listing?.providerProfilePhoto || placeholderProfilePic}
+            alt='Provider Profile'
+            className='profile-pic'
+          />
+          <div className='profile-info'>
+            <p className='provider-name'>{listing?.serviceHome?.hostelName}</p>
+            <p className='provider-address'>{listing?.serviceHome?.address}</p>
+          </div>
+        </div>
+
+        <p className='description'>
+          <span className='description-label'>Description - </span>
+          {listing?.serviceHome?.description}
         </p>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6'>
-          {Object.keys(listing?.serviceHome)
-            .filter(
-              (key) => key.startsWith('photo') && listing.serviceHome[key]
-            )
+        <div className='photo-gallery row'>
+          {Object.keys(listing?.serviceHome || {})
+            .filter((key) => key.startsWith('photo') && listing.serviceHome[key])
             .map((key, index) => (
               <div
                 key={index}
-                className='relative overflow-hidden rounded-lg'
-                style={{
-                  paddingTop: '100%',
-                  backgroundImage: `url(${listing?.serviceHome[key]})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
+                className='col-lg-4 col-md-6 mb-4'
+              >
+                <img
+                  src={listing?.serviceHome[key]}
+                  className='gallery-img w-100 shadow-1-strong rounded mb-4'
+                  alt={`Gallery Image ${index}`}
+                />
+              </div>
             ))}
         </div>
 
-        <div className='mt-6'>
-          <ul className='mt-3 space-y-4'>
+        <div className='questions-section'>
+          <ul className='questions-list'>
             {questions.map((question) => {
-              const answer = listing?.answer.find(
-                (item) => item.answer.question_id === question.id
-              )?.answer.ans;
+              const answer = listing?.answer?.find((item) => item.answer.question_id === question.id)?.answer.ans || '';
               return (
-                <li key={question.id} className='text-slate-800'>
+                <li key={question.id} className='question-item'>
                   <strong>{question.questions}:</strong>
-                  <div className='flex items-center gap-2'>
+                  <div className='question-answer'>
                     {question.id === 33 && (
-                      <div className='flex gap-2'>
+                      <div className='pet-types'>
                         {acceptedPetTypes.map((type) => (
-                          <span key={type} className='flex items-center gap-1'>
-                            {petTypeIcons[type]} {type}
+                          <span key={type} className='pet-type'>
+                            {type === 'dog' ? (
+                              <img src={dogImg} alt={type} className='pet-icon' />
+                            ) : (
+                              <span className='no-icon'>No icon</span>
+                            )}
+                            <span className='pet-type-label'>{type}</span>
                           </span>
                         ))}
                       </div>
                     )}
+
                     {question.id === 34 && (
-                      <div className='flex gap-2'>
+                      <div className='pet-sizes'>
                         {acceptedPetSizes.map((size) => (
-                          <span key={size} className='flex items-center gap-1'>
+                          <span key={size} className='pet-size'>
                             {petSizeIcons[size]} {size}
                           </span>
                         ))}
@@ -268,36 +255,57 @@ const Listing = () => {
             })}
           </ul>
         </div>
-        <div className='mt-4'>
-          {currentUser?.usertype !== 'Provider' && (
-            <button
-              onClick={handleBookNowClick}
-              className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded'
-            >
-              Book Now
-            </button>
-          )}
-        </div>
-        <div className='mt-10'>
-          <h2 className='text-2xl font-semibold'>Reviews</h2>
+
+        {currentUser?.usertype !== 'Provider' && (
+          <div className='service-container'>
+            <div className='services-header'>
+              <h3>Our Services & Rates</h3>
+            </div>
+            <div className='services-body'>
+              {/* Service Item: Booking */}
+              <div className='service-item'>
+                <h4>Booking</h4>
+                <p>Book a session with us.</p>
+                <p className='service-price'>Free</p>
+                <button className='btn-book' onClick={handleBookNowClick}>
+                  Book Now
+                </button>
+              </div>
+            </div>
+            <div className='services-info'>
+              <p>
+                Book with us to enjoy Premium Insurance, 24/7 support, booking guarantee, safe cashless payments, photo updates,
+                and more!
+              </p>
+            </div>
+            <div className='payment-methods'>
+              <FaCcVisa size={24} className='payment-icon' />
+              <FaCcMastercard size={24} className='payment-icon' />
+              <FaPaypal size={24} className='payment-icon' />
+              <FaCcAmex size={24} className='payment-icon' />
+            </div>
+          </div>
+        )}
+
+        <div className='reviews-section'>
+          <h2 className='reviews-title'>Reviews</h2>
           {reviews.length === 0 ? (
-            <p className='text-slate-700'>No reviews yet.</p>
+            <p className='no-reviews'>No reviews yet.</p>
           ) : (
-            <ul className='space-y-4 mt-4'>
+            <ul className='reviews-list'>
               {reviews.map((review, index) => (
-                <li key={index} className='border-b pb-4 relative'>
-                  <div className='flex items-center'>
+                <li key={index} className='review-item'>
+                  <div className='review-stars'>
                     {renderStars(review.stars)}
                   </div>
-                  <p className='text-slate-700 mt-2'>{review.reviewMessage}</p>
-                  <p className='text-gray-500 text-xs mt-1'>
+                  <p className='review-text'>{review.reviewMessage}</p>
+                  <p className='review-date'>
                     Posted on {new Date(review.postedDate).toLocaleDateString()}
                   </p>
-                  {/* Only show delete button if current user posted the review */}
                   {currentUser?.id === review.customerId && (
-                    <span className='absolute right-0 top-0 mt-2 mr-2'>
+                    <span className='delete-review'>
                       <FaTrash
-                        className='text-red-600 cursor-pointer'
+                        className='delete-review-icon'
                         onClick={() => handleDeleteReview(review.id)}
                       />
                     </span>
@@ -307,53 +315,67 @@ const Listing = () => {
             </ul>
           )}
         </div>
-        {/* Leave a Review section */}
-      {currentUser?.usertype !== 'Provider' && (
-        <div className='mt-8 border-t pt-6'>
-          <h3 className='text-2xl font-semibold mb-4'>Leave a Review</h3>
-          {reviewError && (
-            <p className='text-red-500 mb-4'>{reviewError}</p>
-          )}
-          <form onSubmit={handleReviewSubmit} className='bg-gray-100 rounded-lg p-4'>
-            <textarea
-              value={newReview.text}
-              onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
-              className='w-full p-2 border border-gray-300 rounded mb-4'
-              rows='4'
-              placeholder='Write your review...'
-            ></textarea>
-            <div className='flex items-center mb-4'>
-              <span className='mr-2'>Rating:</span>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <FaStar
-                  key={star}
-                  className={`text-xl cursor-pointer ${
-                    newReview.rating >= star ? 'text-yellow-400' : 'text-gray-300'
-                  }`}
-                  onClick={() => setNewReview({ ...newReview, rating: star })}
-                />
-              ))}
-            </div>
-            <button
-              type='submit'
-              className='bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded'
-            >
-              Submit Review
-            </button>
-          </form>
-        </div>
-      )}
 
-        
+        {currentUser?.usertype !== 'Provider' && (
+          <div className='leave-review-section'>
+            <h3 className='leave-review-title'>Leave a Review</h3>
+            {reviewError && (
+              <p className='review-error'>{reviewError}</p>
+            )}
+            <form onSubmit={handleReviewSubmit} className='review-form'>
+              <textarea
+                value={newReview.text}
+                onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                className='review-textarea'
+                rows='4'
+                placeholder='Write your review...'
+              ></textarea>
+              <div className='rating-section'>
+                <span className='rating-label'>Rating:</span>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <FaStar
+                    key={star}
+                    className={`rating-star ${
+                      newReview.rating >= star ? 'rated' : 'unrated'
+                    }`}
+                    onClick={() => setNewReview({ ...newReview, rating: star })}
+                  />
+                ))}
+              </div>
+              <button
+                type='submit'
+                className='submit-review-button'
+              >
+                Submit Review
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     );
   };
 
+  if (loading) {
+    return (
+      <div className='loading-container'>
+        <Spinner animation='border' role='status'>
+          <span className='visually-hidden'>Loading...</span>
+        </Spinner>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className='error-message'>Error: {error}</p>;
+  }
+
+  if (!listing) {
+    return <p className='no-listing'>No listing available</p>;
+  }
+
   return (
-    <div>
-      {loading && <p>Loading...</p>}
-      {error && <p className='text-red-600'>{error}</p>}
-      {!loading && !error && listing && renderListingDetails()}
+    <div className='listing-container'>
+      {renderListingDetails()}
     </div>
   );
 };

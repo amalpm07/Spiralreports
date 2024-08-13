@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect } from 'react';
 import { Container, Typography, Card, CardContent, CardActions, Button, Grid, Box, TextField } from '@mui/material';
 import { styled } from '@mui/system';
@@ -10,22 +9,46 @@ import image1 from '../assets/prebanner1.jpeg';
 import image2 from '../assets/prebanner2.jpeg';
 import image3 from '../assets/prebanner3.jpeg';
 
+// Define the primary theme color
+const themeColors = {
+  primary: '#6d4c7d', // Violet
+  secondary: '#8e5a9f', // Light Violet
+  background: '#f3f4f6', // Light Grey
+  textPrimary: '#212121', // Dark Grey
+  textSecondary: '#757575', // Grey
+  border: '#e0e0e0', // Light Border
+};
+
 const StyledContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(8),
   paddingBottom: theme.spacing(8),
+  backgroundColor: themeColors.background,
 }));
 
-// eslint-disable-next-line no-unused-vars
+const BannerImage = styled('img')({
+  width: '100%',
+  height: 'auto',
+  maxHeight: '450px',
+  objectFit: 'cover',
+  borderRadius: '8px',
+  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+});
+
 const StyledCard = styled(Card)(({ theme, selected }) => ({
-  transition: 'transform 0.3s, border-color 0.3s',
+  transition: 'transform 0.3s, box-shadow 0.3s',
   transform: selected ? 'scale(1.05)' : 'scale(1)',
+  boxShadow: selected ? theme.shadows[8] : theme.shadows[3],
+  border: `1px solid ${themeColors.border}`,
+  borderRadius: '12px',
   '&:hover': {
     transform: 'scale(1.05)',
+    boxShadow: theme.shadows[6],
   },
 }));
 
 const CardContentCentered = styled(CardContent)({
   textAlign: 'center',
+  padding: '24px',
 });
 
 const CardActionsCentered = styled(CardActions)({
@@ -41,15 +64,15 @@ const QuoteBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.shadows[1],
+  boxShadow: theme.shadows[3],
   marginBottom: theme.spacing(2),
   textAlign: 'center',
-  border: '1px solid #ddd',
+  border: `1px solid ${themeColors.border}`,
   transition: 'transform 0.3s, border-color 0.3s, box-shadow 0.3s',
   '&:hover': {
-    transform: 'scale(1.05)',
-    borderColor: theme.palette.primary.main,
-    boxShadow: theme.shadows[3],
+    transform: 'scale(1.02)',
+    borderColor: themeColors.primary,
+    boxShadow: theme.shadows[6],
   },
 }));
 
@@ -63,7 +86,6 @@ const images = [
   image1,
   image2,
   image3,
- 
 ];
 
 const PremiumSubscription = () => {
@@ -73,11 +95,12 @@ const PremiumSubscription = () => {
   const [mobileError, setMobileError] = useState('');
   const [showInvoice, setShowInvoice] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
 
   const bookingDetails = {
-    CustomerId: currentUser.id,
-    customerName: currentUser.userName,
+    CustomerId: currentUser ? currentUser.id : '',
+    customerName: currentUser ? currentUser.userName : '',
     charge: selectedPlan === 'Basic' ? 1 : selectedPlan === 'Standard' ? 20 : 30,
   };
 
@@ -139,7 +162,7 @@ const PremiumSubscription = () => {
 
         const options = {
           key,
-          amount: orderResponse.totalAmount,
+          amount: bookingDetails.charge * 100, // Convert amount to the smallest currency unit
           currency: 'INR',
           order_id: orderId,
           name: 'Your Company Name',
@@ -157,7 +180,7 @@ const PremiumSubscription = () => {
                 {
                   headers: {
                     'Content-Type': 'application/json',
-                    'Token': currentUser.guid, // Replace with your actual token
+                    'Token': currentUser.guid,
                   },
                 }
               );
@@ -178,7 +201,7 @@ const PremiumSubscription = () => {
                   {
                     headers: {
                       'Content-Type': 'application/json',
-                      'Token': currentUser.guid, // Replace with your actual token
+                      'Token': currentUser.guid,
                     },
                   }
                 );
@@ -198,25 +221,53 @@ const PremiumSubscription = () => {
         rzp.open();
       } catch (error) {
         console.error('Error initiating payment:', error);
+        setPaymentError('Payment initiation failed');
       }
     } else {
       setPaymentError('Please enter a valid email and mobile number');
     }
   };
 
+  const handlePlanClick = (plan) => {
+    if (!currentUser) {
+      setShowLoginPopup(true);
+    } else {
+      setSelectedPlan((prev) => (prev === plan ? null : plan));
+    }
+  };
+
+  const handleLoginPopupClose = () => {
+    setShowLoginPopup(false);
+  };
+
+  const handleLoginPopupYes = () => {
+    setShowLoginPopup(false);
+    window.location.href = '/sign-in'; // Redirect to sign-in page
+  };
+
   return (
     <StyledContainer maxWidth="xl">
-<Carousel showThumbs={false} autoPlay infiniteLoop showArrows={true} showStatus={false} showIndicators={true}>
-  {images.map((src, index) => (
-    <div key={index} style={{ maxWidth: '1000px', margin: 'auto' }}>
-      <img src={src} alt={`slide-${index}`} style={{ maxWidth: '100%', height: 'auto' }} />
-    </div>
-  ))}
-</Carousel>
-      <Typography variant="h4" gutterBottom align="center" color="primary">
+      <Carousel
+        showThumbs={false}
+        autoPlay
+        infiniteLoop
+        showArrows
+        showStatus={false}
+        showIndicators
+        dynamicHeight
+        swipeable
+        style={{ marginBottom: '40px' }}
+      >
+        {images.map((src, index) => (
+          <div key={index}>
+            <BannerImage src={src} alt={`slide-${index}`} />
+          </div>
+        ))}
+      </Carousel>
+      <Typography variant="h4" gutterBottom align="center" color={themeColors.primary}>
         Select Your Premium Subscription
       </Typography>
-      <Typography variant="h6" gutterBottom align="center">
+      <Typography variant="h6" gutterBottom align="center" color={themeColors.textSecondary}>
         Choose the plan that best suits your pet's needs
       </Typography>
       <Grid container spacing={4}>
@@ -224,19 +275,23 @@ const PremiumSubscription = () => {
           <Grid item xs={12} sm={6} md={4} key={plan}>
             <StyledCard
               selected={selectedPlan === plan}
-              onClick={() => setSelectedPlan(plan)}
+              onClick={() => handlePlanClick(plan)}
             >
               <CardContentCentered>
-                <Typography variant="h5" color="secondary">{plan} Plan</Typography>
-                <Typography variant="h6">{`${plan === 'Basic' ? 1 : plan === 'Standard' ? 20 : 30}/month`}</Typography>
+                <Typography variant="h5" color={themeColors.primary} gutterBottom>
+                  {plan} Plan
+                </Typography>
+                <Typography variant="h6" color={themeColors.textPrimary}>
+                  {`${plan === 'Basic' ? 1 : plan === 'Standard' ? 20 : 30}/month`}
+                </Typography>
               </CardContentCentered>
               <CardActionsCentered>
                 <Button
                   variant={selectedPlan === plan ? 'contained' : 'outlined'}
                   color="primary"
-                  onClick={() => setSelectedPlan(plan)}
+                  onClick={() => handlePlanClick(plan)}
                 >
-                  Select
+                  {selectedPlan === plan ? 'Deselect' : 'Select'}
                 </Button>
               </CardActionsCentered>
             </StyledCard>
@@ -245,7 +300,7 @@ const PremiumSubscription = () => {
       </Grid>
       {selectedPlan && (
         <CenteredBox>
-          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+          <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '600px', margin: 'auto' }}>
             <TextField
               label="Email"
               variant="outlined"
@@ -253,6 +308,7 @@ const PremiumSubscription = () => {
               margin="normal"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              style={{ marginBottom: '16px' }}
             />
             <TextField
               label="Mobile"
@@ -264,6 +320,7 @@ const PremiumSubscription = () => {
               inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 10 }}
               error={!!mobileError}
               helperText={mobileError}
+              style={{ marginBottom: '16px' }}
             />
             <Button
               type="submit"
@@ -285,7 +342,7 @@ const PremiumSubscription = () => {
       )}
       {showInvoice && (
         <CenteredBox>
-          <Typography variant="h5" color="primary">
+          <Typography variant="h5" color={themeColors.primary}>
             Payment Successful!
           </Typography>
           <Typography variant="body1">
@@ -293,14 +350,44 @@ const PremiumSubscription = () => {
           </Typography>
         </CenteredBox>
       )}
+      {showLoginPopup && (
+        <CenteredBox>
+          <Box
+            sx={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              padding: 3,
+              backgroundColor: 'white',
+              border: `1px solid ${themeColors.border}`,
+              boxShadow: 6,
+              zIndex: 1000,
+              borderRadius: '12px',
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Please log in to access premium subscription features.
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <Button variant="contained" color="primary" onClick={handleLoginPopupYes} sx={{ mr: 2 }}>
+                Yes
+              </Button>
+              <Button variant="outlined" color="secondary" onClick={handleLoginPopupClose}>
+                No
+              </Button>
+            </Box>
+          </Box>
+        </CenteredBox>
+      )}
       <CenteredBox>
-        <Typography variant="h6" color="primary" gutterBottom>
+        <Typography variant="h6" color={themeColors.primary} gutterBottom>
           Why Go Premium?
         </Typography>
-        <Typography variant="body1" paragraph>
+        <Typography variant="body1" paragraph color={themeColors.textPrimary}>
           With our premium subscription, your pet will enjoy top-notch care and exclusive benefits including:
         </Typography>
-        <ul>
+        <ul style={{ textAlign: 'left', margin: '0 auto', maxWidth: '600px', color: themeColors.textPrimary }}>
           <li>Priority booking</li>
           <li>Personalized care plans</li>
           <li>Discounts on additional services</li>
@@ -309,7 +396,7 @@ const PremiumSubscription = () => {
       <CenteredBox>
         {quotes.map((quote, index) => (
           <QuoteBox key={index}>
-            <Typography variant="body1" style={{ fontStyle: 'italic' }}>
+            <Typography variant="body1" style={{ fontStyle: 'italic', color: themeColors.textSecondary }}>
               "{quote}"
             </Typography>
           </QuoteBox>

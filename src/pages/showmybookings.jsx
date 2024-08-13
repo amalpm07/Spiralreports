@@ -1,16 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link } from 'react-router-dom';
 
 function BookingsPage() {
-  const [userBookings, setUserBookings] = useState([]);
+  const [bookings, setBookings] = useState({
+    completed: [],
+    confirmed: [],
+    pending: [],
+    cancelled: [],
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [visibleCategory, setVisibleCategory] = useState('all');
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    // Fetch user bookings when component mounts
     handleShowBookings();
   }, []);
 
@@ -21,7 +26,7 @@ function BookingsPage() {
       const res = await fetch(`https://hibow.in/api/Booking/GetBookingDetailsByUserTypeAndId?userType=${currentUser.usertype}&userId=${currentUser.id}`, {
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid, // Assuming currentUser.guid contains the token
+          'Token': currentUser.guid,
         },
       });
 
@@ -31,20 +36,30 @@ function BookingsPage() {
 
       const data = await res.json();
 
-      // Log the received data for debugging
-      console.log('Received booking details:', data);
-
-      // Check if data is in the expected format
       if (!data || (!Array.isArray(data) && !Array.isArray(data.booking))) {
         throw new Error('Invalid data format received');
       }
 
-      // Set the bookings based on user type
+      let categorizedBookings = {
+        completed: [],
+        confirmed: [],
+        pending: [],
+        cancelled: [],
+      };
+
       if (Array.isArray(data)) {
-        setUserBookings(data); // Customer response
+        categorizedBookings.completed = data.filter(b => b.isCompleted);
+        categorizedBookings.confirmed = data.filter(b => b.isConfirmed && !b.isCompleted);
+        categorizedBookings.pending = data.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive);
+        categorizedBookings.cancelled = data.filter(b => b.cancelledBy);
       } else if (Array.isArray(data.booking)) {
-        setUserBookings(data.booking); // Provider response
+        categorizedBookings.completed = data.booking.filter(b => b.isCompleted);
+        categorizedBookings.confirmed = data.booking.filter(b => b.isConfirmed && !b.isCompleted);
+        categorizedBookings.pending = data.booking.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive);
+        categorizedBookings.cancelled = data.booking.filter(b => b.cancelledBy);
       }
+
+      setBookings(categorizedBookings);
     } catch (error) {
       setError(error.message || 'Failed to load bookings');
       console.error('An error occurred while fetching bookings:', error);
@@ -53,45 +68,57 @@ function BookingsPage() {
     }
   };
 
+  const handleCategoryChange = (category) => {
+    setVisibleCategory(category);
+  };
+
+  const displayedBookings = visibleCategory === 'all'
+    ? Object.values(bookings).flat()
+    : bookings[visibleCategory];
+
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-3xl font-semibold mb-8 text-center">My Bookings</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {userBookings.length > 0 ? (
-          userBookings.map((booking) => (
-            <Link
-              key={booking.id}
-              to={`/booking/${booking.id}`} // Navigate to booking details page with booking ID
-              className="border border-gray-200 rounded-lg p-6 block hover:bg-gray-50"
-            >
-              <p className="font-semibold">Booking ID: {booking.id}</p>
-              <p>Customer Name: {booking.customerName}</p>
-              <p>Service Name: {booking.serviceName}</p>
-              <p>Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
-              <p>Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
-              <p>Charge: ${`${booking.charge.toFixed(2)}`}</p>
-            </Link>
-          ))
+    <div className="container mx-auto p-4 md:p-6">
+      <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center text-gray-800">My Bookings</h2>
+
+      <div className="mb-6 flex flex-wrap justify-center gap-2 md:gap-4">
+        {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(category => (
+          <button
+            key={category}
+            className={`py-3 px-6 rounded-full text-sm md:text-base font-medium transition-colors ${visibleCategory === category ? 'bg-[#755AA6] text-white shadow-md' : 'bg-gray-200 text-gray-800 shadow-sm'} hover:bg-[#6d4c7d] hover:text-white`}
+            onClick={() => handleCategoryChange(category)}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)} Bookings
+          </button>
+        ))}
+      </div>
+
+      {loading && <p className="text-center text-[#755AA6] font-medium">Loading...</p>}
+      {error && <p className="text-center text-red-600 font-medium">{error}</p>}
+
+      <div className="space-y-4 md:space-y-8">
+        {displayedBookings.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {displayedBookings.map((booking) => (
+              <Link
+                key={booking.id}
+                to={`/booking/${booking.id}`}
+                className="border border-gray-300 rounded-lg shadow-lg p-4 bg-white hover:bg-gray-50 transition-colors"
+              >
+                <p className="font-semibold text-lg">Booking ID: {booking.id}</p>
+                <p className="text-gray-700">Customer Name: {booking.customerName}</p>
+                <p className="text-gray-700">Service Name: {booking.serviceName}</p>
+                <p className="text-gray-700">Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
+                <p className="text-gray-700">Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
+                <p className="text-gray-700">Charge: ${booking.charge.toFixed(2)}</p>
+              </Link>
+            ))}
+          </div>
         ) : (
-          <p className="text-lg text-gray-600 mt-4 mx-auto">
-            {loading ? 'Loading...' : 'No bookings found.'}
+          <p className="text-lg text-gray-600 mt-4 text-center">
+            {loading ? 'Loading...' : `No ${visibleCategory} bookings found.`}
           </p>
         )}
       </div>
-
-      {loading && <p className="mt-8 text-center">Loading...</p>}
-      {error && <p className="mt-8 text-center text-red-600">{error}</p>}
-
-      {/* Show button to fetch bookings */}
-      {!loading && userBookings.length === 0 && (
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mt-8 mx-auto block"
-          onClick={handleShowBookings}
-          disabled={loading}
-        >
-          {loading ? 'Loading...' : 'Show My Bookings'}
-        </button>
-      )}
     </div>
   );
 }

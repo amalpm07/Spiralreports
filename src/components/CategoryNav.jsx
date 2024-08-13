@@ -1,78 +1,73 @@
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import '../styleComponets/styledComponents.css';
+import '../styleComponets/CategoryMetaNav.css';
+import DogBoardingIcon from '../assets/pet-boarding.png'; 
+import DogGroomingIcon from '../assets/pet-Groomimg.jpg'; 
+import DogTrainingIcon from '../assets/pet-Training.png'; 
+import DogStoreIcon from '../assets/pet-Store.jpg'; 
+import DogTaxiIcon from '../assets/pet-Taxi.jpg'; 
 
 const CategoryMetaNav = () => (
-  <div className="container">
-    <div className="category-meta-nav">
-      <div className="curved-div">
-        <div className="row">
-          {columns.map((column, index) => (
-            <Column key={index} {...column} />
-          ))}
-        </div>
-      </div>
+  <div className="category-meta-nav">
+    <div className="container">
+      {columns.map((column, index) => (
+        <Column key={index} {...column} />
+      ))}
     </div>
   </div>
 );
 
 const columns = [
   {
-    link: "",
-    imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/pet-boarding.png",
-    alt: "pet boarding near me",
-    text: "Dog Boarding"
+    link: "/pet-Boarding",
+    icon: DogBoardingIcon, 
+    alt: "Dog Boarding",
+    text: "Pet Boarding"
   },
   {
-    link: "",
-    imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/cat-boarding.png",
-    alt: "cat boarding near me",
+    link: "/pet-sitting",
+    icon: DogTrainingIcon,
+    alt: "Pet Sitting",
     text: "Pet Sitting"
   },
   {
-    link: "",
-    imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/pet-grooming-1.png",
-    alt: "pet grooming near me",
+    link: "/pet-grooming",
+    icon: DogGroomingIcon,
+    alt: "Pet Grooming",
     text: "Pet Grooming"
   },
   {
-    link: "",
-    imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/dog-walking.png",
-    alt: "dog walking near me",
-    text: "pet store"
+    link: "/pet-store",
+    icon: DogStoreIcon,
+    alt: "Pet Store",
+    text: "Pet Store"
   },
   {
-    link: "",
-    imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/pet-taxi.png",
-    alt: "pet taxi near me",
+    link: "/pet-taxi",
+    icon: DogTaxiIcon,
+    alt: "Pet Taxi",
     text: "Pet Taxi"
   },
-  {
-    link: "",
-    imgUrl: "https://content.petbacker.com/images/cms/icons/service-type/more.png",
-    alt: "pet service near me",
-    text: "More"
-  }
 ];
 
-const Column = ({ link, imgUrl, alt, text }) => {
-  const handleClick = (e) => {
-    e.preventDefault(); // Prevent default navigation behavior
-    // Optionally, you can add custom functionality here
-  };
-
-  return (
-    <div className="col">
-      <a href={link} target="_blank" rel="noreferrer" className="link-dark column-content" onClick={handleClick}>
-        <img src={imgUrl} alt={alt} width="40" />
-        <p>{text}</p>
-      </a>
-    </div>
-  );
-};
+const Column = ({ link, icon, alt, text }) => (
+  <div className="column">
+    <Link
+      to={link}
+      className="card"
+      aria-label={text}
+    >
+      <img src={icon} alt={alt} className="card-image" />
+      <div className="card-content">
+        <p className="card-text">{text}</p>
+      </div>
+    </Link>
+  </div>
+);
 
 Column.propTypes = {
   link: PropTypes.string.isRequired,
-  imgUrl: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired, // All icons are images
   alt: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
 };

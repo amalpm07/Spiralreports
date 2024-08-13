@@ -1,0 +1,428 @@
+/* Listing Container */
+.listing-container {
+  margin: 0 auto;
+  padding: 1rem;
+  max-width: 1200px;
+}
+
+/* Profile Section */
+.profile-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.profile-info {
+  text-align: left;
+}
+
+.provider-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.provider-address {
+  color: #666;
+}
+
+.description {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.description-label {
+  font-weight: 600;
+}
+
+/* Photo Gallery */
+.photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.photo-item {
+  padding-top: 56%;
+  background-size: cover;
+  background-position: center;
+  border-radius: 8px;
+  position: relative;
+}
+
+.photo-gallery img {
+  object-fit: cover;
+  height: 300px; /* Adjust height as needed */
+  border-radius: 8px;
+}
+
+.photo-gallery .gallery-img {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.photo-gallery .gallery-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Questions Section */
+.questions-section {
+  margin-top: 20px;
+}
+
+.questions-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.question-item {
+  font-size: 1.1rem; /* Increased font size */
+  font-weight: bold; /* Bold text */
+  margin-bottom: 15px;
+}
+
+.question-answer {
+  margin-top: 5px;
+  font-size: 1rem; /* Slightly larger font size for answers */
+}
+
+/* Pet Types & Sizes */
+.pet-types, .pet-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Space between items */
+}
+
+.pet-type, .pet-size {
+  display: flex;
+  align-items: center;
+  font-size: 1rem; /* Consistent size */
+}
+
+.pet-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+}
+
+.pet-type-label {
+  font-weight: normal; /* Normal weight for labels */
+}
+
+.no-icon {
+  color: #999;
+  display: none; /* Hide no-icon span */
+}
+
+/* Booking Section */
+.booking-section {
+  margin-bottom: 1.5rem;
+}
+
+.book-now-button {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.book-now-button:hover {
+  background-color: #0056b3;
+}
+
+/* Reviews Section */
+.reviews-section {
+  margin-bottom: 1.5rem;
+}
+
+.reviews-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.no-reviews {
+  color: #666;
+}
+
+.reviews-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.review-item {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+  position: relative;
+}
+
+.review-stars {
+  display: flex;
+}
+
+.review-text {
+  color: #333;
+  margin-top: 0.5rem;
+}
+
+.review-date {
+  color: #666;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.delete-review {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0.5rem;
+}
+
+.delete-review-icon {
+  color: #dc3545;
+  cursor: pointer;
+}
+
+/* Leave Review Section */
+.leave-review-section {
+  border-top: 1px solid #ddd;
+  padding-top: 1.5rem;
+}
+
+.leave-review-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.review-error {
+  color: #dc3545;
+  margin-bottom: 1rem;
+}
+
+.review-form {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.rating-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rating-label {
+  margin-right: 0.5rem;
+}
+
+.rating-star {
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.rated {
+  color: #ffc107;
+}
+
+.unrated {
+  color: #ddd;
+}
+
+.submit-review-button {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.submit-review-button:hover {
+  background-color: #0056b3;
+}
+
+/* Loading and Error Messages */
+.loading-container, .error-message, .no-listing {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.error-message, .no-listing {
+  color: #dc3545;
+}
+
+/* Services Container */
+.service-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  
+  max-width: 335px; /* Adjust as needed */
+  position: absolute;
+  top: 430px; /* Adjust position as needed */
+  left: 68%; /* Adjust position as needed */
+}
+
+.services-header {
+  background-color: #795ea1;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px 8px 0 0; /* Rounded corners on the top */
+}
+
+.services-body {
+  background-color: #fff;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.service-item {
+  background-color: #f0f0f0;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px; /* Spacing between items */
+  transition: transform 0.3s ease;
+}
+
+.service-item:hover {
+  transform: translateY(-5px); /* Slight elevation effect on hover */
+}
+
+.service-item h4 {
+  font-size: 1.2rem;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.service-item p {
+  margin: 0 0 10px 0;
+  color: #666;
+}
+
+.service-price {
+  color: #795ea1;
+  font-weight: bold;
+}
+
+.btn-book {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none; /* Ensure no underline */
+}
+
+.btn-book:hover {
+  background-color: #0056b3;
+}
+
+.services-info {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1rem;
+  color: #333;
+}
+
+.payment-methods {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.payment-icon {
+  color: #555;
+  margin: 0 10px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.payment-icon:hover {
+  color: #007bff;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .profile-section {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .profile-pic {
+      margin-bottom: 1rem;
+  }
+
+  .photo-gallery {
+      grid-template-columns: 1fr; /* Single column on small screens */
+  }
+
+  .questions-section {
+      order: 1;
+  }
+
+  .service-container {
+      order: 2;
+      margin-top: 20px; /* Space between sections */
+      position: static;
+      width: 100%; /* Full width on mobile */
+      max-width: none; /* Remove max-width constraint */
+  }
+
+  .reviews-section {
+      order: 3;
+  }
+
+  .leave-review-section {
+      order: 4;
+  }
+
+  .payment-methods {
+      margin-top: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .services-container {
+      position: static;
+      width: 100%;
+  }
+}

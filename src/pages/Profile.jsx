@@ -134,8 +134,7 @@ export default function Profile() {
       console.error('Sign-out error:', error);
     }
   };
-   
-  
+
     // const handleShowListings = async () => {
     //   try {
     //     setShowListingsError(false);
@@ -158,7 +157,7 @@ export default function Profile() {
     //     setShowListingsError(true);
     //   }
     // };
-  
+
     // eslint-disable-next-line no-unused-vars
     const handleListingDelete = async (listingId) => {
       // Implement delete functionality here
@@ -194,32 +193,31 @@ export default function Profile() {
         <div className="flex flex-col gap-4 mt-4 w-full">
           <Link
             to="/showmybookings"
-            className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center ${
+            className={`bg-[#755AA6] text-white py-2 px-4 rounded-lg hover:bg-[#6d4c7d] transition duration-200 text-center ${
               !currentUser && 'opacity-50 pointer-events-none'
             }`}
           >
             Bookings
           </Link>
-          {currentUser && currentUser.usertype === 'provider' && (
+          {currentUser && currentUser.usertype === 'Provider' && (
             <>
               <Link
                 to="/create-listing"
-                className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center`}
+                className={`bg-[#755AA6] text-white py-2 px-4 rounded-lg hover:bg-[#6d4c7d] transition duration-200 text-center`}
               >
                 Create Listing
               </Link>
               <Link
                 to="/showmylisting"
-                className={`bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200 text-center`}
+                className={`bg-[#755AA6] text-white py-2 px-4 rounded-lg hover:bg-[#6d4c7d] transition duration-200 text-center`}
               >
-              Show My Listings
+                Show My Listings
               </Link>
-          
             </>
           )}
           <button
             type="button"
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
+            className="bg-[#755AA6] text-white py-2 px-4 rounded-lg hover:bg-[#6d4c7d] transition duration-200"
             onClick={handleSignOut}
           >
             Sign Out

@@ -16,7 +16,6 @@ export default function SignUp() {
     firstName: '',
     lastName: '',
     password: '',
-    userName: '',
     usertype: '',
     email: '',
     phoneNumber: '',
@@ -73,7 +72,6 @@ export default function SignUp() {
 
     if (!formData.firstName.trim()) return 'Please enter your first name.';
     if (!formData.lastName.trim()) return 'Please enter your last name.';
-    if (!formData.userName.trim()) return 'Please enter a username.';
     if (!formData.usertype.trim()) return 'Please select a user type.';
     if (!formData.email.trim()) return 'Please enter your email.';
     if (!emailRegex.test(formData.email)) {
@@ -125,11 +123,7 @@ export default function SignUp() {
         const errorText = await response.text();
         try {
           const errorJson = JSON.parse(errorText);
-          if (errorJson.error === "user name sree already exists!!") {
-            setError('Username already exists.');
-          } else {
-            setError(errorJson.error || 'Failed to sign up.');
-          }
+          setError(errorJson.error || 'Failed to sign up.');
         } catch {
           setError(errorText);
         }
@@ -147,8 +141,7 @@ export default function SignUp() {
       setError(error.message || 'Failed to add user');
     }
   };
-  
-  
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4 sm:p-6">
       <div className="p-4 sm:p-8 bg-white shadow-2xl rounded-lg max-w-2xl w-full">
@@ -188,22 +181,6 @@ export default function SignUp() {
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Last Name"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col sm:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Username
-            </label>
-            <div className="relative">
-              <FaUser className="inline-block h-5 w-5 text-gray-400 mr-3" />
-              <input
-                type="text"
-                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                id="userName"
-                value={formData.userName}
-                onChange={handleChange}
-                placeholder="Username"
               />
             </div>
           </div>
