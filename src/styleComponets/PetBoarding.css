@@ -1,50 +1,24 @@
 /* src/styleComponets/PetBoarding.css */
 
 .pet-boarding {
-    font-family: Arial, sans-serif;
-    text-align: center;
-  }
-  
-  .banner {
-    background-image: url('../assets/banner.jpg'); /* Path to your banner image */
-    background-size: cover;
-    background-position: center;
-    color: white;
-    padding: 40px;
-    margin-bottom: 20px;
-    height: 300px; /* Adjust the height as needed */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .banner h1 {
-    margin: 0;
-    font-size: 2.5em;
-  }
-  
-  .banner p {
-    margin: 10px 0 0;
-    font-size: 1.2em;
-  }
-  
-  .content {
-    padding: 0 20px;
-  }
-  
-  .content h2 {
-    font-size: 2em;
-    margin-bottom: 20px;
-  }
-  
-  .content ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .content ul li {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  background-color: #f8f9fa; /* Light background color */
+}
+
+.under-construction {
+  text-align: center;
+}
+
+.under-construction h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.under-construction p {
+  font-size: 1.25rem;
+  color: #666;
+}
