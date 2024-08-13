@@ -1,14 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
-import { FaMapMarkerAlt, FaDog, FaCat, FaPaw, FaStar, FaTrash } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaDog, FaCat, FaPaw, FaStar, FaTrash, FaCcVisa, FaCcMastercard, FaPaypal, FaCcAmex } from 'react-icons/fa';
 import Spinner from 'react-bootstrap/Spinner'; // Import Spinner component
 import '../styleComponets/listing.css';
 import { useSelector } from 'react-redux';
 import dogImg from '../assets/dog.png';
 import placeholderProfilePic from '../assets/avatar.jpg';
-import ServicesAndRates from '../components/ServicesAndRates ';
+
 const Listing = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,6 @@ const Listing = () => {
   const [questions, setQuestions] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
   const { selectedType, id } = useParams();
-  const [isMounted, setIsMounted] = useState(false);
 
   const fetchReviews = useCallback(async (serviceHomeId) => {
     try {
@@ -41,70 +40,60 @@ const Listing = () => {
     }
   }, [currentUser]);
 
+  const fetchListing = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch listing');
+      }
+      const data = await res.json();
+      setListing(data);
+    } catch (error) {
+      console.error('Error fetching listing:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await fetch(`https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${selectedType}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch questions');
+      }
+      const data = await response.json();
+      setQuestions(data);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchListing = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(
-          `https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error('Failed to fetch listing');
-        }
-        setListing(data);
-      } catch (error) {
-        console.error('Error fetching listing:', error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchQuestions = async () => {
-      try {
-        const response = await fetch(
-          `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${selectedType}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error('Failed to fetch questions');
-        }
-        const data = await response.json();
-        setQuestions(data);
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-      }
-    };
-
     if (id && selectedType) {
       fetchListing();
       fetchQuestions();
     }
-  }, [selectedType, id, currentUser]);
+  }, [selectedType, id]);
 
   useEffect(() => {
-    if (listing && listing.serviceHome && listing.serviceHome.id) {
+    if (listing?.serviceHome?.id) {
       fetchReviews(listing.serviceHome.id);
     }
   }, [listing, fetchReviews]);
 
   const handleBookNowClick = () => {
-    if (!currentUser) {
-      navigate('/booking', { state: { listing } });
-    } else {
-      navigate('/bookings', { state: { listing } });
-    }
+    navigate(currentUser ? '/bookings' : '/booking', { state: { listing } });
   };
 
   const handleReviewSubmit = async (e) => {
@@ -129,7 +118,7 @@ const Listing = () => {
           'Token': currentUser.guid,
         },
         body: JSON.stringify({
-          serviceHomeId: listing.serviceHome.id,
+          serviceHomeId: listing?.serviceHome?.id,
           customerId: currentUser.id,
           customerName: currentUser.userName,
           reviewMessage: newReview.text,
@@ -137,11 +126,11 @@ const Listing = () => {
           postedDate: new Date().toISOString(),
         }),
       });
-      const data = await res.json();
       if (!res.ok) {
         throw new Error('Failed to submit review');
       }
-      setReviews([...reviews, data]);
+      const data = await res.json();
+      setReviews((prevReviews) => [...prevReviews, data]);
       setNewReview({ text: '', rating: 0 });
       setReviewError(null);
     } catch (error) {
@@ -162,23 +151,20 @@ const Listing = () => {
       if (!res.ok) {
         throw new Error('Failed to delete review');
       }
-      setReviews(reviews.filter((review) => review.id !== reviewId));
+      setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
     } catch (error) {
       console.error('Error deleting review:', error);
     }
   };
 
   const renderStars = (rating) => {
-    const stars = [];
-    for (let i = 0; i < rating; i++) {
-      stars.push(<FaStar key={i} className='text-yellow-400' />);
-    }
-    return stars;
+    return Array.from({ length: 5 }, (_, i) => (
+      <FaStar key={i} className={i < rating ? 'text-yellow-400' : 'text-gray-300'} />
+    ));
   };
 
   const renderListingDetails = () => {
-    const acceptedPetTypes =
-      listing?.answer.find((item) => item.answer.question_id === 33)?.answer.ans.split(', ') || [];
+    const acceptedPetTypes = listing?.answer?.find((item) => item.answer.question_id === 33)?.answer.ans.split(', ') || [];
     const petTypeIcons = {
       Dogs: <FaDog className='text-xl' />,
       Cats: <FaCat className='text-xl' />,
@@ -186,8 +172,7 @@ const Listing = () => {
       'Guinea Pigs': <FaPaw className='text-xl' />,
     };
 
-    const acceptedPetSizes =
-      listing?.answer.find((item) => item.answer.question_id === 34)?.answer.ans.split(', ') || [];
+    const acceptedPetSizes = listing?.answer?.find((item) => item.answer.question_id === 34)?.answer.ans.split(', ') || [];
     const petSizeIcons = {
       '1-5kg': <FaPaw className='text-xl' />,
       '5-10kg': <FaPaw className='text-xl' />,
@@ -195,7 +180,7 @@ const Listing = () => {
     };
 
     return (
-      <div className={`listing-container ${isMounted ? 'slide-in-left' : ''}`}>
+      <div className='listing-details'>
         {/* Profile */}
         <div className='profile-section'>
           <img
@@ -204,35 +189,37 @@ const Listing = () => {
             className='profile-pic'
           />
           <div className='profile-info'>
-            <p className='provider-name'>{listing?.serviceHome.hostelName}</p>
-            <p className='provider-address'>{listing?.serviceHome.address}</p>
+            <p className='provider-name'>{listing?.serviceHome?.hostelName}</p>
+            <p className='provider-address'>{listing?.serviceHome?.address}</p>
           </div>
         </div>
 
         <p className='description'>
           <span className='description-label'>Description - </span>
-          {listing?.serviceHome.description}
+          {listing?.serviceHome?.description}
         </p>
 
-        <div className='photo-gallery'>
-          {Object.keys(listing?.serviceHome)
+        <div className='photo-gallery row'>
+          {Object.keys(listing?.serviceHome || {})
             .filter((key) => key.startsWith('photo') && listing.serviceHome[key])
             .map((key, index) => (
               <div
                 key={index}
-                className='photo-item'
-                style={{
-                  backgroundImage: `url(${listing?.serviceHome[key]})`,
-                }}
-              />
+                className='col-lg-4 col-md-6 mb-4'
+              >
+                <img
+                  src={listing?.serviceHome[key]}
+                  className='gallery-img w-100 shadow-1-strong rounded mb-4'
+                  alt={`Gallery Image ${index}`}
+                />
+              </div>
             ))}
         </div>
+
         <div className='questions-section'>
           <ul className='questions-list'>
             {questions.map((question) => {
-              const answer = listing?.answer.find(
-                (item) => item.answer.question_id === question.id
-              )?.answer.ans;
+              const answer = listing?.answer?.find((item) => item.answer.question_id === question.id)?.answer.ans || '';
               return (
                 <li key={question.id} className='question-item'>
                   <strong>{question.questions}:</strong>
@@ -269,16 +256,36 @@ const Listing = () => {
           </ul>
         </div>
 
-        <div className='booking-section'>
-          {currentUser?.usertype !== 'Provider' && (
-            <button
-              onClick={handleBookNowClick}
-              className='book-now-button'
-            >
-              Book Now
-            </button>
-          )}
-        </div>
+        {currentUser?.usertype !== 'Provider' && (
+          <div className='service-container'>
+            <div className='services-header'>
+              <h3>Our Services & Rates</h3>
+            </div>
+            <div className='services-body'>
+              {/* Service Item: Booking */}
+              <div className='service-item'>
+                <h4>Booking</h4>
+                <p>Book a session with us.</p>
+                <p className='service-price'>Free</p>
+                <button className='btn-book' onClick={handleBookNowClick}>
+                  Book Now
+                </button>
+              </div>
+            </div>
+            <div className='services-info'>
+              <p>
+                Book with us to enjoy Premium Insurance, 24/7 support, booking guarantee, safe cashless payments, photo updates,
+                and more!
+              </p>
+            </div>
+            <div className='payment-methods'>
+              <FaCcVisa size={24} className='payment-icon' />
+              <FaCcMastercard size={24} className='payment-icon' />
+              <FaPaypal size={24} className='payment-icon' />
+              <FaCcAmex size={24} className='payment-icon' />
+            </div>
+          </div>
+        )}
 
         <div className='reviews-section'>
           <h2 className='reviews-title'>Reviews</h2>
@@ -348,11 +355,6 @@ const Listing = () => {
     );
   };
 
-  useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false); // Cleanup function to reset animation state
-  }, []);
-
   if (loading) {
     return (
       <div className='loading-container'>
@@ -362,9 +364,11 @@ const Listing = () => {
       </div>
     );
   }
+
   if (error) {
     return <p className='error-message'>Error: {error}</p>;
   }
+
   if (!listing) {
     return <p className='no-listing'>No listing available</p>;
   }

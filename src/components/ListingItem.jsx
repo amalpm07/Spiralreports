@@ -2,26 +2,45 @@
 /* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom';
 import { MdLocationOn } from 'react-icons/md';
+import { useSelector } from 'react-redux';
+
 
 const ListingItem = ({ listing }) => {
   const {
     id,
+    userId,
     serviceName,
     hostelName,
     address,
     description,
     photo1,
-    // eslint-disable-next-line no-unused-vars
     photo2,
     photo3,
     photo4,
     photo5,
     photo6,
   } = listing;
+  const { currentUser } = useSelector((state) => state.user);
+  console.log(currentUser);
 
   return (
     <div className='bg-white shadow-md hover:shadow-lg transition-shadow overflow-hidden rounded-lg w-full sm:w-[330px]'>
-      <Link to={`/listing/${id}`}>
+      <Link 
+        to={`/listing/${serviceName}/${userId}`} 
+        state={{ 
+          id, 
+          serviceName, 
+          hostelName, 
+          address, 
+          description, 
+          photo1, 
+          photo2, 
+          photo3, 
+          photo4, 
+          photo5, 
+          photo6 
+        }}
+      >
         <img
           src={photo1 || 'https://via.placeholder.com/595x400'}
           alt='Listing cover'

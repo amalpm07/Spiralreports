@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

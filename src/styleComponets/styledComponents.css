@@ -338,107 +338,13 @@ margin-right: 5px;
 }
 
 
-.services-container {
-width: 100%;
-max-width: 335px;
-position: absolute;
-top: 230px;
-font-family: 'Arial, sans-serif';
-border-radius: 8px;
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-overflow: hidden;
-left: 68%;
-}
 
-.services-header {
-background-color: #795ea1;
-color: #fff;
-padding: 10px;
-text-align: center;
-}
 
-.services-body {
-background-color: #fff;
-padding: 20px;
-border-bottom: 1px solid #ddd;
-}
 
-.service-item {
-margin-bottom: 20px;
-}
 
-.service-item h4 {
-margin: 0 0 10px 0;
-color: #333;
-}
 
-.service-item p {
-margin: 0 0 10px 0;
-color: #666;
-}
 
-.service-item .service-price {
-color: #795ea1;
-font-weight: bold;
-}
 
-.service-item button {
-background-color: #28a745;
-color: #fff;
-border: none;
-padding: 10px 15px;
-border-radius: 5px;
-cursor: pointer;
-}
-
-.services-info {
-background-color: #fff;
-border: 1px solid #ddd;
-padding: 20px;
-margin-top: 10px;
-border-radius: 8px;
-}
-
-.payment-methods {
-display: flex;
-justify-content: space-around;
-background-color: #fff;
-border: 1px solid #ddd;
-padding: 10px;
-margin-top: 10px;
-border-radius: 8px;
-}
-
-.services-footer {
-display: flex;
-justify-content: space-around;
-background-color: #fff;
-padding: 20px;
-margin-top: 10px;
-border-radius: 8px;
-border-top: 1px solid #ddd;
-}
-
-.credential-item {
-text-align: center;
-}
-
-.credential-item img {
-display: block;
-margin: 0 auto 5px;
-}
-
-.credential-item p {
-margin: 0;
-color: #666;
-}
-
-@media (max-width: 767px) {
-.services-container {
-  position: static;
-  width: 100%;
-}
-}
 
 
 body {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import  { useState, useEffect } from 'react';
 import ListingItem from '../components/ListingItem';
 import { useSelector } from 'react-redux';
 
@@ -8,14 +9,15 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
-  const [visibleListings, setVisibleListings] = useState(3);
-  const [searchClicked, setSearchClicked] = useState(false);
+  const [visibleListings, setVisibleListings] = useState(3); // Initially show 3 listings
+  const [searchClicked, setSearchClicked] = useState(false); // State to track search button click
 
   const fetchListings = async () => {
     setLoading(true);
     try {
       let url = 'https://hibow.in/api/Provider/SearchServiceHomeByLocationAndServicenName';
 
+      // Construct the query parameters based on state
       const params = {};
       if (location.trim() !== '') {
         params.serviceHomeLocation = encodeURIComponent(location);
@@ -25,6 +27,7 @@ const Search = () => {
       }
       const queryParams = new URLSearchParams(params).toString();
 
+      // Append query parameters to the URL
       if (queryParams !== '') {
         url = `${url}?${queryParams}`;
       }
@@ -66,18 +69,18 @@ const Search = () => {
   };
 
   const handleSearch = () => {
-    setSearchClicked(true);
+    setSearchClicked(true); // Set searchClicked to true on search button click
     fetchListings();
   };
 
   useEffect(() => {
     if (searchClicked) {
-      fetchListings();
+      fetchListings(); // Fetch listings only if searchClicked is true
     }
-  }, [searchClicked]);
+  }, [searchClicked]); // Depend on searchClicked state to trigger useEffect
 
   const handleShowMore = () => {
-    setVisibleListings(prev => prev + 3);
+    setVisibleListings(prev => prev + 3); // Increase visible listings by 3
   };
 
   return (
@@ -115,7 +118,7 @@ const Search = () => {
             </div>
           </div>
           <button
-            type='submit'
+            type='submit' // Change type to submit to trigger form submit
             className='bg-[#755AA6] text-white p-3 rounded-lg uppercase hover:bg-[#6a4d8e] transition'
           >
             Search
