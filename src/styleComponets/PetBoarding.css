@@ -1,0 +1,24 @@
+/* src/styleComponets/PetBoarding.css */
+
+.pet-boarding {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  background-color: #f8f9fa; /* Light background color */
+}
+
+.under-construction {
+  text-align: center;
+}
+
+.under-construction h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.under-construction p {
+  font-size: 1.25rem;
+  color: #666;
+}
