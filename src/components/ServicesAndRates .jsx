@@ -33,11 +33,7 @@ const ServicesAndRates = () => {
               </button>
             </div>
             {/* Service Item: Pet Boarding */}
-            <div className="service-item">
-              <h4>Pet Boarding</h4>
-              <p>Comfortable boarding for your pets.</p>
-              <button className="btn-reservation">Make Reservation</button>
-            </div>
+       
           </div>
           {/* Additional Service Information */}
           <div className="services-info">
