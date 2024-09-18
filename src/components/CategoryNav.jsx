@@ -6,12 +6,13 @@ import DogGroomingIcon from '../assets/pet-Groomimg.jpg';
 import DogTrainingIcon from '../assets/pet-Training.png'; 
 import DogStoreIcon from '../assets/pet-Store.jpg'; 
 import DogTaxiIcon from '../assets/pet-Taxi.jpg'; 
+import MoreIcon from '../assets/more.png'; // Add your "More" icon here
 
 const CategoryMetaNav = () => (
   <div className="category-meta-nav">
     <div className="container">
       {columns.map((column, index) => (
-        <Column key={index} {...column} />
+        <MetaNavColumn key={index} {...column} />
       ))}
     </div>
   </div>
@@ -19,7 +20,7 @@ const CategoryMetaNav = () => (
 
 const columns = [
   {
-    link: "/pet-Boarding",
+    link: "/petBoarding",
     icon: DogBoardingIcon, 
     alt: "Dog Boarding",
     text: "Pet Boarding"
@@ -48,24 +49,30 @@ const columns = [
     alt: "Pet Taxi",
     text: "Pet Taxi"
   },
+  {
+    link: "/more",
+    icon: MoreIcon, // Make sure to import this icon
+    alt: "More",
+    text: "More"
+  }
 ];
 
-const Column = ({ link, icon, alt, text }) => (
-  <div className="column">
+const MetaNavColumn = ({ link, icon, alt, text }) => (
+  <div className="meta-nav-column">
     <Link
       to={link}
-      className="card"
+      className="meta-nav-card"
       aria-label={text}
     >
-      <img src={icon} alt={alt} className="card-image" />
-      <div className="card-content">
-        <p className="card-text">{text}</p>
+      <img src={icon} alt={alt} className="meta-nav-card-image" />
+      <div className="meta-nav-card-content">
+        <p className="meta-nav-card-text">{text}</p>
       </div>
     </Link>
   </div>
 );
 
-Column.propTypes = {
+MetaNavColumn.propTypes = {
   link: PropTypes.string.isRequired,
   icon: PropTypes.string.isRequired, // All icons are images
   alt: PropTypes.string.isRequired,

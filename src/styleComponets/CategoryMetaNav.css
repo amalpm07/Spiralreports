@@ -1,32 +1,32 @@
-/* CategoryMetaNav.css */
-
 /* Container styling */
 .category-meta-nav {
   padding: 20px;
   background-color: #f9f9f9;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Center content horizontally */
+  overflow-x: hidden; /* Hide any horizontal overflow */
 }
 
+/* Flex container to arrange items in a single row */
 .container {
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping for smaller screens */
-  gap: 20px; /* Space between items */
-  max-width: 1200px;
+  flex-wrap: nowrap; /* Prevent wrapping of items in a row */
+  gap: 15px; /* Space between items */
+  max-width: 100%; /* Full width of the parent container */
   width: 100%;
-  margin: 0; /* Reset margin for centering */
   box-sizing: border-box; /* Include padding and border in element's total width */
 }
 
 /* Column styling */
-.column {
-  flex: 1 1 calc(20% - 20px); /* Adjust to fit 5 items with margin */
-  max-width: calc(20% - 20px);
-  box-sizing: border-box; /* Ensure padding and border are included in the element's total width */
+.meta-nav-column {
+  flex: 1 1 auto; /* Allow columns to grow and shrink */
+  min-width: 200px; /* Ensure a minimum width for each column */
+  max-width: 300px; /* Ensure a maximum width to prevent overflowing */
+  box-sizing: border-box; /* Ensure padding and border are included */
 }
 
 /* Card styling */
-.card {
+.meta-nav-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,66 +36,78 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  padding: 15px; /* Add padding to card content */
-  margin-bottom: 20px; /* Ensure consistent spacing at the bottom */
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-}
-
-/* Card image styling */
-.card-image {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  margin-top: 15px;
-}
-
-/* Card content styling */
-.card-content {
-  padding: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; /* Smooth transition for hover effects */
+  padding: 10px;
+  height: 180px;
+  width: 100%; /* Full width of the column */
+  box-sizing: border-box;
   text-align: center;
 }
 
-.card-text {
-  font-size: 16px;
+/* Hover effect */
+.meta-nav-card:hover {
+  transform: scale(1.05); /* Slightly increase the size of the card */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increase the shadow for a more prominent effect */
+  background-color: #e0e0e0; /* Change background color on hover */
+}
+
+/* Ensure card image is consistent */
+.meta-nav-card-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border-radius: 50%;
+}
+
+/* Card content styling */
+.meta-nav-card-content {
+  padding: 5px;
+}
+
+.meta-nav-card-text {
+  font-size: 14px;
   font-weight: 500;
   color: #333;
-  margin: 0; /* Ensure no extra space around text */
+  margin: 0;
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .container {
-    gap: 15px; /* Reduced space between items for medium screens */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    gap: 15px; /* Adjust spacing for tablet screens */
   }
 
-  .column {
-    flex: 1 1 calc(45% - 15px); /* Two columns per row for medium screens */
-    max-width: calc(45% - 15px);
+  .meta-nav-column {
+    flex: 1 1 calc(50% - 15px); /* Two columns per row for tablets */
+    max-width: calc(50% - 15px); /* Ensure two items fit per row */
   }
 }
 
 @media (max-width: 768px) {
   .container {
+    flex-direction: column; /* Stack items vertically on small screens */
     gap: 10px; /* Reduced space between items for small screens */
   }
 
-  .column {
-    flex: 1 1 calc(100% - 10px); /* Full width for small screens */
-    max-width: calc(100% - 10px);
+  .meta-nav-column {
+    min-width: 100%; /* Full width for small screens */
+    max-width: 100%; /* Full width for small screens */
   }
 
-  .card-image {
-    width: 50px;
-    height: 50px;
+  .meta-nav-card {
+    height: auto; /* Allow height to adjust based on content */
+    padding: 8px; /* Reduced padding for small screens */
   }
 
-  .card-text {
-    font-size: 14px;
+  .meta-nav-card-image {
+    width: 60px; /* Further reduced width */
+    height: 60px; /* Further reduced height */
+  }
+
+  .meta-nav-card-text {
+    font-size: 12px; /* Further reduced text size */
   }
 }
 
@@ -104,16 +116,22 @@
     gap: 5px; /* Reduced space between items for very small screens */
   }
 
-  .card {
-    padding: 10px;
+  .meta-nav-column {
+    min-width: 100%; /* Full width for very small screens */
+    max-width: 100%; /* Full width for very small screens */
   }
 
-  .card-image {
-    width: 40px;
-    height: 40px;
+  .meta-nav-card {
+    padding: 8px; /* Further reduced padding for very small screens */
+    height: auto; /* Allow height to adjust based on content */
   }
 
-  .card-text {
+  .meta-nav-card-image {
+    width: 50px; /* Further reduced width */
+    height: 50px; /* Further reduced height */
+  }
+
+  .meta-nav-card-text {
     font-size: 12px;
   }
 }

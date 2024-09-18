@@ -135,11 +135,15 @@ const BookingForm = () => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const location = useLocation();
-  const listing = location.state?.listing; // Initialize listing
+  const { listing } = location.state || {};
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
+  const listingDetails = listing || {};
+console.log(listingDetails.serviceHome.id);
 
+  const acceptedPetTypes = listingDetails.acceptedPetTypes || [];
+  const acceptedPetSizes = listingDetails.acceptedPetSizes || [];
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
@@ -186,7 +190,7 @@ const BookingForm = () => {
       const currentDate = new Date();
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
-        providerId: listing?.serviceHome?.userId,
+        providerId: listingDetails.serviceHome.id,
         serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
         bookingDate: currentDate.toISOString(),
         serviceFromDate: checkInDate.toISOString(),
@@ -260,13 +264,23 @@ const BookingForm = () => {
     }));
   }, []);
 
-  const handleCheckboxChange = useCallback((e) => {
-    const { name, value, checked } = e.target;
-    setAnswers(prevAnswers => ({
-      ...prevAnswers,
-      [name]: checked ? value : '' // Ensure only one option is selected
-    }));
-  }, []);
+  const handleCheckboxChange = (e, value) => {
+    const questionId = e.target.name;
+
+    // Only update the answer for the selected checkbox
+    if (e.target.checked) {
+      setAnswers(prevAnswers => ({
+        ...prevAnswers,
+        [questionId]: value
+      }));
+    } else {
+      // If unchecked, clear the answer for that question
+      setAnswers(prevAnswers => ({
+        ...prevAnswers,
+        [questionId]: ''
+      }));
+    }
+  };
 
   return (
     <BookingFormWrapper>
@@ -315,102 +329,70 @@ const BookingForm = () => {
         </>
       )}
 
-      {currentSection === 2 && (
+{currentSection === 2 && (
         <>
-          <FormGroup>
-            {loading ? (
-              <p>Loading questions...</p>
-            ) : error ? (
-              <p style={{ color: 'red' }}>{error}</p>
-            ) : (
-              <>
-                {questions.map((question, index) => (
-                  <FormGroup key={question.id}>
-                    <Span>{question.questions}</Span>
-                    {index === 0 ? (
-                      <>
-                        <Checkbox
-                          label="Dog"
-                          name={question.id}
-                          checked={answers[question.id] === 'Dog'}
-                          onChange={handleCheckboxChange}
-                        />
-                        <Checkbox
-                          label="Cat"
-                          name={question.id}
-                          checked={answers[question.id] === 'Cat'}
-                          onChange={handleCheckboxChange}
-                        />
-                        <Checkbox
-                          label="Bird"
-                          name={question.id}
-                          checked={answers[question.id] === 'Bird'}
-                          onChange={handleCheckboxChange}
-                        />
-                      </>
-                    ) : index === 2 ? (
-                      <>
-                        <Checkbox
-                          label="Young"
-                          name={question.id}
-                          checked={answers[question.id] === 'Young'}
-                          onChange={handleCheckboxChange}
-                        />
-                        <Checkbox
-                          label="Adult"
-                          name={question.id}
-                          checked={answers[question.id] === 'Adult'}
-                          onChange={handleCheckboxChange}
-                        />
-                        <Checkbox
-                          label="Senior"
-                          name={question.id}
-                          checked={answers[question.id] === 'Senior'}
-                          onChange={handleCheckboxChange}
-                        />
-                      </>
-                    ) : index === 3 ? (
-                      <>
-                        <Checkbox
-                          label="Small"
-                          name={question.id}
-                          checked={answers[question.id] === 'Small'}
-                          onChange={handleCheckboxChange}
-                        />
-                        <Checkbox
-                          label="Medium"
-                          name={question.id}
-                          checked={answers[question.id] === 'Medium'}
-                          onChange={handleCheckboxChange}
-                        />
-                        <Checkbox
-                          label="Large"
-                          name={question.id}
-                          checked={answers[question.id] === 'Large'}
-                          onChange={handleCheckboxChange}
-                        />
-                      </>
-                    ) : (
-                      <Input
-                        type="text"
-                        name={question.id}
-                        value={answers[question.id] || ''}
-                        onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                        placeholder={`Enter ${question.questions}`}
-                      />
-                    )}
-                  </FormGroup>
-                ))}
-                <FormGroup>
-                  <Button onClick={handleProceedClick} disabled={loading}>Proceed</Button>
-                </FormGroup>
-              </>
-            )}
-          </FormGroup>
+          {loading && <p>Loading questions...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {questions.map((question, index) => (
+            <FormGroup key={question.id}>
+              <Span>{question.questions}</Span>
+              {index === 0 && acceptedPetTypes.length > 0 ? (
+                acceptedPetTypes.map(pet => (
+                  <Checkbox
+                    key={pet}
+                    label={pet.charAt(0).toUpperCase() + pet.slice(1)}
+                    name={question.id}
+                    checked={answers[question.id] === pet}
+                    onChange={(e) => handleCheckboxChange(e, pet)}
+                  />
+                ))
+              ) : index === 2 ? (
+                <>
+                  <Checkbox
+                    label="Young"
+                    name={question.id}
+                    checked={answers[question.id] === 'Young'}
+                    onChange={(e) => handleCheckboxChange(e, 'Young')}
+                  />
+                  <Checkbox
+                    label="Adult"
+                    name={question.id}
+                    checked={answers[question.id] === 'Adult'}
+                    onChange={(e) => handleCheckboxChange(e, 'Adult')}
+                  />
+                  <Checkbox
+                    label="Senior"
+                    name={question.id}
+                    checked={answers[question.id] === 'Senior'}
+                    onChange={(e) => handleCheckboxChange(e, 'Senior')}
+                  />
+                </>
+              ) :index === 3 && acceptedPetSizes.length > 0 ? (
+                acceptedPetSizes.map(size => (
+                  <Checkbox
+                    key={size}
+                    label={size.charAt(0).toUpperCase() + size.slice(1)}
+                    name={question.id}
+                    checked={answers[question.id] === size}
+                    onChange={(e) => handleCheckboxChange(e, size)}
+                  />
+                ))
+              ) : (
+                <Input
+                  type="text"
+                  name={question.id}
+                  value={answers[question.id] || ''}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  placeholder={`Enter ${question.questions}`}
+                />
+              )}
+            </FormGroup>
+          ))}
+          <Button onClick={handleProceedClick} disabled={loading}>
+            {loading ? 'Processing...' : 'Confirm Booking'}
+          </Button>
         </>
       )}
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
     </BookingFormWrapper>
   );
 };

@@ -16,8 +16,10 @@ function BookingsPage() {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    handleShowBookings();
-  }, []);
+    if (currentUser && currentUser.id && currentUser.guid) {
+      handleShowBookings();
+    }
+  }, [currentUser]);
 
   const handleShowBookings = async () => {
     setLoading(true);
@@ -35,30 +37,11 @@ function BookingsPage() {
       }
 
       const data = await res.json();
-
       if (!data || (!Array.isArray(data) && !Array.isArray(data.booking))) {
         throw new Error('Invalid data format received');
       }
 
-      let categorizedBookings = {
-        completed: [],
-        confirmed: [],
-        pending: [],
-        cancelled: [],
-      };
-
-      if (Array.isArray(data)) {
-        categorizedBookings.completed = data.filter(b => b.isCompleted);
-        categorizedBookings.confirmed = data.filter(b => b.isConfirmed && !b.isCompleted);
-        categorizedBookings.pending = data.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive);
-        categorizedBookings.cancelled = data.filter(b => b.cancelledBy);
-      } else if (Array.isArray(data.booking)) {
-        categorizedBookings.completed = data.booking.filter(b => b.isCompleted);
-        categorizedBookings.confirmed = data.booking.filter(b => b.isConfirmed && !b.isCompleted);
-        categorizedBookings.pending = data.booking.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive);
-        categorizedBookings.cancelled = data.booking.filter(b => b.cancelledBy);
-      }
-
+      const categorizedBookings = categorizeBookings(data);
       setBookings(categorizedBookings);
     } catch (error) {
       setError(error.message || 'Failed to load bookings');
@@ -66,6 +49,23 @@ function BookingsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const categorizeBookings = (data) => {
+    const categorizedBookings = {
+      completed: [],
+      confirmed: [],
+      pending: [],
+      cancelled: [],
+    };
+
+    const bookingsArray = Array.isArray(data) ? data : data.booking || [];
+    categorizedBookings.completed = bookingsArray.filter(b => b.isCompleted);
+    categorizedBookings.confirmed = bookingsArray.filter(b => b.isConfirmed && !b.isCompleted);
+    categorizedBookings.pending = bookingsArray.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive);
+    categorizedBookings.cancelled = bookingsArray.filter(b => b.cancelledBy);
+
+    return categorizedBookings;
   };
 
   const handleCategoryChange = (category) => {
@@ -78,13 +78,23 @@ function BookingsPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
+      <style>
+        {`
+          .card-hover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+          }
+        `}
+      </style>
+
       <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center text-gray-800">My Bookings</h2>
 
-      <div className="mb-6 flex flex-wrap justify-center gap-2 md:gap-4">
+      <div className="mb-6 flex flex-wrap justify-center gap-4">
         {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(category => (
           <button
             key={category}
-            className={`py-3 px-6 rounded-full text-sm md:text-base font-medium transition-colors ${visibleCategory === category ? 'bg-[#755AA6] text-white shadow-md' : 'bg-gray-200 text-gray-800 shadow-sm'} hover:bg-[#6d4c7d] hover:text-white`}
+            className={`py-3 px-6 rounded-full text-sm md:text-base font-medium transition-colors ${visibleCategory === category ? 'bg-[#755AA6] text-white shadow-lg' : 'bg-gray-200 text-gray-800 shadow-sm'} hover:bg-[#6d4c7d] hover:text-white`}
             onClick={() => handleCategoryChange(category)}
           >
             {category.charAt(0).toUpperCase() + category.slice(1)} Bookings
@@ -95,29 +105,25 @@ function BookingsPage() {
       {loading && <p className="text-center text-[#755AA6] font-medium">Loading...</p>}
       {error && <p className="text-center text-red-600 font-medium">{error}</p>}
 
-      <div className="space-y-4 md:space-y-8">
+      <div className="mt-6">
         {displayedBookings.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {displayedBookings.map((booking) => (
               <Link
                 key={booking.id}
                 to={`/booking/${booking.id}`}
-                className="border border-gray-300 rounded-lg shadow-lg p-4 bg-white hover:bg-gray-50 transition-colors"
+                className="border border-gray-300 rounded-lg shadow-lg p-4 bg-white hover:bg-gray-50 transition-colors flex flex-col card-hover"
               >
-                <p className="font-semibold text-lg">Booking ID: {booking.id}</p>
-                <p className="text-gray-700">Customer Name: {booking.customerName}</p>
-                <p className="text-gray-700">Service Name: {booking.serviceName}</p>
-                <p className="text-gray-700">Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
-                <p className="text-gray-700">Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
+                <p className="font-semibold text-lg mb-2">Booking ID: {booking.id}</p>
+                <p className="text-gray-700 mb-1">Customer Name: {booking.customerName}</p>
+                <p className="text-gray-700 mb-1">Service Name: {booking.serviceName}</p>
+                <p className="text-gray-700 mb-1">Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
+                <p className="text-gray-700 mb-1">Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
                 <p className="text-gray-700">Charge: ${booking.charge.toFixed(2)}</p>
               </Link>
             ))}
           </div>
-        ) : (
-          <p className="text-lg text-gray-600 mt-4 text-center">
-            {loading ? 'Loading...' : `No ${visibleCategory} bookings found.`}
-          </p>
-        )}
+        ) : null}
       </div>
     </div>
   );

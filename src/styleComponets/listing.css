@@ -1,83 +1,113 @@
 /* Listing Container */
 .listing-container {
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1.5rem;
   max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* Profile Section */
 .profile-section {
   display: flex;
   align-items: center;
-  margin-bottom: 1.5rem;
+  gap: 15px;
+  margin-bottom: 2rem;
 }
 
 .profile-pic {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
   border-radius: 50%;
-  margin-right: 1rem;
+  border: 3px solid #755AA6; /* Border around profile picture */
 }
 
 .profile-info {
-  text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 
 .provider-name {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #333;
 }
 
 .provider-address {
   color: #666;
+  font-size: 1.1rem;
 }
 
+/* Description */
 .description {
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: 1.5rem;
+  font-size: 1.125rem;
+  color: #444;
+  margin-bottom: 20px; /* Adds a gap between the description and the image gallery */
 }
 
 .description-label {
-  font-weight: 600;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
 /* Photo Gallery */
-.photo-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+.image-gallery-container {
+  display: flex;
+  gap: 15px;
+  padding-left: 10px; /* Add padding for alignment */
+  overflow-x: auto; /* Enable horizontal scrolling */
 }
 
-.photo-item {
-  padding-top: 56%;
-  background-size: cover;
-  background-position: center;
-  border-radius: 8px;
-  position: relative;
+.thumbnail-container {
+  flex: 1;
+  max-width: 106px; /* Adjusted for better alignment */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.photo-gallery img {
-  object-fit: cover;
-  height: 300px; /* Adjust height as needed */
-  border-radius: 8px;
-}
-
-.photo-gallery .gallery-img {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.thumbnail {
+  width: 100%;
+  height: auto;
   cursor: pointer;
+  object-fit: cover;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.photo-gallery .gallery-img:hover {
+.thumbnail.selected {
+  border-color: #755AA6;
+}
+
+.thumbnail:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Viewer */
+.image-viewer {
+  flex: 2; /* Increase flex value for larger width */
+  max-width: 100%; /* Allow full width */
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  overflow: hidden; /* Ensure no overflow from the image */
+}
+
+.image-viewer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Questions Section */
 .questions-section {
-  margin-top: 20px;
+  margin-top: 2rem;
 }
 
 .questions-list {
@@ -87,37 +117,39 @@
 }
 
 .question-item {
-  font-size: 1.1rem; /* Increased font size */
-  font-weight: bold; /* Bold text */
+  font-size: 1.2rem;
+  font-weight: 600;
   margin-bottom: 15px;
+  color: #333;
 }
 
 .question-answer {
   margin-top: 5px;
-  font-size: 1rem; /* Slightly larger font size for answers */
+  font-size: 1.1rem;
+  color: #777;
 }
 
 /* Pet Types & Sizes */
 .pet-types, .pet-sizes {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px; /* Space between items */
+  gap: 12px;
 }
 
 .pet-type, .pet-size {
   display: flex;
   align-items: center;
-  font-size: 1rem; /* Consistent size */
+  font-size: 1.1rem;
 }
 
 .pet-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 5px;
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
 }
 
 .pet-type-label {
-  font-weight: normal; /* Normal weight for labels */
+  font-weight: 500;
 }
 
 .no-icon {
@@ -127,35 +159,43 @@
 
 /* Booking Section */
 .booking-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .book-now-button {
-  background-color: #007bff;
+  background-color: #755AA6; /* Updated button background color */
   color: white;
   font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  font-size: 1.125rem;
 }
 
 .book-now-button:hover {
-  background-color: #0056b3;
+  background-color: #6a4f8a; /* Slightly darker shade for hover effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Reviews Section */
 .reviews-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .reviews-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #333;
 }
 
 .no-reviews {
-  color: #666;
+  color: #777;
 }
 
 .reviews-list {
@@ -172,6 +212,7 @@
 
 .review-stars {
   display: flex;
+  margin-bottom: 0.5rem;
 }
 
 .review-text {
@@ -180,7 +221,7 @@
 }
 
 .review-date {
-  color: #666;
+  color: #777;
   font-size: 0.875rem;
   margin-top: 0.5rem;
 }
@@ -195,6 +236,7 @@
 .delete-review-icon {
   color: #dc3545;
   cursor: pointer;
+  font-size: 1.5rem;
 }
 
 /* Leave Review Section */
@@ -204,9 +246,10 @@
 }
 
 .leave-review-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 700;
   margin-bottom: 1rem;
+  color: #333;
 }
 
 .review-error {
@@ -215,17 +258,19 @@
 }
 
 .review-form {
-  background-color: #f8f9fa;
-  padding: 1rem;
+  background-color: #f1f1f1;
+  padding: 1.5rem;
   border-radius: 8px;
 }
 
 .review-textarea {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-bottom: 1rem;
+  resize: vertical;
+  font-size: 1rem;
 }
 
 .rating-section {
@@ -235,11 +280,12 @@
 }
 
 .rating-label {
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
 }
 
 .rating-star {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   cursor: pointer;
 }
 
@@ -252,17 +298,20 @@
 }
 
 .submit-review-button {
-  background-color: #007bff;
+  background-color: #755AA6; /* Updated button background color */
   color: white;
   font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 1.125rem;
 }
 
 .submit-review-button:hover {
-  background-color: #0056b3;
+  background-color: #6a4f8a; /* Slightly darker shade for hover effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Loading and Error Messages */
@@ -273,156 +322,139 @@
 
 .error-message, .no-listing {
   color: #dc3545;
+  font-size: 1.125rem;
 }
 
-/* Services Container */
+/* Services Container and Details Container */
+.service-details-container {
+  display: flex;
+  gap: 20px; /* Add gap between containers */
+  justify-content: space-between;
+}
+
 .service-container {
   background-color: #ffffff;
-  padding: 20px;
+  padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  
-  max-width: 335px; /* Adjust as needed */
-  position: absolute;
-  top: 430px; /* Adjust position as needed */
-  left: 68%; /* Adjust position as needed */
-}
-
-.services-header {
-  background-color: #795ea1;
-  color: #fff;
-  padding: 10px;
-  text-align: center;
-  border-radius: 8px 8px 0 0; /* Rounded corners on the top */
-}
-
-.services-body {
-  background-color: #fff;
-  padding: 20px;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 20px;
-}
-
-.service-item {
-  background-color: #f0f0f0;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 15px; /* Spacing between items */
-  transition: transform 0.3s ease;
-}
-
-.service-item:hover {
-  transform: translateY(-5px); /* Slight elevation effect on hover */
-}
-
-.service-item h4 {
-  font-size: 1.2rem;
-  margin: 0 0 10px 0;
-  color: #333;
-}
-
-.service-item p {
-  margin: 0 0 10px 0;
-  color: #666;
-}
-
-.service-price {
-  color: #795ea1;
-  font-weight: bold;
-}
-
-.btn-book {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-align: center;
-  display: inline-block;
-  text-decoration: none; /* Ensure no underline */
-}
-
-.btn-book:hover {
-  background-color: #0056b3;
-}
-
-.services-info {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 15px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  max-width: 340px;
+  position: relative;
   margin-top: 20px;
+}
+
+.details-sections {
+  padding: 1.5rem;
   border-radius: 8px;
-  text-align: center;
-  font-size: 1rem;
-  color: #333;
-}
-
-.payment-methods {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.payment-icon {
-  color: #555;
-  margin: 0 10px;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.payment-icon:hover {
-  color: #007bff;
+  flex: 2; /* Adjust the flex-grow property */
+  order: -1;
+  background-color: transparent;
+  box-shadow: none;
+  border: 1px solid transparent;
 }
 
 /* Responsive Styles */
-@media (max-width: 768px) {
-  .profile-section {
-      flex-direction: column;
-      align-items: flex-start;
+@media (max-width: 1024px) {
+  .listing-container {
+    padding: 1rem;
   }
 
-  .profile-pic {
-      margin-bottom: 1rem;
+  .service-details-container {
+    flex-direction: column;
   }
-
-  .photo-gallery {
-      grid-template-columns: 1fr; /* Single column on small screens */
-  }
-
-  .questions-section {
-      order: 1;
-  }
-
+  
   .service-container {
-      order: 2;
-      margin-top: 20px; /* Space between sections */
-      position: static;
-      width: 100%; /* Full width on mobile */
-      max-width: none; /* Remove max-width constraint */
+    margin-top: 20px;
+    width: 100%;
   }
 
-  .reviews-section {
-      order: 3;
-  }
-
-  .leave-review-section {
-      order: 4;
-  }
-
-  .payment-methods {
-      margin-top: 20px;
+  .details-sections {
+    width: 100%;
+    flex: 1;
+    margin-top: 20px;
   }
 }
 
-@media (max-width: 767px) {
-  .services-container {
-      position: static;
-      width: 100%;
+@media (max-width: 768px) {
+  .profile-section {
+    flex-direction: column;
+    align-items: flex-start;
   }
+
+  .profile-pic {
+    margin-bottom: 1rem;
+  }
+
+  .image-gallery-container {
+    flex-direction: column;
+    align-items: center;
+    padding-left: 0;
+  }
+  
+  .thumbnail-container {
+    flex-direction: row;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  .thumbnail {
+    height: 80px;
+  }
+  
+  .image-viewer {
+    aspect-ratio: 16 / 9; /* Maintain aspect ratio on smaller screens */
+    width: 100%; /* Full width on small screens */
+    max-width: none; /* Remove max-width */
+  }
+  
+  .service-container {
+    margin-top: 20px;
+    position: static;
+    width: 100%;
+    max-width: none;
+  }
+  
+  .details-sections {
+    flex: 1; /* Adjust the flex-grow property */
+    width: 100%;
+    background-color: transparent;
+    box-shadow: none;
+    border: 1px solid transparent;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-pic {
+    width: 100px;
+    height: 100px;
+  }
+
+  .thumbnail {
+    height: 60px;
+  }
+  
+  .book-now-button, .submit-review-button {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .review-textarea {
+    font-size: 0.875rem;
+  }
+}
+.thumbnail-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow images to wrap if they exceed the container width */
+  gap: 10px; /* Adjust spacing between thumbnails */
+}
+
+.thumbnail-container img {
+  width: 100px; /* Set the fixed width for thumbnails */
+  height: 100px; /* Set the fixed height for thumbnails */
+  object-fit: cover; /* Ensure images cover the container without distortion */
+  border: 2px solid transparent; /* Optional: border styling */
+  transition: border-color 0.3s; /* Optional: transition effect for selected border */
+}
+
+.thumbnail-container img.selected {
+  border-color: blue; /* Highlight the selected thumbnail with a different border color */
 }

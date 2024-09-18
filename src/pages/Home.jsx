@@ -234,7 +234,7 @@ const ImageWrapper = styled.div`
 `;
 
 const Highlight = styled.span`
-  color: #007bff;
+  color:#755AA6 ;
 `;
 
 const Home = () => {

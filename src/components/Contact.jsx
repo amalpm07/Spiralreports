@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { MdMessage } from "react-icons/md";
 import { FaPhoneAlt } from "react-icons/fa";
 import { HiMail } from "react-icons/hi";
-import '../styleComponets/styledComponents.css';
+import '../styleComponets/contact.css';
 import contact from '../assets/contact.svg';
 
 const Button = ({ isOutline, icon, text, ...rest }) => {
@@ -68,6 +68,7 @@ const ContactForm = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
+              placeholder="Enter your name"
             />
           </div>
           <div className="contactForm-form_control">
@@ -77,15 +78,17 @@ const ContactForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              placeholder="Enter your email"
             />
           </div>
           <div className="contactForm-form_control">
-            <label htmlFor="text">Text</label>
+            <label htmlFor="text">Message</label>
             <textarea
               name="text"
               rows="8"
               value={formData.text}
               onChange={handleChange}
+              placeholder="Enter your message"
             />
           </div>
           <div className="contactForm-submit_btn">

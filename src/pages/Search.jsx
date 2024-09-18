@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ListingItem from '../components/ListingItem';
 import { useSelector } from 'react-redux';
 
@@ -8,7 +7,6 @@ const Search = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
-  const { currentUser } = useSelector((state) => state.user);
   const [visibleListings, setVisibleListings] = useState(3); // Initially show 3 listings
   const [searchClicked, setSearchClicked] = useState(false); // State to track search button click
 
@@ -36,7 +34,7 @@ const Search = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid,
+          // No Token header since user authentication is not needed
         },
       });
 
@@ -46,10 +44,10 @@ const Search = () => {
 
       const data = await res.json();
       setListings(data);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
       setListings([]);
+    } finally {
       setLoading(false);
     }
   };
@@ -62,9 +60,9 @@ const Search = () => {
     }
 
     if (checked) {
-      setServices([...services, id]);
+      setServices((prevServices) => [...prevServices, id]);
     } else {
-      setServices(services.filter(service => service !== id));
+      setServices((prevServices) => prevServices.filter(service => service !== id));
     }
   };
 
@@ -80,7 +78,7 @@ const Search = () => {
   }, [searchClicked]); // Depend on searchClicked state to trigger useEffect
 
   const handleShowMore = () => {
-    setVisibleListings(prev => prev + 3); // Increase visible listings by 3
+    setVisibleListings((prev) => prev + 3); // Increase visible listings by 3
   };
 
   return (

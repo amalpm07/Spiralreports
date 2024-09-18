@@ -1,24 +1,129 @@
-/* src/styleComponets/PetBoarding.css */
+/* src/styleComponents/PetBoarding.css */
 
+/* General container styles */
 .pet-boarding {
+  width: 90%;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 20px;
+}
+
+/* Styles for the banner carousel */
+.carousel-banner {
+  margin-bottom: 30px; /* Adjust spacing as needed */
+}
+
+.banner-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles for the section title */
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Styles for the services section carousel */
+.service-carousel {
+  margin-top: 20px;
+}
+
+.carousel-slide {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Full viewport height */
-  background-color: #f8f9fa; /* Light background color */
 }
 
-.under-construction {
+/* Styles for the service card */
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
-.under-construction h1 {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 1rem;
+.card-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 
-.under-construction p {
-  font-size: 1.25rem;
+.card-content {
+  padding: 10px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin: 10px 0;
+  color: #333;
+}
+
+.card-description {
+  font-size: 1rem;
   color: #666;
+}
+
+.card-location {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0; /* Adjust spacing as needed */
+}
+
+.page-item {
+  margin: 0 5px;
+}
+
+.page-link {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  border-radius: 8px; /* Matches card corners */
+  color: #007bff;
+  background-color: #fff; /* Matches card background */
+  font-size: 0.875rem; /* Smaller font size */
+}
+
+.page-link:hover {
+  background-color: #f1f1f1;
+}
+
+.active .page-link {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+  color: #ccc;
+  pointer-events: none;
+}
+
+.page-item.disabled .page-link:hover {
+  background-color: #fff;
+}
+
+/* Optional: Adjust dot styling for both carousels */
+.slick-dots li button:before {
+  font-size: 12px;
+  color: #333;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #007bff; /* Active dot color */
 }

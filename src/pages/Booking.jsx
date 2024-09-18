@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 /* eslint-disable no-undef */
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -10,14 +10,17 @@ import styled, { createGlobalStyle } from 'styled-components';
 import CustomDatePicker from '../components/CustomDatePicker';
 
 // Styled components
-const Checkbox = ({ checked, onChange, label }) => {
-  return (
-    <label>
-      <input type="checkbox" checked={checked} onChange={onChange} />
-      {label}
-    </label>
-  );
-};
+const Checkbox = ({ checked, onChange, label, name }) => (
+  <label>
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      name={name}
+    />
+    {label}
+  </label>
+);
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -73,7 +76,7 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #00d690;
+    border-color: #755AA6;
     box-shadow: 0 0 5px rgba(0, 214, 144, 0.5);
   }
 
@@ -84,7 +87,7 @@ const Input = styled.input`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #007bff; /* Default background color */
+  background-color: #755AA6; /* Default background color */
   color: #fff; /* Default text color */
   border: none;
   border-radius: 5px;
@@ -96,7 +99,7 @@ const Button = styled.button`
   max-width: 200px;
 
   &:hover {
-    background-color: #0056b3; /* Background color on hover */
+    background-color: #6a4e9b; /* Slightly different color on hover */
   }
 
   &:disabled {
@@ -105,6 +108,18 @@ const Button = styled.button`
     cursor: not-allowed;
   }
 `;
+
+// DatePicker component
+const DatePicker = ({ selected, onChange, minDate, placeholder }) => (
+  <CustomDatePicker
+    selected={selected}
+    onChange={onChange}
+    dateFormat="MM/dd/yyyy"
+    className="form-control"
+    placeholderText={placeholder}
+    minDate={minDate}
+  />
+);
 
 const BookingForm = () => {
   const [email, setEmail] = useState('');
@@ -118,10 +133,15 @@ const BookingForm = () => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const location = useLocation();
-  const listing = location.state?.listing; // Initialize listing
+  const { listing } = location.state || {};
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
+  const listingDetails = listing || {};
+
+  const acceptedPetTypes = listingDetails.acceptedPetTypes || [];
+  const acceptedPetSizes = listingDetails.acceptedPetSizes || [];
+console.log(listing);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -160,13 +180,21 @@ const BookingForm = () => {
     setCurrentSection(3);
   };
 
+  const handleNotification = (message, type) => {
+    if (type === 'success') {
+      alert(`Success: ${message}`);
+    } else if (type === 'error') {
+      alert(`Error: ${message}`);
+    }
+  };
+
   const handleProceedClick = async () => {
     try {
       if (checkOutDate <= checkInDate) {
         setDateError('Check-out date must be after check-in date');
         return;
       }
-  
+
       const currentDate = new Date();
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
@@ -188,13 +216,13 @@ const BookingForm = () => {
           ans: String(answers[questionId]),
         }))
       };
-  
+
       if (!currentUser) {
         const userAdd = {
           email,
           phoneNumber
         };
-  
+
         const addUserRes = await fetch('https://hibow.in/api/User/Add', {
           method: 'POST',
           headers: {
@@ -202,21 +230,21 @@ const BookingForm = () => {
           },
           body: JSON.stringify(userAdd)
         });
-  
+
         if (!addUserRes.ok) {
           throw new Error('Failed to add user');
         }
-  
+
         const userData = await addUserRes.json();
         dispatch({ type: 'SET_CURRENT_USER', payload: userData }); // Update currentUser state with the fetched user data
-  
+
         // Update bookingData with the guest user's details
         bookingData = {
           ...bookingData,
           customer_id: userData.id, // Assuming userData.id is provided by the API response
         };
       }
-  
+
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
@@ -227,22 +255,22 @@ const BookingForm = () => {
           userType: currentUser ? "Customer" : "guest" // Set userType based on currentUser existence
         })
       });
-  
+
       if (!bookingRes.ok) {
         throw new Error('Failed to book service');
       }
-  
+
       const bookingResult = await bookingRes.json();
-  
+
       const answersData = {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
           question_id: parseInt(questionId),
-          customer_id: currentUser?.id ||  userData.id, // Use 0 for guest user
+          customer_id: currentUser?.id || userData.id, // Use 0 for guest user
           ans: String(answers[questionId]),
         }))
       };
-  
+
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
         headers: {
@@ -250,17 +278,18 @@ const BookingForm = () => {
         },
         body: JSON.stringify(answersData)
       });
-  
+
       if (!answersRes.ok) {
         throw new Error('Failed to add answers');
       }
-  
+
       const answersResult = await answersRes.text();
-  
+
+      handleNotification('Booking successful!', 'success');
       navigate('/payment', { state: { bookingResponse: bookingResult } });
-  
+
     } catch (error) {
-      setError(error.message);
+      handleNotification(error.message, 'error');
     }
   };
 
@@ -272,21 +301,20 @@ const BookingForm = () => {
   };
 
   const handleCheckboxChange = (e, value) => {
-    const isChecked = e.target.checked;
     const questionId = e.target.name;
 
-    if (isChecked) {
-      const updatedAnswers = {
-        ...answers,
-        [questionId]: [value],
-      };
-      setAnswers(updatedAnswers);
+    // Only update the answer for the selected checkbox
+    if (e.target.checked) {
+      setAnswers(prevAnswers => ({
+        ...prevAnswers,
+        [questionId]: value
+      }));
     } else {
-      const updatedAnswers = {
-        ...answers,
-        [questionId]: [],
-      };
-      setAnswers(updatedAnswers);
+      // If unchecked, clear the answer for that question
+      setAnswers(prevAnswers => ({
+        ...prevAnswers,
+        [questionId]: ''
+      }));
     }
   };
 
@@ -296,17 +324,16 @@ const BookingForm = () => {
       {currentSection === 1 && (
         <>
           <FormGroup>
-            <Span>Email</Span>
+            <Span>Email:</Span>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your Email"
+              placeholder="Enter your email"
             />
           </FormGroup>
-
           <FormGroup>
-            <Span>Phone Number</Span>
+            <Span>Phone Number:</Span>
             <Input
               type="tel"
               value={phoneNumber}
@@ -314,18 +341,16 @@ const BookingForm = () => {
               placeholder="Enter your phone number"
             />
           </FormGroup>
-
-          <FormGroup>
-            <Button onClick={handleProceedTodatepicker}>Proceed</Button>
-          </FormGroup>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <Button onClick={handleProceedTodatepicker}>Proceed to Date Picker</Button>
         </>
       )}
 
-      {(currentSection === 2) && (
+      {currentSection === 2 && (
         <>
           <FormGroup>
             <Span><FiCalendar /> Check-In</Span>
-            <CustomDatePicker
+            <DatePicker
               selected={checkInDate}
               onChange={(date) => {
                 setCheckInDate(date);
@@ -335,16 +360,14 @@ const BookingForm = () => {
                   setDateError('');
                 }
               }}
-              dateFormat="MM/dd/yyyy"
-              className="form-control"
-              placeholderText="Select check-in date"
-              minDate={new Date()} // Disable past dates
+              minDate={new Date()}
+              placeholder="Select check-in date"
             />
           </FormGroup>
 
           <FormGroup>
             <Span><FiCalendar /> Check-Out</Span>
-            <CustomDatePicker
+            <DatePicker
               selected={checkOutDate}
               onChange={(date) => {
                 setCheckOutDate(date);
@@ -354,122 +377,89 @@ const BookingForm = () => {
                   setDateError('');
                 }
               }}
-              dateFormat="MM/dd/yyyy"
-              className="form-control"
-              placeholderText="Select check-out date"
-              minDate={checkInDate} // Disable past dates and dates before check-in date
+              minDate={checkInDate}
+              placeholder="Select check-out date"
             />
             {dateError && <p style={{ color: 'red', marginTop: '5px' }}>{dateError}</p>}
           </FormGroup>
-  
+
           <FormGroup>
-            <Button onClick={handleProceedToQuestions} disabled={loading}>Proceed</Button>
+            <Button onClick={handleProceedToQuestions} disabled={loading}>Next</Button>
           </FormGroup>
         </>
       )}
 
-      {(currentSection === 3) && (
+      {currentSection === 3 && (
         <>
-          <FormGroup>
-            {loading ? (
-              <p>Loading questions...</p>
-            ) : error ? (
-              <p style={{ color: 'red' }}>{error}</p>
-            ) : (
-              <>
-                {questions.map((question, index) => (
-                  <FormGroup key={question.id}>
-                    <Span>{question.questions}</Span>
-                    {index === 0 ? (
-                      <>
-                        <Checkbox
-                          label="Dog"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Dog') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Dog')}
-                        />
-                        <Checkbox
-                          label="Cat"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Cat') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Cat')}
-                        />
-                        <Checkbox
-                          label="Bird"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Bird') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Bird')}
-                        />
-                      </>
-                    ) : index === 2 ? (
-                      <>
-                        <Checkbox
-                          label="Young"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Young') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Young')}
-                        />
-                        <Checkbox
-                          label="Adult"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Adult') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Adult')}
-                        />
-                        <Checkbox
-                          label="Senior"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Senior') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Senior')}
-                        />
-                      </>
-                    ) : index === 3 ? (
-                      <>
-                        <Checkbox
-                          label="Small"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Small') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Small')}
-                        />
-                        <Checkbox
-                          label="Medium"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Medium') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Medium')}
-                        />
-                        <Checkbox
-                          label="Large"
-                          name={question.id}
-                          checked={answers[question.id]?.includes('Large') || false}
-                          onChange={(e) => handleCheckboxChange(e, 'Large')}
-                        />
-                      </>
-                    ) : (
-                      <Input
-                        type="text"
-                        name={question.id}
-                        value={answers[question.id] || ''}
-                        onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                        placeholder={`Enter ${question.questions}`}
-                      />
-                    )}
-                  </FormGroup>
-                ))}
-                <FormGroup>
-                  <Button onClick={handleProceedClick} disabled={loading}>Proceed</Button>
-                </FormGroup>
-              </>
-            )}
-          </FormGroup>
+          {loading && <p>Loading questions...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {questions.map((question, index) => (
+            <FormGroup key={question.id}>
+              <Span>{question.questions}</Span>
+              {index === 0 && acceptedPetTypes.length > 0 ? (
+                acceptedPetTypes.map(pet => (
+                  <Checkbox
+                    key={pet}
+                    label={pet.charAt(0).toUpperCase() + pet.slice(1)}
+                    name={question.id}
+                    checked={answers[question.id] === pet}
+                    onChange={(e) => handleCheckboxChange(e, pet)}
+                  />
+                ))
+              ) : index === 2 ? (
+                <>
+                  <Checkbox
+                    label="Young"
+                    name={question.id}
+                    checked={answers[question.id] === 'Young'}
+                    onChange={(e) => handleCheckboxChange(e, 'Young')}
+                  />
+                  <Checkbox
+                    label="Adult"
+                    name={question.id}
+                    checked={answers[question.id] === 'Adult'}
+                    onChange={(e) => handleCheckboxChange(e, 'Adult')}
+                  />
+                  <Checkbox
+                    label="Senior"
+                    name={question.id}
+                    checked={answers[question.id] === 'Senior'}
+                    onChange={(e) => handleCheckboxChange(e, 'Senior')}
+                  />
+                </>
+              ) : index === 3 && acceptedPetSizes.length > 0 ? (
+                acceptedPetSizes.map(size => (
+                  <Checkbox
+                    key={size}
+                    label={size.charAt(0).toUpperCase() + size.slice(1)}
+                    name={question.id}
+                    checked={answers[question.id] === size}
+                    onChange={(e) => handleCheckboxChange(e, size)}
+                  />
+                ))
+              ) : (
+                <Input
+                  type="text"
+                  name={question.id}
+                  value={answers[question.id] || ''}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                  placeholder={`Enter ${question.questions}`}
+                />
+              )}
+            </FormGroup>
+          ))}
+          <Button onClick={handleProceedClick} disabled={loading}>
+            {loading ? 'Processing...' : 'Confirm Booking'}
+          </Button>
         </>
       )}
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
     </BookingFormWrapper>
   );
 };
 
 BookingForm.propTypes = {
-  // Add prop types if required
+  currentUser: PropTypes.object,
+  listing: PropTypes.object,
 };
 
 export default BookingForm;
