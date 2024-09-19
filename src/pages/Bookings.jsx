@@ -190,7 +190,7 @@ console.log(listingDetails.serviceHome.id);
       const currentDate = new Date();
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
-        providerId: listingDetails.serviceHome.id,
+        providerId: listing?.serviceHome?.userId,
         serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
         bookingDate: currentDate.toISOString(),
         serviceFromDate: checkInDate.toISOString(),

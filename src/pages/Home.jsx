@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaGoogle, FaFacebook, FaCheckCircle } from 'react-icons/fa';
+import { FaGoogle, FaFacebook, FaCheckCircle, FaStar } from 'react-icons/fa';
 import CategoryMetaNav from '../components/CategoryNav';
 import styled from 'styled-components';
 import { Container, Row, Col } from 'react-bootstrap';
@@ -40,7 +41,7 @@ const BannerSection = styled.section`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5); /* Darker overlay for better contrast */
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1;
   }
 
@@ -56,7 +57,7 @@ const BannerSection = styled.section`
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Centers content vertically */
+    justify-content: center;
     animation: fadeInContent 1s ease-out;
 
     h1 {
@@ -69,24 +70,24 @@ const BannerSection = styled.section`
       padding: 0.5rem;
       border-radius: 5px;
       animation: fadeInText 1s ease-out;
-      
+
       @media (min-width: 576px) {
-        font-size: 2rem; /* Small tablets and larger phones */
+        font-size: 2rem;
       }
 
       @media (min-width: 768px) {
-        font-size: 2.5rem; /* Tablets and larger screens */
+        font-size: 2.5rem;
       }
 
       @media (min-width: 1024px) {
-        font-size: 3rem; /* Desktops and larger screens */
+        font-size: 3rem;
       }
     }
 
     p {
       font-size: 0.875rem;
       margin-top: 0.5rem;
-      background: rgba(0, 0, 0, 0.6); /* Darker background for better readability */
+      background: rgba(0, 0, 0, 0.6);
       padding: 0.5rem;
       border-radius: 5px;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
@@ -180,11 +181,11 @@ const SectionTitle = styled.h1`
   text-align: center;
 
   @media (min-width: 576px) {
-    font-size: 2.5rem; /* Small tablets and larger phones */
+    font-size: 2.5rem;
   }
 
   @media (min-width: 768px) {
-    font-size: 3rem; /* Tablets and larger screens */
+    font-size: 3rem;
   }
 `;
 
@@ -195,11 +196,11 @@ const SectionText = styled.p`
   text-align: center;
 
   @media (min-width: 576px) {
-    font-size: 1.25rem; /* Small tablets and larger phones */
+    font-size: 1.25rem;
   }
 
   @media (min-width: 768px) {
-    font-size: 1.5rem; /* Tablets and larger screens */
+    font-size: 1.5rem;
   }
 `;
 
@@ -234,7 +235,7 @@ const ImageWrapper = styled.div`
 `;
 
 const Highlight = styled.span`
-  color:#755AA6 ;
+  color: #755AA6;
 `;
 
 const Home = () => {
@@ -248,7 +249,12 @@ const Home = () => {
           throw new Error('Failed to fetch service homes');
         }
         const data = await res.json();
-        const serviceHomesData = data.map(item => item.serviceHome);
+        // Map serviceHomes and extract charge and stars from the parent object
+        const serviceHomesData = data.map(item => ({
+          ...item.serviceHome,
+          charge: item.charge,
+          stars: item.stars,
+        }));
         setServiceHomes(serviceHomesData);
       } catch (error) {
         console.error('Error fetching service homes:', error);
@@ -309,39 +315,25 @@ const Home = () => {
                     {home.isFacebookVerified && <FaCheckCircle className="text-green-500" />}
                   </div>
                 </div>
+
+                {/* Display charge and stars */}
+                <div className="mt-4 flex justify-between items-center">
+                  <p className="text-gray-700 font-bold">
+                    ₹{home.charge}/night
+                  </p>
+                  <div className="flex items-center">
+                    {Array.from({ length: home.stars }).map((_, index) => (
+                      <FaStar key={index} className="text-yellow-500" />
+                    ))}
+                    {Array.from({ length: 5 - home.stars }).map((_, index) => (
+                      <FaStar key={index} className="text-gray-300" />
+                    ))}
+                  </div>
+                </div>
               </div>
             </Link>
           ))}
         </div>
-      </div>
-
-      {/* Pet Service Section */}
-      <div>
-        <Container fluid style={{ backgroundColor: '#f8f9fa', padding: '5% 10%' }}>
-          <Row className="align-items-center">
-            <Col xs={12} md={6} style={{ marginBottom: '2rem' }}>
-              <SectionTitle>Find Trusted <Highlight>Pet Services</Highlight> Near You</SectionTitle>
-              <SectionText>
-                Discover reliable pet sitters, groomers, and dog walkers with ease. Read reviews, compare prices, and book the best services for your furry friends.
-              </SectionText>
-              <AppButtons>
-                <AppButtonImage
-                  src="https://www.expodine.com/new/img/images/f_download_btn01.png"
-                  alt="Download App from App Store"
-                />
-                <AppButtonImage
-                  src="https://th.bing.com/th/id/R.53a0a9e80cf44c7fd882eaa1839b6602?rik=ENH6JK32UtKSag&riu=http%3a%2f%2fwww.quotemaker.in%2fassets%2fimages%2fQgoogle.png&ehk=Yx7X%2bYwtB7XC56tug%2boAQUqg2zBDwkdosUY1MSqtWMA%3d&risl=&pid=ImgRaw&r=0"
-                  alt="Download App from Google Play"
-                />
-              </AppButtons>
-            </Col>
-            <Col xs={12} md={6}>
-              <ImageWrapper>
-                <img className="img-fluid" src="https://www.dogster.com/wp-content/uploads/2022/10/GoDog-Training-App.jpg" alt="Pet Services" />
-              </ImageWrapper>
-            </Col>
-          </Row>
-        </Container>
       </div>
     </div>
   );

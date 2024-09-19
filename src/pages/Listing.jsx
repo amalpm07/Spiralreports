@@ -1,20 +1,26 @@
-/* eslint-disable no-undef */
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useParams here
+import { useParams, useNavigate } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
 import useFetchListing from '../Hooks/useFetchListing';
 import ListingDetails from '../components/ListingDetails';
-import { useSelector } from 'react-redux'; // Import useSelector to access the Redux store
+import { useSelector } from 'react-redux';
 
 const Listing = () => {
   const { selectedType, id } = useParams();
   const navigate = useNavigate();
-  const { listing, loading, error, reviews, questions } = useFetchListing(selectedType, id);
+  const { listing, loading, error, questions } = useFetchListing(selectedType, id);
   const [newReview, setNewReview] = React.useState({ text: '', rating: 0 });
   const [reviewError, setReviewError] = React.useState(null);
+  const [reviews, setReviews] = React.useState([]); // Initialize reviews state
 
   // Access currentUser from Redux store
   const { currentUser } = useSelector((state) => state.user);
+
+  React.useEffect(() => {
+    if (listing?.reviews) {
+      setReviews(listing.reviews); // Set initial reviews from listing if available
+    }
+  }, [listing]);
 
   const handleBookNowClick = () => {
     const acceptedPetTypes = listing?.answer?.find((item) => item.answer.question_id === 33)?.answer.ans.split(', ') || [];
@@ -62,7 +68,7 @@ const Listing = () => {
       });
       if (!res.ok) throw new Error('Failed to submit review');
       const data = await res.json();
-      setReviews((prevReviews) => [...prevReviews, data]);
+      setReviews((prevReviews) => [...prevReviews, data]); // Update local reviews state
       setNewReview({ text: '', rating: 0 });
       setReviewError(null);
     } catch (error) {
@@ -81,7 +87,7 @@ const Listing = () => {
         },
       });
       if (!res.ok) throw new Error('Failed to delete review');
-      setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
+      setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId)); // Update local reviews state
     } catch (error) {
       console.error('Error deleting review:', error);
     }

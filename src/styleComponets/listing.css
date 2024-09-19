@@ -14,6 +14,7 @@
   align-items: center;
   gap: 15px;
   margin-bottom: 2rem;
+  margin-left: 50px;
 }
 
 .profile-pic {
@@ -46,6 +47,7 @@
   font-size: 1.125rem;
   color: #444;
   margin-bottom: 20px; /* Adds a gap between the description and the image gallery */
+  margin-left: 50px;
 }
 
 .description-label {
@@ -59,6 +61,7 @@
   gap: 15px;
   padding-left: 10px; /* Add padding for alignment */
   overflow-x: auto; /* Enable horizontal scrolling */
+  margin-left: 50px;
 }
 
 .thumbnail-container {
@@ -91,7 +94,7 @@
 /* Image Viewer */
 .image-viewer {
   flex: 2; /* Increase flex value for larger width */
-  max-width: 100%; /* Allow full width */
+  max-width: 80%; /* Allow full width */
   position: relative;
   aspect-ratio: 16 / 9;
   background-color: #f1f1f1;
@@ -185,6 +188,10 @@
 /* Reviews Section */
 .reviews-section {
   margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f9f9f9; /* Light background for contrast */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .reviews-title {
@@ -196,6 +203,8 @@
 
 .no-reviews {
   color: #777;
+  text-align: center; /* Center the message */
+  font-size: 1.125rem;
 }
 
 .reviews-list {
@@ -215,9 +224,15 @@
   margin-bottom: 0.5rem;
 }
 
+.review-stars .star {
+  font-size: 1.5rem; /* Larger star size */
+  color: #ffc107; /* Gold color for stars */
+}
+
 .review-text {
   color: #333;
   margin-top: 0.5rem;
+  font-size: 1.1rem; /* Increased font size for better readability */
 }
 
 .review-date {
@@ -243,6 +258,8 @@
 .leave-review-section {
   border-top: 1px solid #ddd;
   padding-top: 1.5rem;
+  margin-top: 1.5rem; /* Space above this section */
+  background-color: #f1f1f1; /* Light background */
 }
 
 .leave-review-title {
@@ -258,9 +275,10 @@
 }
 
 .review-form {
-  background-color: #f1f1f1;
+  background-color: #ffffff; /* White background for the form */
   padding: 1.5rem;
   border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .review-textarea {
@@ -328,8 +346,8 @@
 /* Services Container and Details Container */
 .service-details-container {
   display: flex;
-  gap: 20px; /* Add gap between containers */
-  justify-content: space-between;
+  gap: 10px; /* Reduced gap between containers */
+  justify-content: flex-start; /* Align to the left */
 }
 
 .service-container {
@@ -339,7 +357,8 @@
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
   max-width: 340px;
   position: relative;
-  margin-top: 20px;
+  margin-top: 10px; /* Reduced top margin */
+  margin-right: 185px; /* Remove right margin */
 }
 
 .details-sections {
@@ -350,6 +369,7 @@
   background-color: transparent;
   box-shadow: none;
   border: 1px solid transparent;
+  margin-left: 50px; /* Reduced left margin for closer alignment */
 }
 
 /* Responsive Styles */
@@ -361,64 +381,55 @@
   .service-details-container {
     flex-direction: column;
   }
-  
+
   .service-container {
-    margin-top: 20px;
-    width: 100%;
+    margin-top: 10px; /* Reduced top margin */
+    width: 100%; /* Full width for smaller screens */
   }
 
   .details-sections {
     width: 100%;
     flex: 1;
-    margin-top: 20px;
+    margin-top: 10px; /* Reduced top margin */
+  }
+
+  .profile-section {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 0; /* Remove left margin */
+  }
+
+  .image-gallery-container {
+    padding-left: 0; /* Remove left padding */
   }
 }
 
 @media (max-width: 768px) {
-  .profile-section {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .profile-pic {
     margin-bottom: 1rem;
   }
 
-  .image-gallery-container {
-    flex-direction: column;
-    align-items: center;
-    padding-left: 0;
-  }
-  
   .thumbnail-container {
     flex-direction: row;
     max-width: 100%;
     overflow-x: auto;
   }
-  
+
   .thumbnail {
     height: 80px;
   }
-  
+
   .image-viewer {
     aspect-ratio: 16 / 9; /* Maintain aspect ratio on smaller screens */
     width: 100%; /* Full width on small screens */
     max-width: none; /* Remove max-width */
   }
-  
+
   .service-container {
-    margin-top: 20px;
+    margin-top: 10px; /* Reduced top margin */
     position: static;
     width: 100%;
     max-width: none;
-  }
-  
-  .details-sections {
-    flex: 1; /* Adjust the flex-grow property */
-    width: 100%;
-    background-color: transparent;
-    box-shadow: none;
-    border: 1px solid transparent;
   }
 }
 
@@ -431,7 +442,7 @@
   .thumbnail {
     height: 60px;
   }
-  
+
   .book-now-button, .submit-review-button {
     font-size: 1rem;
     padding: 0.5rem 1rem;
@@ -441,6 +452,8 @@
     font-size: 0.875rem;
   }
 }
+
+/* Additional Responsive Styles */
 .thumbnail-container {
   display: flex;
   flex-wrap: wrap; /* Allow images to wrap if they exceed the container width */

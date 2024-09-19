@@ -52,6 +52,7 @@ const PaymentPage = () => {
   const [paymentError, setPaymentError] = useState('');
   const [paymentDetails, setPaymentDetails] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
+console.log(bookingDetails);
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -89,7 +90,7 @@ const PaymentPage = () => {
     if (validateEmail(email) && validateMobile(mobile)) {
       try {
         const orderResponse = await axios.post(
-         `https://hibow.in/api/Order/Initiate Order?providerId=${bookingDetails.providerId}`,
+          `https://hibow.in/api/Order/Initiate Order?providerId=${bookingDetails.providerId}`,
           {
             userId: bookingDetails.providerId,
             customerName: bookingDetails.customerName,
@@ -145,10 +146,13 @@ const PaymentPage = () => {
                   mobile,
                 });
 
+                // Pass both orderId and bookingId to the PaymentStatus page
                 navigate('/paymentstatus', {
-                  state: { orderId: orderId }
+                  state: {
+                    orderId: orderId,
+                    bookingId: bookingDetails.id, // Assuming bookingId is part of bookingDetails
+                  },
                 });
-                
               } else {
                 throw new Error('Payment verification failed');
               }
