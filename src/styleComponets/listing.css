@@ -96,16 +96,16 @@
   flex: 2; /* Increase flex value for larger width */
   max-width: 80%; /* Allow full width */
   position: relative;
-  aspect-ratio: 16 / 9;
   background-color: #f1f1f1;
   border-radius: 8px;
   overflow: hidden; /* Ensure no overflow from the image */
+  height: auto; /* Allow height to adjust automatically */
 }
 
 .image-viewer img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: 100%; /* Set height to 100% to fill the container */
+  object-fit: cover; /* Use cover to fill the container without distortion */
 }
 
 /* Questions Section */
@@ -420,9 +420,12 @@
   }
 
   .image-viewer {
-    aspect-ratio: 16 / 9; /* Maintain aspect ratio on smaller screens */
-    width: 100%; /* Full width on small screens */
-    max-width: none; /* Remove max-width */
+    height: 250px; /* Set a specific height for mobile */
+  }
+
+  .image-viewer img {
+    height: 100%; /* Maintain full height in the viewer */
+    object-fit: cover; /* Ensure the image fills the container */
   }
 
   .service-container {

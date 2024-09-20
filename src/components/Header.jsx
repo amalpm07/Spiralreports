@@ -26,6 +26,9 @@ export default function Header() {
           <Link to='/about' className='text-black hover:text-gray-600'>
             <span className='hidden sm:inline'>About</span>
           </Link>
+          <Link to='/showmybookings' className='text-black hover:text-gray-600'>
+            <span className='hidden sm:inline'>My Bookings</span>
+          </Link>
           <button 
             onClick={handleSearchClick} 
             className='flex items-center text-black hover:text-gray-600'

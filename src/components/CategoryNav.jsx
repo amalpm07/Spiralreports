@@ -29,7 +29,7 @@ const columns = [
     link: "/pet-sitting",
     icon: DogTrainingIcon,
     alt: "Pet Sitting",
-    text: "Pet Sitting"
+    text: "Pet Training"
   },
   {
     link: "/pet-grooming",

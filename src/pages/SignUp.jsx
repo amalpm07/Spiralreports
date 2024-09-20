@@ -16,6 +16,7 @@ export default function SignUp() {
     firstName: '',
     lastName: '',
     password: '',
+    rePassword: '', // New state for re-entered password
     usertype: '',
     email: '',
     phoneNumber: '',
@@ -80,6 +81,8 @@ export default function SignUp() {
     }
     if (!formData.password.trim()) return 'Please enter a password.';
     if (formData.password.length < 6) return 'Password must be at least 6 characters.';
+    if (!formData.rePassword.trim()) return 'Please re-enter your password.';
+    if (formData.password !== formData.rePassword) return 'Passwords do not match.';
     if (!formData.phoneNumber.trim()) return 'Please enter your phone number.';
     if (!phoneRegex.test(formData.phoneNumber)) {
       setPhoneError('Phone number must be exactly 10 digits.');
@@ -153,9 +156,7 @@ export default function SignUp() {
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"
         >
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">First Name</label>
             <div className="relative">
               <FaUser className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -169,9 +170,7 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">Last Name</label>
             <div className="relative">
               <FaUser className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -185,9 +184,7 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col sm:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              User Type
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">User Type</label>
             <div className="flex items-center space-x-4">
               <label className="flex items-center">
                 <input
@@ -214,9 +211,7 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">Email</label>
             <div className="relative">
               <FaEnvelope className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -233,9 +228,7 @@ export default function SignUp() {
             {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
             <div className="relative">
               <FaLock className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -249,9 +242,21 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Phone Number
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">Re-enter Password</label>
+            <div className="relative">
+              <FaLock className="inline-block h-5 w-5 text-gray-400 mr-3" />
+              <input
+                type="password"
+                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                id="rePassword"
+                value={formData.rePassword}
+                onChange={handleChange}
+                placeholder="Re-enter Password"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-1">Phone Number</label>
             <div className="relative">
               <FaPhone className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -268,9 +273,7 @@ export default function SignUp() {
             {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              House Name
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">House Name</label>
             <div className="relative">
               <FaHome className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -284,9 +287,7 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Landmark
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">Landmark</label>
             <div className="relative">
               <FaMapMarkerAlt className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -300,9 +301,7 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              District
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">District</label>
             <div className="relative">
               <FaCity className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -316,9 +315,7 @@ export default function SignUp() {
             </div>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Pincode
-            </label>
+            <label className="text-sm font-medium text-gray-700 mb-1">Pincode</label>
             <div className="relative">
               <FaMapMarkerAlt className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
@@ -334,12 +331,12 @@ export default function SignUp() {
 
           <button
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-lg uppercase hover:from-blue-700 hover:to-indigo-700 disabled:bg-blue-400 col-span-1 sm:col-span-2 flex items-center justify-center transition duration-300"
+            style={{ backgroundColor: '#755AA6' }}
+            className="text-white p-3 rounded-lg uppercase hover:bg-purple-700 disabled:bg-purple-400 col-span-1 sm:col-span-2 flex items-center justify-center transition duration-300"
           >
             {loading ? 'Loading...' : <FaSignInAlt className="mr-2" />}
             Sign Up
           </button>
-          {/* <OAuth className="col-span-1 sm:col-span-2" /> */}
         </form>
         <div className="flex justify-center mt-5">
           <p>Have an account?</p>

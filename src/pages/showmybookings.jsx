@@ -77,53 +77,44 @@ function BookingsPage() {
     : bookings[visibleCategory];
 
   return (
-    <div className="container mx-auto p-4 md:p-6">
-      <style>
-        {`
-          .card-hover:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-          }
-        `}
-      </style>
+    <div className="container mx-auto p-4 md:p-6 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <h2 className="text-center text-2xl font-semibold mb-4 text-gray-800">My Bookings</h2>
+        <div className="flex flex-wrap justify-center gap-4 mb-4">
+          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(category => (
+            <button
+              key={category}
+              className={`py-2 px-4 rounded-full text-sm md:text-base font-medium ${visibleCategory === category ? 'bg-[#755AA6] text-white shadow-lg' : 'bg-white text-gray-800 shadow-sm border border-gray-300'}`}
+              onClick={() => handleCategoryChange(category)}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)} Bookings
+            </button>
+          ))}
+        </div>
 
-      <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center text-gray-800">My Bookings</h2>
+        {loading && <p className="text-center text-[#755AA6] font-medium">Loading...</p>}
+        {error && <p className="text-center text-red-600 font-medium">{error}</p>}
 
-      <div className="mb-6 flex flex-wrap justify-center gap-4">
-        {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(category => (
-          <button
-            key={category}
-            className={`py-3 px-6 rounded-full text-sm md:text-base font-medium transition-colors ${visibleCategory === category ? 'bg-[#755AA6] text-white shadow-lg' : 'bg-gray-200 text-gray-800 shadow-sm'} hover:bg-[#6d4c7d] hover:text-white`}
-            onClick={() => handleCategoryChange(category)}
-          >
-            {category.charAt(0).toUpperCase() + category.slice(1)} Bookings
-          </button>
-        ))}
-      </div>
-
-      {loading && <p className="text-center text-[#755AA6] font-medium">Loading...</p>}
-      {error && <p className="text-center text-red-600 font-medium">{error}</p>}
-
-      <div className="mt-6">
-        {displayedBookings.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {displayedBookings.map((booking) => (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {displayedBookings.length > 0 ? (
+            displayedBookings.map((booking) => (
               <Link
                 key={booking.id}
                 to={`/booking/${booking.id}`}
-                className="border border-gray-300 rounded-lg shadow-lg p-4 bg-white hover:bg-gray-50 transition-colors flex flex-col card-hover"
+                className="border border-gray-300 rounded-lg shadow-lg p-4 bg-white flex flex-col"
               >
-                <p className="font-semibold text-lg mb-2">Booking ID: {booking.id}</p>
-                <p className="text-gray-700 mb-1">Customer Name: {booking.customerName}</p>
-                <p className="text-gray-700 mb-1">Service Name: {booking.serviceName}</p>
-                <p className="text-gray-700 mb-1">Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}</p>
-                <p className="text-gray-700 mb-1">Service Dates: {`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</p>
-                <p className="text-gray-700">Charge: ${booking.charge.toFixed(2)}</p>
+                <p className="font-semibold text-lg mb-2">Booking ID: <span className="font-medium">{booking.id}</span></p>
+                <p className="text-gray-700 mb-1">Customer Name: <span className="font-medium">{booking.customerName}</span></p>
+                <p className="text-gray-700 mb-1">Service Name: <span className="font-medium">{booking.serviceName}</span></p>
+                <p className="text-gray-700 mb-1">Booking Date: <span className="font-medium">{new Date(booking.bookingDate).toLocaleDateString()}</span></p>
+                <p className="text-gray-700 mb-1">Service Dates: <span className="font-medium">{`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</span></p>
+                <p className="text-gray-700">Charge: <span className="font-medium">${booking.charge.toFixed(2)}</span></p>
               </Link>
-            ))}
-          </div>
-        ) : null}
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No bookings available in this category.</p>
+          )}
+        </div>
       </div>
     </div>
   );
