@@ -2,14 +2,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Dropdown from './Dropdown';
 import siteIcon from '../assets/leashbench.jpeg';
-import { FaSearch } from 'react-icons/fa'; // Import search icon from react-icons
+import { FaSearch } from 'react-icons/fa';
 
 export default function Header() {
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);
 
   const handleSearchClick = () => {
-    navigate('/search'); // Navigate to search page
+    navigate('/search');
   };
 
   return (
@@ -26,9 +26,11 @@ export default function Header() {
           <Link to='/about' className='text-black hover:text-gray-600'>
             <span className='hidden sm:inline'>About</span>
           </Link>
-          <Link to='/showmybookings' className='text-black hover:text-gray-600'>
-            <span className='hidden sm:inline'>My Bookings</span>
-          </Link>
+          {currentUser && currentUser.usertype === 'Customer' && (
+            <Link to='/showmybookings' className='text-black hover:text-gray-600'>
+              <span className='hidden sm:inline'>My Bookings</span>
+            </Link>
+          )}
           <button 
             onClick={handleSearchClick} 
             className='flex items-center text-black hover:text-gray-600'

@@ -16,7 +16,7 @@ export default function SignUp() {
     firstName: '',
     lastName: '',
     password: '',
-    rePassword: '', // New state for re-entered password
+    rePassword: '',
     usertype: '',
     email: '',
     phoneNumber: '',
@@ -30,17 +30,16 @@ export default function SignUp() {
   const [error, setError] = useState(null);
   const [emailError, setEmailError] = useState(null);
   const [phoneError, setPhoneError] = useState(null);
+  const [rePasswordError, setRePasswordError] = useState(null); // New state for re-enter password error
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
+    
     if (id === 'phoneNumber') {
       if (/^\d*$/.test(value) && value.length <= 10) {
-        setFormData((prevData) => ({
-          ...prevData,
-          [id]: value,
-        }));
+        setFormData((prevData) => ({ ...prevData, [id]: value }));
       }
       if (value.length === 10) {
         setPhoneError(null);
@@ -51,11 +50,14 @@ export default function SignUp() {
         [id]: type === 'checkbox' ? checked : value,
       }));
     }
-    if (id === 'email') {
-      setEmailError(null); // Reset email error when user types
-    }
-    if (id === 'phoneNumber') {
-      setPhoneError(null); // Reset phone error when user types
+
+    // Reset errors when typing
+    if (id === 'email') setEmailError(null);
+    if (id === 'phoneNumber') setPhoneError(null);
+
+    // Check rePassword match
+    if (id === 'rePassword') {
+      setRePasswordError(value !== formData.password ? 'Passwords do not match.' : null);
     }
   };
 
@@ -104,7 +106,7 @@ export default function SignUp() {
       setError(validationError);
       return;
     }
-  
+
     setLoading(true);
     try {
       const userModel = {
@@ -113,7 +115,7 @@ export default function SignUp() {
         pincode: formData.pincode.toString(),
         photo: '',
       };
-  
+
       const response = await fetch('https://hibow.in/api/User/Add', {
         method: 'POST',
         headers: {
@@ -121,7 +123,7 @@ export default function SignUp() {
         },
         body: JSON.stringify(userModel),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         try {
@@ -133,7 +135,7 @@ export default function SignUp() {
         setLoading(false);
         return;
       }
-  
+
       alert('Sign up successful! Please sign in with your credentials.');
       setLoading(false);
       setError(null);
@@ -155,6 +157,7 @@ export default function SignUp() {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6"
         >
+          {/* First Name */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">First Name</label>
             <div className="relative">
@@ -169,6 +172,7 @@ export default function SignUp() {
               />
             </div>
           </div>
+          {/* Last Name */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">Last Name</label>
             <div className="relative">
@@ -183,6 +187,7 @@ export default function SignUp() {
               />
             </div>
           </div>
+          {/* User Type */}
           <div className="flex flex-col sm:col-span-2">
             <label className="text-sm font-medium text-gray-700 mb-1">User Type</label>
             <div className="flex items-center space-x-4">
@@ -210,15 +215,14 @@ export default function SignUp() {
               </label>
             </div>
           </div>
+          {/* Email */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">Email</label>
             <div className="relative">
               <FaEnvelope className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="email"
-                className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${
-                  emailError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'
-                }`}
+                className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'}`}
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -227,6 +231,7 @@ export default function SignUp() {
             </div>
             {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
           </div>
+          {/* Password */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
             <div className="relative">
@@ -241,29 +246,30 @@ export default function SignUp() {
               />
             </div>
           </div>
+          {/* Re-enter Password */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">Re-enter Password</label>
             <div className="relative">
               <FaLock className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="password"
-                className="border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${rePasswordError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'}`}
                 id="rePassword"
                 value={formData.rePassword}
                 onChange={handleChange}
                 placeholder="Re-enter Password"
               />
             </div>
+            {rePasswordError && <p className="text-red-500 text-sm mt-1">{rePasswordError}</p>}
           </div>
+          {/* Phone Number */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">Phone Number</label>
             <div className="relative">
               <FaPhone className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
                 type="text"
-                className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${
-                  phoneError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'
-                }`}
+                className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${phoneError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'}`}
                 id="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
@@ -272,6 +278,7 @@ export default function SignUp() {
             </div>
             {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
           </div>
+          {/* House Name */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">House Name</label>
             <div className="relative">
@@ -286,6 +293,7 @@ export default function SignUp() {
               />
             </div>
           </div>
+          {/* Landmark */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">Landmark</label>
             <div className="relative">
@@ -300,6 +308,7 @@ export default function SignUp() {
               />
             </div>
           </div>
+          {/* District */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">District</label>
             <div className="relative">
@@ -314,6 +323,7 @@ export default function SignUp() {
               />
             </div>
           </div>
+          {/* Pincode */}
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">Pincode</label>
             <div className="relative">
@@ -344,9 +354,7 @@ export default function SignUp() {
             Sign in
           </Link>
         </div>
-        {error && (
-          <p className="text-red-500 mt-5 text-center">{error}</p>
-        )}
+        {error && <p className="text-red-500 mt-5 text-center">{error}</p>}
       </div>
     </div>
   );
