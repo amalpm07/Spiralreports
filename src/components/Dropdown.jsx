@@ -19,7 +19,7 @@ const Dropdown = ({ currentUser }) => {
   }, [location]);
 
   // Render default avatar if currentUser doesn't exist or avatar is not provided
-  const avatarSrc = currentUser?.avatar ? currentUser.avatar : defaultAvatar;
+  const avatarSrc = currentUser?.avatar || defaultAvatar;
   const altText = currentUser?.avatar ? 'profile' : 'default profile';
 
   return (
@@ -46,9 +46,15 @@ const Dropdown = ({ currentUser }) => {
           aria-orientation='vertical'
           aria-labelledby='profile-menu'
         >
-          <span className="block px-4 py-2 text-gray-800 text-center font-bold uppercase">
-            {currentUser.userName}
-          </span>
+          {currentUser ? (
+            <span className="block px-4 py-2 text-gray-800 text-center font-bold uppercase">
+              {currentUser.userName}
+            </span>
+          ) : (
+            <span className="block px-4 py-2 text-gray-800 text-center font-bold uppercase">
+              Guest
+            </span>
+          )}
           <Link to='/profile' className='block px-4 py-2 flex items-center text-gray-800 hover:bg-gray-200' role='menuitem'>
             <FaUser className='mr-2 text-gray-600' />
             Profile
@@ -57,20 +63,7 @@ const Dropdown = ({ currentUser }) => {
             <FaCrown className='mr-2 text-yellow-500' />
             Upgrade to Premium
           </Link>
-          {/* <Link to='/settings' className='block px-4 py-2 text-gray-800 hover:bg-gray-200' role='menuitem'>
-            Settings
-          </Link> */}
-          {/* <button
-            onClick={() => {
-              // Add your logout logic here
-              console.log('Logout clicked');
-              setDropdownVisible(false); // Close the dropdown
-            }}
-            className='block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200'
-            role='menuitem'
-          >
-            Logout
-          </button> */}
+          {/* Additional links or buttons can be added here */}
         </div>
       )}
     </div>
@@ -81,7 +74,7 @@ const Dropdown = ({ currentUser }) => {
 Dropdown.propTypes = {
   currentUser: PropTypes.shape({
     avatar: PropTypes.string,
-    userName: PropTypes.string.isRequired,
+    userName: PropTypes.string, // Change this to optional
   }),
 };
 

@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { FaGoogle, FaFacebook, FaCheckCircle, FaStar } from 'react-icons/fa';
 import CategoryMetaNav from '../components/CategoryNav';
 import styled from 'styled-components';
-import { Container, Row, Col } from 'react-bootstrap';
 import banner from '../assets/banner3.png';
 
 // Styled-components for responsiveness and improved design
@@ -173,69 +172,10 @@ const BannerSection = styled.section`
   }
 `;
 
-const SectionTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #333;
-  text-align: center;
-
-  @media (min-width: 576px) {
-    font-size: 2.5rem;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 3rem;
-  }
-`;
-
-const SectionText = styled.p`
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 1.5rem;
-  text-align: center;
-
-  @media (min-width: 576px) {
-    font-size: 1.25rem;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 1.5rem;
-  }
-`;
-
-const AppButtons = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-`;
-
-const AppButtonImage = styled.img`
-  width: 120px;
-  height: auto;
-
-  @media (max-width: 768px) {
-    width: 100px;
-  }
-
-  @media (max-width: 480px) {
-    width: 80px;
-  }
-`;
-
-const ImageWrapper = styled.div`
-  text-align: center;
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-`;
-
-const Highlight = styled.span`
-  color: #755AA6;
+const ServiceHomesContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
 `;
 
 const Home = () => {
@@ -249,7 +189,6 @@ const Home = () => {
           throw new Error('Failed to fetch service homes');
         }
         const data = await res.json();
-        // Map serviceHomes and extract charge and stars from the parent object
         const serviceHomesData = data.map(item => ({
           ...item.serviceHome,
           charge: item.charge,
@@ -282,8 +221,8 @@ const Home = () => {
       {/* Main Content */}
       <CategoryMetaNav />
 
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">Service Homes</h2>
+      <ServiceHomesContainer>
+        <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Service Homes</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {serviceHomes.map((home) => (
             <Link
@@ -334,7 +273,7 @@ const Home = () => {
             </Link>
           ))}
         </div>
-      </div>
+      </ServiceHomesContainer>
     </div>
   );
 };

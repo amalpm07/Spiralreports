@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -10,6 +11,18 @@ import {
   FaCity,
   FaSignInAlt,
 } from 'react-icons/fa';
+
+// Pop-Up Component
+const ErrorPopup = ({ message, onClose }) => {
+  return (
+    <div className="fixed top-0 left-0 right-0 bg-red-600 text-white p-4 text-center z-50">
+      <div>{message}</div>
+      <button className="mt-2" onClick={onClose}>
+        Close
+      </button>
+    </div>
+  );
+};
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -30,8 +43,9 @@ export default function SignUp() {
   const [error, setError] = useState(null);
   const [emailError, setEmailError] = useState(null);
   const [phoneError, setPhoneError] = useState(null);
-  const [rePasswordError, setRePasswordError] = useState(null); // New state for re-enter password error
+  const [rePasswordError, setRePasswordError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [popupVisible, setPopupVisible] = useState(false); // State for pop-up visibility
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -104,6 +118,7 @@ export default function SignUp() {
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
+      setPopupVisible(true); // Show the pop-up
       return;
     }
 
@@ -133,22 +148,26 @@ export default function SignUp() {
           setError(errorText);
         }
         setLoading(false);
+        setPopupVisible(true); // Show the pop-up
         return;
       }
 
       alert('Sign up successful! Please sign in with your credentials.');
       setLoading(false);
       setError(null);
+      setPopupVisible(false); // Hide the pop-up
       navigate('/sign-in');
     } catch (error) {
       console.error('Error:', error);
       setLoading(false);
       setError(error.message || 'Failed to add user');
+      setPopupVisible(true); // Show the pop-up
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4 sm:p-6">
+      {popupVisible && <ErrorPopup message={error} onClose={() => setPopupVisible(false)} />}
       <div className="p-4 sm:p-8 bg-white shadow-2xl rounded-lg max-w-2xl w-full">
         <h1 className="text-2xl sm:text-4xl text-center font-bold mb-6 sm:mb-8 text-gray-800">
           Sign Up
@@ -221,7 +240,7 @@ export default function SignUp() {
             <div className="relative">
               <FaEnvelope className="inline-block h-5 w-5 text-gray-400 mr-3" />
               <input
-                type="email"
+                type="text"
                 className={`border p-2 sm:p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'}`}
                 id="email"
                 value={formData.email}
@@ -354,7 +373,6 @@ export default function SignUp() {
             Sign in
           </Link>
         </div>
-        {error && <p className="text-red-500 mt-5 text-center">{error}</p>}
       </div>
     </div>
   );

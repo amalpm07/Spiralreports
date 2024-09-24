@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
@@ -17,24 +16,25 @@ import {
 export default function Profile() {
   const navigate = useNavigate();
   const fileRef = useRef(null);
-  const { currentUser, loading, error } = useSelector((state) => state.user) || {};
-  const [file, setFile] = useState(undefined);
+  const [file, setFile] = useState(null);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [signOutMessage, setSignOutMessage] = useState('');
+  const [error, setError] = useState('');
   const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
 
   const handleFileUpload = async (file) => {
     if (!file || !currentUser) return;
 
     const formData = new FormData();
-    formData.append('files', file); // Ensure the key matches what the API expects
+    formData.append('files', file);
 
     try {
       const response = await fetch(`https://hibow.in/api/User/UploadProfilePhotoFile?userName=${currentUser.userName}`, {
         method: 'POST',
         body: formData,
         headers: {
-          'Token': currentUser.guid, // Pass the guid in the headers
+          'Token': currentUser.guid,
         },
       });
 
@@ -48,73 +48,76 @@ export default function Profile() {
     } catch (error) {
       console.error('Error uploading to API:', error);
       setFileUploadError(true);
+      setError(error.message);
     }
   };
 
   useEffect(() => {
     if (file) {
-      handleFileUpload(file);
+      handleFileUpload(file).finally(() => setFile(null));
     }
   }, [file]);
 
   const handleDeleteUser = async () => {
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete your account? This action cannot be undone.'
-    );
-    if (!confirmDelete || !currentUser) return;
+    if (!currentUser || !currentUser.id) {
+      console.error("No user ID available for deletion.");
+      return;
+    }
+
+    const confirmDelete = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+    if (!confirmDelete) return;
 
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`api/auth/User?userName=${currentUser?.username ?? ''}`, {
+      const res = await fetch(`api/auth/User?userName=${currentUser.username}`, {
         method: 'DELETE',
       });
       const data = await res.json();
+
       if (!res.ok) {
         dispatch(deleteUserFailure(data));
+        setError(data.message);
       } else {
         dispatch(deleteUserSuccess(data));
+        navigate('/'); // Navigate after deletion
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
+      setError(error.message);
     }
   };
 
   const handleSignOut = async () => {
-    if (!currentUser) return;
+    if (!currentUser) return; // Exit if no current user
 
     try {
-      dispatch(signOutUserStart());
+      dispatch(signOutUserStart()); // Indicate sign-out has started
+
       const res = await fetch(`https://hibow.in/api/User/LoginDelete?userid=${currentUser.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Token': currentUser.guid,
         },
       });
 
       if (res.ok) {
-        const contentType = res.headers.get('content-type');
-        let data;
-
-        if (contentType && contentType.includes('application/json')) {
-          data = await res.json();
-        } else {
-          data = await res.text();
-        }
-
+        const data = await res.json(); // Parse response data
         dispatch(signOutUserSuccess(data));
         dispatch(clearCurrentUser());
-        setSignOutMessage('You have been signed out successfully.');
-        setTimeout(() => {
-          navigate('/');
-        }, 1000);
+        setSignOutMessage('User logged out successfully.'); // Updated success message
+        setTimeout(() => navigate('/'), 1000); // Redirect after 1 second
       } else {
-        const errorData = await res.json();
+        const errorData = res.headers.get('Content-Length') > 0 
+          ? await res.json() 
+          : { message: 'An error occurred without a detailed message.' };
+
+        console.error('Sign-out error response:', errorData);
         throw new Error(errorData.message || 'Failed to logout');
       }
     } catch (error) {
       dispatch(signOutUserFailure(error.message));
       console.error('Sign-out error:', error);
+      setError(error.message); // Display error message
     }
   };
 
@@ -134,17 +137,15 @@ export default function Profile() {
           className="w-32 h-32 rounded-full object-cover cursor-pointer"
           onClick={() => fileRef.current.click()}
         />
-        <p className="text-sm text-center mt-2">
-          {fileUploadError && (
-            <span className="text-red-600">Error uploading image. Please try again.</span>
-          )}
-        </p>
+        {fileUploadError && (
+          <p className="text-red-600 text-sm text-center mt-2">
+            Error uploading image. Please try again.
+          </p>
+        )}
         <div className="flex flex-col gap-4 mt-4 w-full">
           <Link
             to="/showmybookings"
-            className={`bg-[#755AA6] text-white py-2 px-4 rounded-lg hover:bg-[#6d4c7d] transition duration-200 text-center ${
-              !currentUser && 'opacity-50 pointer-events-none'
-            }`}
+            className={`bg-[#755AA6] text-white py-2 px-4 rounded-lg hover:bg-[#6d4c7d] transition duration-200 text-center ${!currentUser && 'opacity-50 pointer-events-none'}`}
           >
             Bookings
           </Link>
@@ -185,7 +186,8 @@ export default function Profile() {
           Hey, I'm <strong>{currentUser?.userName ?? 'User'}</strong>
         </h4>
         <h5 className="text-lg mb-4">{currentUser?.email}</h5>
-        {error && <p className="text-red-600 mt-4">{error}</p>}
+        {error && <p className="text-red-600 mt-4">{error}</p>} {/* Display error message */}
+        {signOutMessage && <p className="text-green-600 mt-4">{signOutMessage}</p>} {/* Display sign-out success message */}
       </div>
     </main>
   );
