@@ -141,7 +141,10 @@ const BookingForm = () => {
 
   const acceptedPetTypes = listingDetails.acceptedPetTypes || [];
   const acceptedPetSizes = listingDetails.acceptedPetSizes || [];
-console.log(listing);
+
+console.log('Listing data:', listing);
+const chargeValue = listing?.answer.find(item => item.answer.question_id === 38)?.answer.ans;
+console.log('Charge value:', chargeValue);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -194,8 +197,18 @@ console.log(listing);
         setDateError('Check-out date must be after check-in date');
         return;
       }
-
+  
       const currentDate = new Date();
+      
+      // Check charge and ensure it's a valid number
+      const chargeValue = listing?.answer.find(item => item.answer.question_id === 40)?.answer.ans;
+      const charge = typeof chargeValue === 'number' ? chargeValue : parseFloat(chargeValue);
+      
+      // If charge is not a valid number, handle the error
+      if (isNaN(charge)) {
+        throw new Error('Invalid charge value. Please check the listing details.');
+      }
+  
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
         providerId: listing?.serviceHome?.userId,
@@ -203,7 +216,7 @@ console.log(listing);
         bookingDate: currentDate.toISOString(),
         serviceFromDate: checkInDate.toISOString(),
         serviceToDate: checkOutDate.toISOString(),
-        charge: listing?.answer.find(item => item.answer.question_id === 38)?.answer.ans,
+        charge: charge,
         isCancelled: false,
         isConfirmed: false,
         isCompleted: false,
@@ -216,13 +229,14 @@ console.log(listing);
           ans: String(answers[questionId]),
         }))
       };
-
+  
+      // The rest of your existing booking logic remains unchanged
       if (!currentUser) {
         const userAdd = {
           email,
           phoneNumber
         };
-
+  
         const addUserRes = await fetch('https://hibow.in/api/User/Add', {
           method: 'POST',
           headers: {
@@ -230,47 +244,47 @@ console.log(listing);
           },
           body: JSON.stringify(userAdd)
         });
-
+  
         if (!addUserRes.ok) {
           throw new Error('Failed to add user');
         }
-
+  
         const userData = await addUserRes.json();
-        dispatch({ type: 'SET_CURRENT_USER', payload: userData }); // Update currentUser state with the fetched user data
-
+        dispatch({ type: 'SET_CURRENT_USER', payload: userData });
+  
         // Update bookingData with the guest user's details
         bookingData = {
           ...bookingData,
-          customer_id: userData.id, // Assuming userData.id is provided by the API response
+          customer_id: userData.id,
         };
       }
-
+  
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bookingModel: bookingData,
-          userType: currentUser ? "Customer" : "guest" // Set userType based on currentUser existence
+          bookingModel: bookingData, // Ensure bookingModel is wrapped properly
+          userType: currentUser ? "Customer" : "guest"
         })
       });
-
+  
       if (!bookingRes.ok) {
         throw new Error('Failed to book service');
       }
-
+  
       const bookingResult = await bookingRes.json();
-
+  
       const answersData = {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
           question_id: parseInt(questionId),
-          customer_id: currentUser?.id || userData.id, // Use 0 for guest user
+          customer_id: currentUser?.id || userData.id,
           ans: String(answers[questionId]),
         }))
       };
-
+  
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
         headers: {
@@ -278,21 +292,19 @@ console.log(listing);
         },
         body: JSON.stringify(answersData)
       });
-
+  
       if (!answersRes.ok) {
         throw new Error('Failed to add answers');
       }
-
-      const answersResult = await answersRes.text();
-
+  
       handleNotification('Booking successful!', 'success');
       navigate('/payment', { state: { bookingResponse: bookingResult } });
-
+  
     } catch (error) {
       handleNotification(error.message, 'error');
     }
   };
-
+  
   const handleAnswerChange = (questionId, answer) => {
     setAnswers(prevAnswers => ({
       ...prevAnswers,

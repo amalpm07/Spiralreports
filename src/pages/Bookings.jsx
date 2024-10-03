@@ -141,6 +141,7 @@ const BookingForm = () => {
   const currentUser = useSelector((state) => state.user.currentUser);
   const listingDetails = listing || {};
 console.log(listingDetails.serviceHome.id);
+console.log(listing);
 
   const acceptedPetTypes = listingDetails.acceptedPetTypes || [];
   const acceptedPetSizes = listingDetails.acceptedPetSizes || [];
@@ -182,80 +183,84 @@ console.log(listingDetails.serviceHome.id);
 
   const handleProceedClick = useCallback(async () => {
     try {
-      if (checkOutDate <= checkInDate) {
-        setDateError('Check-out date must be after check-in date');
-        return;
-      }
-  
-      const currentDate = new Date();
-      let bookingData = {
-        customerName: currentUser?.userName || "Guest",
-        providerId: listing?.serviceHome?.userId,
-        serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
-        bookingDate: currentDate.toISOString(),
-        serviceFromDate: checkInDate.toISOString(),
-        serviceToDate: checkOutDate.toISOString(),
-        charge: listing?.answer.find(item => item.answer.question_id === 38)?.answer.ans,
-        isCancelled: false,
-        isConfirmed: false,
-        isCompleted: false,
-        isActive: true,
-        cancelledBy: "",
-        answers: Object.keys(answers).map((questionId) => ({
-          id: 0,
-          question_id: parseInt(questionId),
-          customer_id: currentUser?.id || 0, // Use 0 for guest user
-          ans: answers[questionId] || '', // Handle empty answers
-        }))
-      };
-  
-      // Book the service
-      const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bookingModel: bookingData,
-          userType: currentUser ? "Customer" : "guest"
-        })
-      });
-  
-      if (!bookingRes.ok) {
-        throw new Error('Failed to book service');
-      }
-  
-      const bookingResult = await bookingRes.json();
-  
-      // Save answers
-      const answersData = {
-        newAnswers: Object.keys(answers).map((questionId) => ({
-          id: 0,
-          question_id: parseInt(questionId),
-          customer_id: currentUser?.id || 0,
-          ans: answers[questionId] || '',
-        }))
-      };
-  
-      const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(answersData)
-      });
-  
-      if (!answersRes.ok) {
-        throw new Error('Failed to add answers');
-      }
-  
-      // Navigate to the payment page with booking result
-      navigate('/payment', { state: { bookingResponse: bookingResult } });
-  
+        if (checkOutDate <= checkInDate) {
+            setDateError('Check-out date must be after check-in date');
+            return;
+        }
+
+        const currentDate = new Date();
+        const charge = listing?.answer.find(item => item.answer.question_id === 40)?.answer.ans;
+
+        let bookingData = {
+            customerName: currentUser?.userName || "Guest",
+            customerId:currentUser?.id,
+            providerId: listing?.serviceHome?.userId,
+            serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
+            bookingDate: currentDate.toISOString(),
+            serviceFromDate: checkInDate.toISOString(),
+            serviceToDate: checkOutDate.toISOString(),
+            charge: charge,
+            isCancelled: false,
+            isConfirmed: false,
+            isCompleted: false,
+            isActive: true,
+            cancelledBy: "",
+            answers: Object.keys(answers).map((questionId) => ({
+                id: 0,
+                question_id: parseInt(questionId),
+                customer_id: currentUser?.id || 0,
+                ans: answers[questionId] || '',
+            }))
+        };
+
+        // Wrap the bookingData in the expected request format
+        const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                BookingModel: bookingData, // Correctly wrap bookingData in BookingModel
+                userType: currentUser ? "Customer" : "guest",
+            }),
+        });
+
+        if (!bookingRes.ok) {
+            throw new Error('Failed to book service');
+        }
+
+        const bookingResult = await bookingRes.json();
+
+        // Save answers
+        const answersData = {
+            newAnswers: Object.keys(answers).map((questionId) => ({
+                id: 0,
+                question_id: parseInt(questionId),
+                customer_id: currentUser?.id || 0,
+                ans: answers[questionId] || '',
+            }))
+        };
+
+        const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(answersData)
+        });
+
+        if (!answersRes.ok) {
+            throw new Error('Failed to add answers');
+        }
+
+        // Navigate to the payment page with booking result
+        navigate('/payment', { state: { bookingResponse: bookingResult } });
+
     } catch (error) {
-      setError(error.message);
+        setError(error.message);
     }
-  }, [checkInDate, checkOutDate, answers, currentUser, listing, navigate]);
+}, [checkInDate, checkOutDate, answers, currentUser, listing, navigate]);
+
   
   const handleAnswerChange = useCallback((questionId, answer) => {
     setAnswers(prevAnswers => ({
