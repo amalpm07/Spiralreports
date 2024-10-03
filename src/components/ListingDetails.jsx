@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from 'react';
-import {  FaStar, FaTrash, FaCcVisa, FaCcMastercard, FaCcPaypal, FaCcAmex } from 'react-icons/fa';
+import { FaStar, FaTrash, FaCcVisa, FaCcMastercard, FaCcPaypal, FaCcAmex } from 'react-icons/fa';
 import placeholderProfilePic from '../assets/avatar.jpg';
 import dogImg from '../assets/dog.png';  
 import catImg from '../assets/cat.jpg';   
 import birdImg from '../assets/bird.png'; 
 import petSizeImg from '../assets/petsize.jpg'; 
-import potty from '../assets/potty.png'
-import loc from '../assets/loc.png'
-import wolk from '../assets/wolk.png'
+import potty from '../assets/potty.png';
+import loc from '../assets/loc.png';
+import wolk from '../assets/wolk.png';
 import '../styleComponets/listing.css';
 
 const ListingDetails = ({
@@ -62,8 +62,6 @@ const ListingDetails = ({
   const PottyBreak = listing?.answer?.find((item) => item.answer.question_id === 37)?.answer.ans.split(', ') || [];
   const location = listing?.answer?.find((item) => item.answer.question_id === 38)?.answer.ans.split(', ') || [];
   const petwolk = listing?.answer?.find((item) => item.answer.question_id === 39)?.answer.ans.split(', ') || [];
-
-console.log(listing);
 
   const petSizeClasses = {
     small: 'small-pet-icon',
@@ -167,56 +165,56 @@ console.log(listing);
                             <img 
                               src={petSizeImg} 
                               alt={`${size} Pet`} 
-                              className={petSizeClasses[size]} // Use conditional class based on size
+                              className={petSizeClasses[size]} 
                             /> 
                             {size}
                           </span>
                         ))}
                       </div>
                     )}
-                        {question.id === 37 && (
+                    {question.id === 37 && (
                       <div className='pet-potty'>
                         {PottyBreak.map((size) => (
                           <span key={size} className='pet-size'>
                             <img 
                               src={potty} 
                               alt={`${size} Pet`} 
-                              className='pet-icon' // Use conditional class based on size
+                              className='pet-icon' 
                             /> 
                             {size}
                           </span>
                         ))}
                       </div>
                     )}
-                     {question.id === 38 && (
+                    {question.id === 38 && (
                       <div className='pet-potty'>
                         {location.map((size) => (
                           <span key={size} className='pet-size'>
                             <img 
                               src={loc} 
                               alt={`${size} Pet`} 
-                              className='pet-icon' // Use conditional class based on size
+                              className='pet-icon' 
                             /> 
                             {size}
                           </span>
                         ))}
                       </div>
                     )}
-                     {question.id === 39 && (
+                    {question.id === 39 && (
                       <div className='pet-potty'>
                         {petwolk.map((size) => (
                           <span key={size} className='pet-size'>
                             <img 
                               src={wolk} 
                               alt={`${size} Pet`} 
-                              className='pet-wolk' // Use conditional class based on size
+                              className='pet-wolk' 
                             /> 
                             {size}
                           </span>
                         ))}
                       </div>
                     )}
-                    {question.id !== 35 && question.id !== 36 && question.id !==37&& question.id !==38&& question.id !==39&&<span>{answer}</span>}
+                    {question.id !== 35 && question.id !== 36 && question.id !== 37 && question.id !== 38 && question.id !== 39 && <span>{answer}</span>}
                   </div>
                 </li>
               );

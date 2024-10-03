@@ -358,9 +358,9 @@ body {
 
 /* Service Container Adjustments */
 .service-container {
-  position: absolute; /* Keep it absolute */
-  top: 294px; /* Adjusted position */
-  right: 125px; /* Reduce the right margin */
+  position: sticky; /* Change to sticky */
+  top: 20px; /* Distance from the top of the viewport */
+  right: 20px; /* Distance from the right side */
   background-color: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
@@ -368,14 +368,6 @@ body {
   width: 350px; /* Fixed width */
   max-width: 340px; /* Limit maximum width */
   z-index: 1000; /* Ensure it's above other content */
-}
-
-/* Sticky class for service container */
-.sticky {
-  position: fixed; /* Make it fixed when sticky */
-  top: 295px; /* Adjust as needed */
-  left: 20px; /* Adjust as needed */
-  z-index: 1000; /* Ensure it’s above other content */
 }
 
 /* Adjust .details-sections to ensure proper alignment */
