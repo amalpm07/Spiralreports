@@ -3,11 +3,20 @@
   box-sizing: border-box;
 }
 
+/* Body to manage zoom adjustments */
+body {
+  display: flex;
+  justify-content: center; /* Center content horizontally */
+  align-items: flex-start; /* Align items at the top */
+  min-height: 100vh; /* Ensure the body takes full height */
+  margin: 0; /* Reset default margin */
+}
+
 /* Listing Container */
 .listing-container {
-  margin: 0 auto;
   padding: 1.5rem;
-  max-width: 1200px;
+  max-width: 1200px; /* Limit max width */
+  width: 100%; /* Full width */
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -18,7 +27,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-left: 200px; /* Set left margin to 200px */
+  width: 100%; /* Ensure full width */
 }
 
 /* Profile Section */
@@ -27,9 +36,9 @@
   align-items: center;
   gap: 15px;
   margin-bottom: 2rem;
-  margin-left: 200px; /* Maintain original left margin */
 }
 
+/* Profile Pic */
 .profile-pic {
   width: 120px; /* Fixed size */
   height: 120px; /* Fixed size */
@@ -56,11 +65,6 @@
   font-size: 1.125rem; /* Fixed size */
   color: #444;
   margin-bottom: 20px;
-  margin-left: 200px; /* Maintain original left margin */
-}
-
-.description-label {
-  font-weight: 700;
 }
 
 /* Photo Gallery */
@@ -160,10 +164,6 @@
   height: 28px; /* Fixed size */
 }
 
-.pet-type-label {
-  font-weight: 500;
-}
-
 /* Booking Section */
 .booking-section {
   margin-bottom: 2rem;
@@ -197,7 +197,6 @@
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 2px 4px #6a4f8a; /* Subtle shadow */
   width: 95%;
-  margin-left: 50px;
 }
 
 .reviews-title {
@@ -267,7 +266,6 @@
   margin-top: 1.5rem; /* Space above this section */
   background-color: white; /* Light background */
   width: 95%;
-  margin-left: 50px;
 }
 
 .leave-review-title {
@@ -334,12 +332,14 @@
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
   font-size: 1.125rem; /* Fixed size */
 }
 
 .submit-review-button:hover {
   background-color: #6a4f8a; /* Darker shade for hover effect */
-  box-shadow: 0 4px 8px #6a4f8a;
 }
 
 /* Loading and Error Messages */
@@ -360,7 +360,7 @@
 .service-container {
   position: absolute; /* Keep it absolute */
   top: 294px; /* Adjusted position */
-  right: 50px; /* Reduce the right margin */
+  right: 125px; /* Reduce the right margin */
   background-color: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
@@ -387,7 +387,6 @@
   background-color: transparent;
   box-shadow: none;
   border: 1px solid transparent;
-  margin-left: 200px; /* Maintain original left margin */
 }
 
 /* Responsive Styles */
@@ -408,14 +407,13 @@
   .parent-container {
     flex-direction: column; /* Stack vertically on smaller screens */
     align-items: center; /* Center items */
-    margin-left: 0; /* Remove left margin */
-    margin-right: 0; /* Remove right margin */
+    margin: 0; /* Remove left/right margins */
   }
 
   .profile-section,
   .description {
-    margin-left: 0; /* Remove left margin */
     width: 100%; /* Full width */
+    margin: 0 auto; /* Center horizontally */
   }
 
   .image-gallery-container {
@@ -511,6 +509,7 @@
   width: 40px; /* Decrease size */
   height: 40px; /* Decrease size */
 }
+
 .pet-wolk {
   width: 60px; /* Decrease size */
   height: 40px; /* Decrease size */

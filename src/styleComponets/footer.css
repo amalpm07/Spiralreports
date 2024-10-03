@@ -1,9 +1,9 @@
 body {
-    background: #fbfbfd;
+    background: white;
 }
 
 .new_footer_area {
-    background: #fbfbfd;
+    background: white; /* Changed from #fbfbfd to white */
 }
 
 .new_footer_top {
