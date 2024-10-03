@@ -1,4 +1,6 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
 import useFetchListing from '../Hooks/useFetchListing';
@@ -8,23 +10,17 @@ import { useSelector } from 'react-redux';
 const Listing = () => {
   const { selectedType, id } = useParams();
   const navigate = useNavigate();
-  const { listing, loading, error, questions } = useFetchListing(selectedType, id);
+  const { listing, loading, error, questions, reviews: initialReviews } = useFetchListing(selectedType, id);
+  const [reviews, setReviews] = React.useState(initialReviews); // Local state for reviews
   const [newReview, setNewReview] = React.useState({ text: '', rating: 0 });
   const [reviewError, setReviewError] = React.useState(null);
-  const [reviews, setReviews] = React.useState([]); // Initialize reviews state
 
   // Access currentUser from Redux store
   const { currentUser } = useSelector((state) => state.user);
 
-  React.useEffect(() => {
-    if (listing?.reviews) {
-      setReviews(listing.reviews); // Set initial reviews from listing if available
-    }
-  }, [listing]);
-
   const handleBookNowClick = () => {
-    const acceptedPetTypes = listing?.answer?.find((item) => item.answer.question_id === 33)?.answer.ans.split(', ') || [];
-    const acceptedPetSizes = listing?.answer?.find((item) => item.answer.question_id === 34)?.answer.ans.split(', ') || [];
+    const acceptedPetTypes = listing?.answer?.find((item) => item.answer.question_id === 35)?.answer.ans.split(', ') || [];
+    const acceptedPetSizes = listing?.answer?.find((item) => item.answer.question_id === 36)?.answer.ans.split(', ') || [];
 
     const listingDetails = {
       ...listing,
@@ -50,25 +46,44 @@ const Listing = () => {
       setReviewError('Providers cannot submit reviews.');
       return;
     }
+
     try {
+      const reviewPayload = {
+        serviceHomeId: listing?.serviceHome?.id,
+        customerId: currentUser.id,
+        customerName: currentUser.userName,
+        reviewMessage: newReview.text,
+        stars: newReview.rating,
+        postedDate: new Date().toISOString(),
+      };
+
+      console.log('Review Payload:', reviewPayload); // Debugging line
+
       const res = await fetch('https://hibow.in/api/User/AddCustomerReview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Token': currentUser.guid,
         },
-        body: JSON.stringify({
-          serviceHomeId: listing?.serviceHome?.id,
-          customerId: currentUser.id,
-          customerName: currentUser.userName,
-          reviewMessage: newReview.text,
-          stars: newReview.rating,
-          postedDate: new Date().toISOString(),
-        }),
+        body: JSON.stringify(reviewPayload),
       });
-      if (!res.ok) throw new Error('Failed to submit review');
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Failed to submit review:', errorData); // Detailed error logging
+        throw new Error('Failed to submit review: ' + errorData.title);
+      }
+
       const data = await res.json();
-      setReviews((prevReviews) => [...prevReviews, data]); // Update local reviews state
+      // Update the local reviews state immediately
+      setReviews((prevReviews) => [
+        ...prevReviews,
+        {
+          ...data,
+          // Assuming the response has the same structure as the review
+          postedDate: new Date().toISOString(), // Or any other property you want to set
+        },
+      ]);
       setNewReview({ text: '', rating: 0 });
       setReviewError(null);
     } catch (error) {
@@ -86,8 +101,15 @@ const Listing = () => {
           'Token': currentUser.guid,
         },
       });
-      if (!res.ok) throw new Error('Failed to delete review');
-      setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId)); // Update local reviews state
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Failed to delete review:', errorData); // Detailed error logging
+        throw new Error('Failed to delete review: ' + errorData.title);
+      }
+
+      // Remove the deleted review from the local state
+      setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
     } catch (error) {
       console.error('Error deleting review:', error);
     }
@@ -114,7 +136,7 @@ const Listing = () => {
   return (
     <ListingDetails
       listing={listing}
-      reviews={reviews}
+      reviews={reviews} // Use local state for reviews
       questions={questions}
       handleBookNowClick={handleBookNowClick}
       handleReviewSubmit={handleReviewSubmit}

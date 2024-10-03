@@ -7,7 +7,7 @@ const useFetchListing = (selectedType, id) => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [review, setReviews] = useState([]);
   const [questions, setQuestions] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
 
@@ -71,7 +71,7 @@ const useFetchListing = (selectedType, id) => {
     }
   }, [selectedType, id]);
 
-  return { listing, loading, error, reviews, questions };
+  return { listing, loading, error, review, questions };
 };
 
 export default useFetchListing; // Ensure this line is present
