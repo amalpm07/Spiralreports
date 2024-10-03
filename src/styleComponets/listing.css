@@ -358,9 +358,9 @@
 
 /* Service Container Adjustments */
 .service-container {
-  position: absolute; /* Change from fixed to absolute */
-  top: 294px; /* Set initial position */
-  right: 270px; /* Maintain original position */
+  position: absolute; /* Keep it absolute */
+  top: 294px; /* Adjusted position */
+  right: 50px; /* Reduce the right margin */
   background-color: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
@@ -399,8 +399,10 @@
   .service-container {
     position: static; /* Change to static for smaller screens */
     width: 90%; /* Full width */
-    margin: 0 auto; /* Center */
+    margin: 20px auto; /* Center with margin */
     order: 1; /* Ensure it comes after the details */
+    top: auto; /* Reset top for static position */
+    right: auto; /* Reset right for static position */
   }
 
   .parent-container {
