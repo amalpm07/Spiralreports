@@ -37,11 +37,9 @@ function BookingsPage() {
       }
 
       const data = await res.json();
-      if (!data || (!Array.isArray(data) && !Array.isArray(data.booking))) {
-        throw new Error('Invalid data format received');
-      }
+      const bookingsArray = Array.isArray(data.bookings) ? data.bookings : data;
 
-      const categorizedBookings = categorizeBookings(data);
+      const categorizedBookings = categorizeBookings(bookingsArray);
       setBookings(categorizedBookings);
     } catch (error) {
       setError(error.message || 'Failed to load bookings');
@@ -51,7 +49,7 @@ function BookingsPage() {
     }
   };
 
-  const categorizeBookings = (data) => {
+  const categorizeBookings = (bookingsArray) => {
     const categorizedBookings = {
       completed: [],
       confirmed: [],
@@ -59,7 +57,6 @@ function BookingsPage() {
       cancelled: [],
     };
 
-    const bookingsArray = Array.isArray(data) ? data : data.booking || [];
     categorizedBookings.completed = bookingsArray.filter(b => b.isCompleted);
     categorizedBookings.confirmed = bookingsArray.filter(b => b.isConfirmed && !b.isCompleted);
     categorizedBookings.pending = bookingsArray.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive);
