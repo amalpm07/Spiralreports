@@ -275,9 +275,11 @@ const ListingDetails = ({
       )}
 
       {/* Booking Button after Reviews Section */}
-      {isButtonVisible && (
+      {isButtonVisible && currentUser?.usertype !== 'Provider' && ( // Replace 'desiredUserType' with the actual user type you want to check
         <div className='unique-booking-button-container'>
-          <button className='unique-book-now-button' onClick={handleBookNowClick}>Book Now</button>
+          <button className='unique-book-now-button' onClick={handleBookNowClick}>
+            Book Now
+          </button>
         </div>
       )}
     </div>

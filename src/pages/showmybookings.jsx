@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import '../styleComponets/BookingsPage.css'; // Import the CSS file
 
-function BookingsPage() {
+const BookingsPage = () => {
   const [bookings, setBookings] = useState({
     completed: [],
     confirmed: [],
@@ -17,11 +18,11 @@ function BookingsPage() {
 
   useEffect(() => {
     if (currentUser && currentUser.id && currentUser.guid) {
-      handleShowBookings();
+      fetchBookings();
     }
   }, [currentUser]);
 
-  const handleShowBookings = async () => {
+  const fetchBookings = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -39,30 +40,22 @@ function BookingsPage() {
       const data = await res.json();
       const bookingsArray = Array.isArray(data.bookings) ? data.bookings : data;
 
-      const categorizedBookings = categorizeBookings(bookingsArray);
-      setBookings(categorizedBookings);
+      setBookings(categorizeBookings(bookingsArray));
     } catch (error) {
       setError(error.message || 'Failed to load bookings');
-      console.error('An error occurred while fetching bookings:', error);
+      console.error('Error fetching bookings:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const categorizeBookings = (bookingsArray) => {
-    const categorizedBookings = {
-      completed: [],
-      confirmed: [],
-      pending: [],
-      cancelled: [],
+    return {
+      completed: bookingsArray.filter(b => b.isCompleted),
+      confirmed: bookingsArray.filter(b => b.isConfirmed && !b.isCompleted),
+      pending: bookingsArray.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive),
+      cancelled: bookingsArray.filter(b => b.cancelledBy),
     };
-
-    categorizedBookings.completed = bookingsArray.filter(b => b.isCompleted);
-    categorizedBookings.confirmed = bookingsArray.filter(b => b.isConfirmed && !b.isCompleted);
-    categorizedBookings.pending = bookingsArray.filter(b => !b.isConfirmed && !b.isCompleted && b.isActive);
-    categorizedBookings.cancelled = bookingsArray.filter(b => b.cancelledBy);
-
-    return categorizedBookings;
   };
 
   const handleCategoryChange = (category) => {
@@ -74,14 +67,14 @@ function BookingsPage() {
     : bookings[visibleCategory];
 
   return (
-    <div className="container mx-auto p-4 md:p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <h2 className="text-center text-2xl font-semibold mb-4 text-gray-800">My Bookings</h2>
-        <div className="flex flex-wrap justify-center gap-4 mb-4">
+    <div className="bookings-container">
+      <div className="bookings-header">
+        <h2>My Bookings</h2>
+        <div className="category-buttons">
           {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(category => (
             <button
               key={category}
-              className={`py-2 px-4 rounded-full text-sm md:text-base font-medium ${visibleCategory === category ? 'bg-[#755AA6] text-white shadow-lg' : 'bg-white text-gray-800 shadow-sm border border-gray-300'}`}
+              className={`category-button ${visibleCategory === category ? 'active' : ''}`}
               onClick={() => handleCategoryChange(category)}
             >
               {category.charAt(0).toUpperCase() + category.slice(1)} Bookings
@@ -89,32 +82,28 @@ function BookingsPage() {
           ))}
         </div>
 
-        {loading && <p className="text-center text-[#755AA6] font-medium">Loading...</p>}
-        {error && <p className="text-center text-red-600 font-medium">{error}</p>}
+        {loading && <p className="loading-text">Loading...</p>}
+        {error && <p className="error-text">{error}</p>}
+      </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {displayedBookings.length > 0 ? (
-            displayedBookings.map((booking) => (
-              <Link
-                key={booking.id}
-                to={`/booking/${booking.id}`}
-                className="border border-gray-300 rounded-lg shadow-lg p-4 bg-white flex flex-col"
-              >
-                <p className="font-semibold text-lg mb-2">Booking ID: <span className="font-medium">{booking.id}</span></p>
-                <p className="text-gray-700 mb-1">Customer Name: <span className="font-medium">{booking.customerName}</span></p>
-                <p className="text-gray-700 mb-1">Service Name: <span className="font-medium">{booking.serviceName}</span></p>
-                <p className="text-gray-700 mb-1">Booking Date: <span className="font-medium">{new Date(booking.bookingDate).toLocaleDateString()}</span></p>
-                <p className="text-gray-700 mb-1">Service Dates: <span className="font-medium">{`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</span></p>
-                <p className="text-gray-700">Charge: <span className="font-medium">${booking.charge.toFixed(2)}</span></p>
-              </Link>
-            ))
-          ) : (
-            <p className="text-center text-gray-500">No bookings available in this category.</p>
-          )}
-        </div>
+      <div className="bookings-grid">
+        {displayedBookings.length > 0 ? (
+          displayedBookings.map((booking) => (
+            <Link key={booking.id} to={`/booking/${booking.id}`} className="booking-card">
+              <h3 className="booking-id">Booking ID: <span className="booking-id-value">{booking.id}</span></h3>
+              <p className="booking-detail">Customer Name: <span className="booking-detail-value">{booking.customerName}</span></p>
+              <p className="booking-detail">Service Name: <span className="booking-detail-value">{booking.serviceName}</span></p>
+              <p className="booking-detail">Booking Date: <span className="booking-detail-value">{new Date(booking.bookingDate).toLocaleDateString()}</span></p>
+              <p className="booking-detail">Service Dates: <span className="booking-detail-value">{`${new Date(booking.serviceFromDate).toLocaleDateString()} - ${new Date(booking.serviceToDate).toLocaleDateString()}`}</span></p>
+              <p className="booking-detail">Charge: <span className="booking-charge">{booking.charge.toFixed(2)}</span></p>
+            </Link>
+          ))
+        ) : (
+          <p className="no-bookings">No bookings available in this category.</p>
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default BookingsPage;

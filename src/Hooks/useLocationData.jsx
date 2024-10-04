@@ -12,12 +12,12 @@ const useLocationData = () => {
       const res = await fetch('https://hibow.in/api/Country');
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       const data = await res.json();
-      
-      // Check if data is an object and has a country_Name property
-      if (data && data.country_Name) {
-        setCountries([data]); // Wrap the object in an array
+      console.log("Fetched countries:", data);
+
+      if (Array.isArray(data)) {
+        setCountries(data);
       } else {
-        throw new Error('Countries data is not an array or valid object.');
+        throw new Error('Countries data is not a valid array.');
       }
     } catch (error) {
       setError('Failed to fetch countries: ' + error.message);
@@ -62,6 +62,5 @@ const useLocationData = () => {
 
   return { countries, states, districts, fetchStates, fetchDistricts, error };
 };
-
 
 export default useLocationData;

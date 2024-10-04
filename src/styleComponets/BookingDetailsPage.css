@@ -1,0 +1,160 @@
+/* General Styles */
+.booking-details-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f3f4f6; /* Light gray for a softer background */
+    min-height: 100vh;
+    border-radius: 8px;
+}
+
+.heading {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #2d3748; /* Darker gray for better contrast */
+}
+
+.details-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin: 0 auto;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    border-bottom: 2px solid #e2e8f0; /* Subtle separator */
+    padding-bottom: 1.5rem;
+}
+
+.detail {
+    font-size: 1.2rem;
+    color: #4a5568; /* Medium gray for details */
+    line-height: 1.5; /* Improved readability */
+}
+
+.button-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    transition: background-color 0.3s, transform 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background-color: #e63946; /* Red for cancel */
+}
+
+.cancel-button:hover {
+    background-color: #d62839;
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+.confirm-button {
+    background-color: #4caf50; /* Green for confirm */
+}
+
+.confirm-button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.edit-button {
+    background-color: #755AA6; /* Blue for edit */
+}
+
+.edit-button:hover {
+    background-color: #755AA6;
+    transform: translateY(-2px);
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.confirmed {
+    color: #4caf50; /* Green for confirmed */
+}
+
+.cancelled {
+    color: #e63946; /* Red for cancelled */
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+}
+
+.popup-message {
+    font-size: 1.2rem;
+    color: #4a5568;
+}
+
+.close-popup {
+    margin-top: 1rem;
+    background-color: #755AA6;
+}
+
+.close-popup:hover {
+    background-color: #755AA6;
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.service-provider-link {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.provider-button {
+    background-color: #755AA6; /* Blue for provider button */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.provider-button:hover {
+    background-color: #755AA6;
+    transform: translateY(-2px);
+}

@@ -1,8 +1,7 @@
 /* eslint-disable react/prop-types */
-// components/Search.js
 import { useState, useEffect, useCallback } from 'react';
 import ListingItem from '../components/ListingItem';
-import useLocationData from '../Hooks/useLocationData';
+import useLocationData from '../hooks/useLocationData';
 import '../styleComponets/search.css';
 
 const SearchForm = ({ onSearch, error }) => {
@@ -10,7 +9,7 @@ const SearchForm = ({ onSearch, error }) => {
   const [country, setCountry] = useState('');
   const [state, setState] = useState('');
   const [district, setDistrict] = useState('');
-  const [service, setService] = useState('');
+  const [services, setServices] = useState([]);
 
   const handleCountryChange = (e) => {
     const value = e.target.value;
@@ -21,20 +20,33 @@ const SearchForm = ({ onSearch, error }) => {
   };
 
   const handleStateChange = (e) => {
-    const value = e.target.value;
-    setState(value);
+    const selectedState = states.find(s => s.state_Name === e.target.value);
+    setState(selectedState ? selectedState : '');
     setDistrict('');
-    fetchDistricts(value);
+    if (selectedState) {
+      fetchDistricts(selectedState.id); // Pass the ID to fetch districts
+    }
+  };
+
+  const handleDistrictChange = (e) => {
+    setDistrict(e.target.value);
   };
 
   const handleServiceChange = (e) => {
-    setService(e.target.value);
+    const serviceName = e.target.value;
+    setServices(prevServices => {
+      if (prevServices.includes(serviceName)) {
+        return prevServices.filter(service => service !== serviceName);
+      } else {
+        return [...prevServices, serviceName];
+      }
+    });
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const location = district || state; // Use state if district is empty
-    onSearch({ district: location, service });
+    const location = district || state.state_Name; // Use the state name now
+    onSearch({ location, services }); // Pass the selected services
   };
 
   return (
@@ -65,7 +77,7 @@ const SearchForm = ({ onSearch, error }) => {
         <select
           id="state"
           className="border rounded-lg p-3 w-full text-gray-900 transition duration-300"
-          value={state}
+          value={state.state_Name || ''}
           onChange={handleStateChange}
           aria-label="State"
         >
@@ -83,7 +95,7 @@ const SearchForm = ({ onSearch, error }) => {
           id="district"
           className="border rounded-lg p-3 w-full text-gray-900 transition duration-300"
           value={district}
-          onChange={(e) => setDistrict(e.target.value)}
+          onChange={handleDistrictChange}
           aria-label="District"
         >
           <option value="" disabled>Select a district</option>
@@ -100,9 +112,9 @@ const SearchForm = ({ onSearch, error }) => {
           {['boarding', 'grooming', 'training'].map((serviceName) => (
             <label key={serviceName} className="flex items-center gap-2">
               <input
-                type="radio"
+                type="checkbox"
                 value={serviceName}
-                checked={service === serviceName}
+                checked={services.includes(serviceName)}
                 onChange={handleServiceChange}
                 className="form-checkbox"
                 aria-label={serviceName}
@@ -161,13 +173,13 @@ const Search = () => {
       const url = 'https://hibow.in/api/Provider/SearchServiceHomeByLocationAndServicenName';
       const params = new URLSearchParams();
 
-      const location = searchParams?.district || searchParams?.state; // Use state if district is null
+      const location = searchParams?.district || searchParams?.location; // Use the state name now
 
       if (location) {
-        params.append('serviceHomeLocation', location); // Use state name now
+        params.append('serviceHomeLocation', location); // Use location name
       }
-      if (searchParams?.service) {
-        params.append('serviceName', searchParams.service);
+      if (searchParams?.services) {
+        params.append('serviceName', searchParams.services.join(',')); // Pass the selected services as a comma-separated string
       }
 
       const res = await fetch(`${url}?${params}`);
