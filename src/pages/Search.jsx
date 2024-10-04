@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useCallback } from 'react';
 import ListingItem from '../components/ListingItem';
-import useLocationData from '../hooks/useLocationData';
+import useLocationData from '../Hooks/useLocationData';
 import '../styleComponets/search.css';
 
 const SearchForm = ({ onSearch, error }) => {
