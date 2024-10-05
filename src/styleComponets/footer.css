@@ -153,3 +153,9 @@ a:hover, a:focus, .btn:hover, .btn:focus, button:hover, button:focus {
         left: 115%; /* Adjusted from 100% to 115% */
     }
 }
+.new_footer_top .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px; /* Ensure that columns fit within container */
+    gap: 0; /* Space between columns */
+}

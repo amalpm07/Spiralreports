@@ -284,7 +284,6 @@ body {
   background-color: #ffffff; /* White background for the form */
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px #6a4f8a; /* Subtle shadow */
 }
 
 .review-textarea {

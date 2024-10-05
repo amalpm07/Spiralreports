@@ -36,8 +36,8 @@ const Footer = () => {
 }
 
 const GetInTouch = () => (
-  <div className="col-lg-3 col-md-6">
-    <div className="f_widget company_widget wow fadeInLeft" data-wow-delay="0.2s">
+  <div className="col-lg-3 col-md-6 ">
+    <div className="f_widget company_widget wow fadeInLeft " data-wow-delay="0.2s">
       <h3 className="f-title f_600 t_color f_size_18">Contact Us</h3>
       <p>Address: No 2/619 Plot No 203, Engineers Avenue, First Main Road, Keelkattalai, Chennai</p>
       <p>Phone: +91 73389 28378</p>
