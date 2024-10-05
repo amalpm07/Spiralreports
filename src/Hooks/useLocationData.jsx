@@ -10,19 +10,25 @@ const useLocationData = () => {
   const fetchCountries = async () => {
     try {
       const res = await fetch('https://hibow.in/api/Country');
+      console.log("Response status:", res.status); // Log response status
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      
       const data = await res.json();
-      console.log("Fetched countries:", data);
+      // console.log("Fetched data:", data); // Log fetched data
 
+      // Check if the data is an object and convert it to an array
       if (Array.isArray(data)) {
         setCountries(data);
+      } else if (typeof data === 'object') {
+        setCountries([data]); // Wrap in an array
       } else {
-        throw new Error('Countries data is not a valid array.');
+        throw new Error('Countries data is not a valid array or object.');
       }
     } catch (error) {
       setError('Failed to fetch countries: ' + error.message);
     }
   };
+console.log(countries);
 
   const fetchStates = async (countryId) => {
     if (!countryId) return;
