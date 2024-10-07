@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -44,7 +44,7 @@ function UserListings() {
 
   const handleListingDelete = async (listingId) => {
     try {
-      const res = await fetch(`https://hibow.in/api/DeleteListing/${listingId}`, {
+      const res = await fetch(`https://hibow.in/api/Provider/DeleteServiceHomeDetails?serviceHomeId=${listingId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

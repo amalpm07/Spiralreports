@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,17 +23,18 @@ export default function CreateListing() {
     address: '',
     phoneNumber: '',
     ServiceName: '',
-    offer: false,
     answers: {},
   });
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
     const fetchQuestions = async () => {
+      if (!formData.ServiceName) return;
+
       try {
         const response = await fetch(
           `https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${formData.ServiceName}`,
@@ -49,109 +52,92 @@ export default function CreateListing() {
       }
     };
 
-    if (formData.ServiceName) {
-      fetchQuestions();
-    }
-  }, [formData.ServiceName, currentUser.token]);
+    fetchQuestions();
+  }, [formData.ServiceName, currentUser.guid]);
 
   const handleImageSubmit = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
       setImageUploadError(false);
-      const promises = [];
+      const promises = Array.from(files).map(storeImage);
 
-      for (let i = 0; i < files.length; i++) {
-        promises.push(storeImage(files[i]));
-      }
       Promise.all(promises)
         .then((urls) => {
-          setFormData({
-            ...formData,
-            imageUrls: formData.imageUrls.concat(urls),
-          });
-          setImageUploadError(false);
+          setFormData((prev) => ({
+            ...prev,
+            imageUrls: [...prev.imageUrls, ...urls],
+          }));
           setUploading(false);
         })
         .catch(() => {
-          setImageUploadError('Image upload failed (2 mb max per image)');
+          setImageUploadError('Image upload failed (2 MB max per image)');
           setUploading(false);
         });
     } else {
       setImageUploadError('You can only upload 6 images per listing');
-      setUploading(false);
     }
   };
 
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
-      const fileName = new Date().getTime() + file.name;
+      const fileName = `${new Date().getTime()}_${file.name}`;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, file);
+
       uploadTask.on(
         'state_changed',
         (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           console.log(`Upload is ${progress}% done`);
         },
-        (error) => {
-          reject(error);
-        },
+        (error) => reject(error),
         () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            resolve(downloadURL);
-          });
+          getDownloadURL(uploadTask.snapshot.ref).then(resolve).catch(reject);
         }
       );
     });
   };
 
   const handleRemoveImage = (index) => {
-    setFormData({
-      ...formData,
-      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
-    });
+    setFormData((prev) => ({
+      ...prev,
+      imageUrls: prev.imageUrls.filter((_, i) => i !== index),
+    }));
   };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
 
-    if (id === 'boarding' || id === 'training' || id === 'grooming') {
-      setFormData({
-        ...formData,
-        ServiceName: id,
-      });
+    if (['boarding', 'training', 'grooming'].includes(id)) {
+      setFormData((prev) => ({ ...prev, ServiceName: id }));
     } else {
-      setFormData({
-        ...formData,
-        [id]: value,
-      });
+      setFormData((prev) => ({ ...prev, [id]: value }));
     }
   };
 
   const handleQuestionChange = (questionId) => (e) => {
     const value = e.target.value;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       answers: {
-        ...formData.answers,
+        ...prev.answers,
         [questionId]: value,
       },
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       if (formData.imageUrls.length < 1) {
         throw new Error('You must upload at least one image');
       }
-
+  
       setLoading(true);
       setError(null);
-
+  
       const {
         hostelName,
         ServiceName,
@@ -161,36 +147,21 @@ export default function CreateListing() {
         imageUrls,
         answers,
       } = formData;
-
-      let selectedType = '';
-      if (ServiceName === 'boarding') {
-        selectedType = 'boarding';
-      } else if (ServiceName === 'training') {
-        selectedType = 'training';
-      } else if (ServiceName === 'grooming') {
-        selectedType = 'grooming';
-      }
-
-      const photos = imageUrls.reduce((acc, url, index) => {
-        acc[`photo${index + 1}`] = url;
-        return acc;
-      }, {});
-
-      for (let i = imageUrls.length; i < 6; i++) {
-        photos[`photo${i + 1}`] = '';
-      }
-
+  
       const serviceHomePayload = {
         id: 0,
         userId: currentUser.id,
-        ServiceName: selectedType,
+        ServiceName,
         hostelName,
         address,
         phoneNumber,
         description,
-        ...photos,
+        ...imageUrls.reduce((acc, url, index) => {
+          acc[`photo${index + 1}`] = url;
+          return acc;
+        }, {}),
       };
-
+  
       const answersPayload = {
         Answers: Object.keys(answers).map((questionId) => ({
           question_id: parseInt(questionId, 10),
@@ -198,12 +169,12 @@ export default function CreateListing() {
           ans: String(answers[questionId]),
         })),
       };
-
+  
       const headers = {
         'Content-Type': 'application/json',
         'Token': currentUser.guid,
       };
-
+  
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
         fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
@@ -216,29 +187,36 @@ export default function CreateListing() {
           body: JSON.stringify(answersPayload),
         }),
       ]);
-
-      const serviceHomeText = await serviceHomeRes.text();
-      const serviceHomeData = serviceHomeText ? JSON.parse(serviceHomeText) : {};
-
-      const addAnswersText = await addAnswersRes.text();
-      const addAnswersData = addAnswersText ? JSON.parse(addAnswersText) : {};
-
-      setLoading(false);
-
-      if (serviceHomeData.success && addAnswersData.success) {
-        window.alert('Listing created successfully!');
-        navigate(`/listing/${ServiceName}/${currentUser.id}`);
+  
+      const serviceHomeData = await serviceHomeRes.json();
+      const addAnswersData = await addAnswersRes.json();
+  
+      console.log('Service Home Response:', serviceHomeData);
+      console.log('Add Answers Response:', addAnswersData);
+  
+      // Adjusting the success condition
+      const isServiceHomeSuccess = serviceHomeData && serviceHomeData.id; // Assuming existence of id means success
+      const isAnswersSuccess = addAnswersData && addAnswersData.message === 'Answers added successfully!!';
+  
+      if (isServiceHomeSuccess && isAnswersSuccess) {
+        alert('Listing created successfully!');
+        navigate(`/`);
       } else {
         const errorMessage = serviceHomeData.message || addAnswersData.message || 'Unknown error occurred';
         setError(errorMessage);
-        window.alert(`Error: ${errorMessage}`);
+        alert(`Error: ${errorMessage}`);
       }
     } catch (error) {
       setError(error.message);
+      alert(`Error: ${error.message}`);
+    } finally {
       setLoading(false);
-      window.alert(`Error: ${error.message}`);
     }
   };
+  
+  
+  
+  
 
   return (
     <main className='p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg'>
@@ -259,7 +237,6 @@ export default function CreateListing() {
             value={formData.hostelName}
           />
           <textarea
-            type='text'
             placeholder='Description'
             className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
             id='description'
@@ -286,36 +263,18 @@ export default function CreateListing() {
             value={formData.phoneNumber}
           />
           <div className='flex flex-wrap gap-4 mt-4'>
-            <div className='flex items-center gap-2'>
-              <input
-                type='checkbox'
-                id='boarding'
-                className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                onChange={handleChange}
-                checked={formData.ServiceName === 'boarding'}
-              />
-              <span className='text-gray-700'>Boarding</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <input
-                type='checkbox'
-                id='training'
-                className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                onChange={handleChange}
-                checked={formData.ServiceName === 'training'}
-              />
-              <span className='text-gray-700'>Training</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <input
-                type='checkbox'
-                id='grooming'
-                className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
-                onChange={handleChange}
-                checked={formData.ServiceName === 'grooming'}
-              />
-              <span className='text-gray-700'>Grooming</span>
-            </div>
+            {['boarding', 'training', 'grooming'].map((service) => (
+              <div className='flex items-center gap-2' key={service}>
+                <input
+                  type='checkbox'
+                  id={service}
+                  className='w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                  onChange={handleChange}
+                  checked={formData.ServiceName === service}
+                />
+                <span className='text-gray-700 capitalize'>{service}</span>
+              </div>
+            ))}
           </div>
         </div>
         <div className='flex flex-col gap-4'>
@@ -344,7 +303,7 @@ export default function CreateListing() {
             </button>
           </div>
           <p className='text-red-600 text-sm'>
-            {imageUploadError && imageUploadError}
+            {imageUploadError}
           </p>
           {formData.imageUrls.length > 0 && (
             <div className='flex flex-wrap gap-4 mt-4'>
@@ -352,7 +311,7 @@ export default function CreateListing() {
                 <div key={url} className='flex flex-col items-center'>
                   <img
                     src={url}
-                    alt='listing image'
+                    alt='listing'
                     className='w-20 h-20 object-cover rounded-lg shadow'
                   />
                   <button
@@ -374,15 +333,13 @@ export default function CreateListing() {
                   <li key={question.id} className='mb-2'>
                     <div className='text-gray-700'>{question.questions}</div>
                     <div className='flex flex-col gap-2 mt-2'>
-                      <label className='block'>
-                        <input
-                          type='text'
-                          id={`${question.id}`}
-                          value={formData.answers[question.id] || ''}
-                          onChange={handleQuestionChange(question.id)}
-                          className='p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-                        />
-                      </label>
+                      <input
+                        type='text'
+                        id={question.id}
+                        value={formData.answers[question.id] || ''}
+                        onChange={handleQuestionChange(question.id)}
+                        className='p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
+                      />
                     </div>
                   </li>
                 ))}
@@ -394,7 +351,7 @@ export default function CreateListing() {
           disabled={loading || uploading}
           className='p-3 bg-[#755AA6] text-white rounded-lg uppercase hover:bg-[#6d4c7d] disabled:opacity-80 mt-6'
         >
-          {loading ? 'Creating...' : 'Create listing'}
+          {loading ? 'Creating...' : 'Create Listing'}
         </button>
         {error && <p className='text-red-600 text-sm'>Error: {error}</p>}
       </form>

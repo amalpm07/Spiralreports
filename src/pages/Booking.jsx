@@ -142,9 +142,7 @@ const BookingForm = () => {
   const acceptedPetTypes = listingDetails.acceptedPetTypes || [];
   const acceptedPetSizes = listingDetails.acceptedPetSizes || [];
 
-console.log('Listing data:', listing);
-const chargeValue = listing?.answer.find(item => item.answer.question_id === 38)?.answer.ans;
-console.log('Charge value:', chargeValue);
+
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -192,6 +190,7 @@ console.log('Charge value:', chargeValue);
   };
 
   const handleProceedClick = async () => {
+    let userData; // Declare userData here
     try {
       if (checkOutDate <= checkInDate) {
         setDateError('Check-out date must be after check-in date');
@@ -230,7 +229,7 @@ console.log('Charge value:', chargeValue);
         }))
       };
   
-      // The rest of your existing booking logic remains unchanged
+      // Check if user is not logged in
       if (!currentUser) {
         const userAdd = {
           email,
@@ -249,7 +248,7 @@ console.log('Charge value:', chargeValue);
           throw new Error('Failed to add user');
         }
   
-        const userData = await addUserRes.json();
+        userData = await addUserRes.json(); // Get user data after successful add
         dispatch({ type: 'SET_CURRENT_USER', payload: userData });
   
         // Update bookingData with the guest user's details
@@ -265,7 +264,7 @@ console.log('Charge value:', chargeValue);
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bookingModel: bookingData, // Ensure bookingModel is wrapped properly
+          bookingModel: bookingData,
           userType: currentUser ? "Customer" : "guest"
         })
       });
@@ -304,6 +303,7 @@ console.log('Charge value:', chargeValue);
       handleNotification(error.message, 'error');
     }
   };
+  
   
   const handleAnswerChange = (questionId, answer) => {
     setAnswers(prevAnswers => ({
