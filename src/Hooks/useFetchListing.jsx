@@ -1,32 +1,16 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-// src/Hooks/useFetchListing.jsx
-import { useState, useEffect, useCallback } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 const useFetchListing = (selectedType, id) => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [review, setReviews] = useState([]);
   const [questions, setQuestions] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const { currentUser } = useSelector((state) => state.user);
 
-  const fetchReviews = useCallback(async (serviceHomeId) => {
-    try {
-      const res = await fetch(`https://hibow.in/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Token': currentUser?.guid || '',
-        },
-      });
-      if (!res.ok) throw new Error('Failed to fetch reviews');
-      const data = await res.json();
-      setReviews(data);
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
-      setReviews([]);
-    }
-  }, [currentUser]);
+  
 
   const fetchListing = async () => {
     try {
@@ -40,7 +24,6 @@ const useFetchListing = (selectedType, id) => {
       if (!res.ok) throw new Error('Failed to fetch listing');
       const data = await res.json();
       setListing(data);
-      fetchReviews(data?.serviceHome?.id); // Fetch reviews on successful listing fetch
     } catch (error) {
       console.error('Error fetching listing:', error);
       setError(error.message);
@@ -71,7 +54,7 @@ const useFetchListing = (selectedType, id) => {
     }
   }, [selectedType, id]);
 
-  return { listing, loading, error, review, questions };
+  return { listing, loading, error,  questions };
 };
 
 export default useFetchListing; // Ensure this line is present

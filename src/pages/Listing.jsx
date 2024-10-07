@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
 import useFetchListing from '../Hooks/useFetchListing';
@@ -11,12 +11,16 @@ const Listing = () => {
   const { selectedType, id } = useParams();
   const navigate = useNavigate();
   const { listing, loading, error, questions, reviews: initialReviews } = useFetchListing(selectedType, id);
-  const [reviews, setReviews] = React.useState(initialReviews); // Local state for reviews
-  const [newReview, setNewReview] = React.useState({ text: '', rating: 0 });
-  const [reviewError, setReviewError] = React.useState(null);
+  const [reviews, setReviews] = useState(initialReviews); // Local state for reviews
+  const [newReview, setNewReview] = useState({ text: '', rating: 0 });
+  const [reviewError, setReviewError] = useState(null);
 
   // Access currentUser from Redux store
   const { currentUser } = useSelector((state) => state.user);
+
+  // Safely check if listing is available
+  const serviceHomeId = listing?.serviceHome?.id;
+console.log(serviceHomeId);
 
   const handleBookNowClick = () => {
     const acceptedPetTypes = listing?.answer?.find((item) => item.answer.question_id === 35)?.answer.ans.split(', ') || [];
@@ -49,7 +53,7 @@ const Listing = () => {
 
     try {
       const reviewPayload = {
-        serviceHomeId: listing?.serviceHome?.id,
+        serviceHomeId: serviceHomeId,
         customerId: currentUser.id,
         customerName: currentUser.userName,
         reviewMessage: newReview.text,
@@ -80,8 +84,7 @@ const Listing = () => {
         ...prevReviews,
         {
           ...data,
-          // Assuming the response has the same structure as the review
-          postedDate: new Date().toISOString(), // Or any other property you want to set
+          postedDate: new Date().toISOString(), // Assuming the response has the same structure as the review
         },
       ]);
       setNewReview({ text: '', rating: 0 });
@@ -91,6 +94,24 @@ const Listing = () => {
       setReviewError('Failed to submit review');
     }
   };
+
+  const fetchReviews = useCallback(async (serviceHomeId) => {
+    if (!serviceHomeId) return; // Early return if serviceHomeId is not available
+    try {
+      const res = await fetch(`https://hibow.in/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Token': currentUser?.guid || '',
+        },
+      });
+      if (!res.ok) throw new Error('Failed to fetch reviews');
+      const data = await res.json();
+      setReviews(data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      setReviews([]);
+    }
+  }, [currentUser]);
 
   const handleDeleteReview = async (reviewId) => {
     try {
@@ -114,6 +135,12 @@ const Listing = () => {
       console.error('Error deleting review:', error);
     }
   };
+
+  useEffect(() => {
+    if (listing) {
+      fetchReviews(serviceHomeId);
+    }
+  }, [listing, fetchReviews, serviceHomeId]);
 
   if (loading) {
     return (
