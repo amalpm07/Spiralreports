@@ -198,11 +198,11 @@ const BookingForm = () => {
       }
   
       const currentDate = new Date();
-      
+  
       // Check charge and ensure it's a valid number
       const chargeValue = listing?.answer.find(item => item.answer.question_id === 40)?.answer.ans;
       const charge = typeof chargeValue === 'number' ? chargeValue : parseFloat(chargeValue);
-      
+  
       // If charge is not a valid number, handle the error
       if (isNaN(charge)) {
         throw new Error('Invalid charge value. Please check the listing details.');
@@ -233,7 +233,8 @@ const BookingForm = () => {
       if (!currentUser) {
         const userAdd = {
           email,
-          phoneNumber
+          phoneNumber,
+          usertype: "guest"
         };
   
         const addUserRes = await fetch('https://hibow.in/api/User/Add', {
@@ -249,12 +250,12 @@ const BookingForm = () => {
         }
   
         userData = await addUserRes.json(); // Get user data after successful add
-        dispatch({ type: 'SET_CURRENT_USER', payload: userData });
+  console.log(userData.id);
   
         // Update bookingData with the guest user's details
         bookingData = {
           ...bookingData,
-          customer_id: userData.id,
+          customerid: userData.id, // Use the id from the response
         };
       }
   
@@ -279,7 +280,7 @@ const BookingForm = () => {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
           question_id: parseInt(questionId),
-          customer_id: currentUser?.id || userData.id,
+          customer_id: currentUser?.id || userData.id, // Use the id from the response if guest
           ans: String(answers[questionId]),
         }))
       };
