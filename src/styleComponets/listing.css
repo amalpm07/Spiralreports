@@ -430,7 +430,7 @@ body {
   }
 
   .image-viewer {
-    max-width: 300px; /* Smaller max width */
+    max-width: 280px; /* Smaller max width */
     height: auto; /* Adjust height */
   }
 
