@@ -186,7 +186,6 @@ body {
 
 .book-now-button:hover {
   background-color: #6a4f8a; /* Darker shade for hover effect */
-  box-shadow: 0 4px 8px #6a4f8a;
 }
 
 /* Reviews Section */
@@ -382,51 +381,57 @@ body {
 
 /* Responsive Styles */
 @media (max-width: 768px) {
+  :root {
+    --container-gap: 1rem; /* Define a variable for gap */
+  }
+
   .listing-container {
     padding: 1rem; /* Adjust padding */
   }
 
-  .service-container {
-    position: static; /* Change to static for smaller screens */
-    width: 90%; /* Full width */
-    margin: 20px auto; /* Center with margin */
-    order: 1; /* Ensure it comes after the details */
-    top: auto; /* Reset top for static position */
-    right: auto; /* Reset right for static position */
-  }
-
   .parent-container {
-    flex-direction: column; /* Stack vertically on smaller screens */
+    flex-direction: column; /* Stack vertically */
     align-items: center; /* Center items */
     margin: 0; /* Remove left/right margins */
+    gap: var(--container-gap); /* Use the gap variable */
   }
 
   .profile-section,
-  .description {
+ 
+  .image-gallery-container,
+  .service-container {
     width: 100%; /* Full width */
     margin: 0 auto; /* Center horizontally */
+    margin-bottom: var(--container-gap); /* Consistent bottom margin */
   }
-
+  .description{
+    width: 100%; /* Full width */
+    margin: 0 auto; /* Center horizontally */
+    margin-bottom: var(--container-gap); /* Consistent bottom margin */
+    margin-left: 35px;
+  }
   .image-gallery-container {
-    flex-direction: column; /* Stack images on small screens */
-    align-items: center; /* Center items */
-    gap: 10px; /* Adjust gap for smaller screens */
-    margin-bottom: 50px; /* Maintain 50px gap */
+    /* flex-direction: column; Stack images */
+    gap: var(--container-gap); /* Consistent gap */
+    margin-bottom: var(--container-gap); /* Maintain gap */
+    margin-left: 10px;
   }
 
   .thumbnail-container {
     flex-direction: row; /* Row layout */
     overflow-x: auto; /* Allow horizontal scrolling */
+    gap: var(--container-gap); /* Use the gap variable */
+    max-width: 60px;
   }
 
   .thumbnail {
-    width: 60px; /* Smaller thumbnails on small screens */
+    width: 60px; /* Smaller thumbnails */
     height: 60px; /* Fixed size */
   }
 
   .image-viewer {
     max-width: 300px; /* Smaller max width */
-    height: auto; /* Adjust height automatically */
+    height: auto; /* Adjust height */
   }
 
   .review-textarea {
@@ -446,11 +451,11 @@ body {
   }
 
   .parent-container {
-    margin-right: 20px; /* Adjust for spacing */
+    margin: 0 10px; /* Set equal margin on both sides */
   }
 
   .image-gallery-container {
-    margin-right: 15px; /* Prevent overlap with the service container */
+    margin: 0; /* Prevent overlap with the service container */
   }
 }
 
