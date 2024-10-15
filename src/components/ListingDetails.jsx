@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import { FaStar, FaTrash, FaCcVisa, FaCcMastercard, FaCcPaypal, FaCcAmex } from 'react-icons/fa';
 import placeholderProfilePic from '../assets/avatar.jpg';
 import dogImg from '../assets/dog.png';  
@@ -25,7 +26,9 @@ const ListingDetails = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState(listing?.serviceHome?.photo1);
   const [isButtonVisible, setIsButtonVisible] = useState(false);
+  const [isPopupVisible, setIsPopupVisible] = useState(false); // State for popup
   const reviewSectionRef = useRef(null);
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,6 +70,21 @@ const ListingDetails = ({
     small: 'small-pet-icon',
     medium: 'medium-pet-icon',
     large: 'large-pet-icon',
+  };
+
+  const handleTextareaClick = () => {
+    if (!currentUser) { // Check if user is logged in
+      setIsPopupVisible(true); // Show popup if not
+    }
+  };
+
+  const handlePopupYes = () => {
+    setIsPopupVisible(false);
+    navigate('/sign-in'); // Navigate to sign-in page
+  };
+
+  const handlePopupNo = () => {
+    setIsPopupVisible(false); // Close the popup
   };
 
   return (
@@ -253,6 +271,7 @@ const ListingDetails = ({
           {reviewError && <p className='review-error'>{reviewError}</p>}
           <form onSubmit={handleReviewSubmit} className='review-form'>
             <textarea
+              onClick={handleTextareaClick} // Call the handler on click
               value={newReview.text}
               onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
               className='review-textarea'
@@ -274,8 +293,24 @@ const ListingDetails = ({
         </div>
       )}
 
+ {/* Popup for Sign In Prompt */}
+{isPopupVisible && (
+  <div className='popup-overlay'>
+    <div className='popup'>
+      <h4>Please Sign In</h4>
+      <p>You need to be signed in to leave a review.</p>
+      <div className='button-container'> {/* New button container */}
+        <button onClick={handlePopupYes}>Yes</button>
+        <button onClick={handlePopupNo}>No</button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
       {/* Booking Button after Reviews Section */}
-      {isButtonVisible && currentUser?.usertype !== 'Provider' && ( // Replace 'desiredUserType' with the actual user type you want to check
+      {isButtonVisible && currentUser?.usertype !== 'Provider' && (
         <div className='unique-booking-button-container'>
           <button className='unique-book-now-button' onClick={handleBookNowClick}>
             Book Now

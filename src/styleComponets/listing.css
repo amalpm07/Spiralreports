@@ -510,3 +510,76 @@ body {
   width: 60px; /* Decrease size */
   height: 40px; /* Decrease size */
 }
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.popup {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: scaleIn 0.3s ease;
+}
+
+.popup h4 {
+  margin-bottom: 10px;
+}
+
+.popup p {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.popup button {
+  background-color: #755AA6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+  margin: 0 5px; /* Adds a gap between buttons */
+}
+
+.popup button:hover {
+  background-color: #634c88; /* Darker shade for hover */
+  transform: scale(1.05);
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Controls the space between buttons */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
