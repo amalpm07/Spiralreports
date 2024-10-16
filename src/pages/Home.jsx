@@ -184,7 +184,7 @@ const Home = () => {
   useEffect(() => {
     const fetchServiceHomes = async () => {
       try {
-        const res = await fetch('https://hibow.in/api/Provider/GetAllServiceHomes');
+        const res = await fetch('/api/Provider/GetAllServiceHomes');
         if (!res.ok) {
           throw new Error('Failed to fetch service homes');
         }
