@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -8,10 +8,9 @@ function UserListings() {
   const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    // Fetch user listings when component mounts
     handleShowListings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only fetch once when component mounts
+  }, []);
 
   const handleShowListings = async () => {
     try {
@@ -28,14 +27,16 @@ function UserListings() {
       }
 
       const data = await res.json();
-      console.log('User listings data:', data); // Log data received from API
-      if (!data || !Array.isArray(data) || data.length === 0) {
+      if (!Array.isArray(data)) {
         setShowListingsError(true);
-        setUserListings([]); // Clear listings if no valid data
         return;
       }
 
-      setUserListings(data); // Set user listings from the API response
+      if (data.length === 0) {
+        setShowListingsError(false);
+      } else {
+        setUserListings(data);
+      }
     } catch (error) {
       console.error("Error fetching user listings:", error);
       setShowListingsError(true);
@@ -56,68 +57,58 @@ function UserListings() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      // Remove the deleted listing from state
       setUserListings(userListings.filter(listing => listing.id !== listingId));
     } catch (error) {
       console.error("Error deleting listing:", error);
-      // Handle error state or notification
     }
   };
 
   return (
-    <div>
-      <button onClick={handleShowListings} className='text-green-700 w-full'>
-        Show Listings
-      </button>
-      <p className='text-red-700 mt-5'>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">Your Listings</h1>
+      <p className='text-red-700 mt-5 text-center'>
         {showListingsError ? 'Error showing listings' : ''}
       </p>
 
-      {userListings && userListings.length > 0 && (
-        <div className='flex flex-col gap-4'>
-          <h1 className='text-center mt-7 text-2xl font-semibold'>
-            Your Listings
-          </h1>
+      {userListings.length > 0 ? (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6'>
           {userListings.map((listing) => (
-            <div
-              key={listing.id}
-              className='border rounded-lg p-3 flex justify-between items-center gap-4'
-            >
+            <div key={listing.id} className='border rounded-lg shadow-lg overflow-hidden bg-white transition-transform transform hover:scale-105'>
               <Link to={`/listing/${listing.id}`}>
                 <img
                   src={listing.photo1}
                   alt='listing cover'
-                  className='h-16 w-16 object-contain'
+                  className='h-48 w-full object-cover'
                 />
               </Link>
-              <Link
-                className='text-slate-700 font-semibold hover:underline truncate flex-1'
-                to={`/listing/${listing.serviceName}/${currentUser.id}`}
-              >
-                <p>{listing.hostelName}</p>
-              </Link>
-
-              <div className='flex flex-col items-center'>
-                <button
-                  onClick={() => handleListingDelete(listing.id)}
-                  className='text-red-700 uppercase'
+              <div className='p-4'>
+                <Link
+                  className='text-slate-700 font-semibold hover:underline truncate'
+                  to={`/listing/${listing.serviceName}/${currentUser.id}`}
                 >
-                  Delete
-                </button>
-                <Link to={`/update-listing/${listing.id}/${listing.serviceName}`}>
-                  <button className='text-green-700 uppercase'>Edit</button>
+                  <p>{listing.hostelName}</p>
                 </Link>
+                <div className='flex justify-between mt-4'>
+                  <button
+                    onClick={() => handleListingDelete(listing.id)}
+                    className='text-red-700 hover:underline'
+                  >
+                    Delete
+                  </button>
+                  <Link to={`/update-listing/${listing.id}/${listing.serviceName}`}>
+                    <button className='text-blue-600 hover:underline'>Edit</button>
+                  </Link>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      )}
-
-      {/* Display a message if there are no listings */}
-      {!showListingsError && userListings.length === 0 && (
-        <p className='text-center mt-5 text-gray-600'>
-          No listings found.
-        </p>
+      ) : (
+        !showListingsError && (
+          <p className='text-center mt-5 text-gray-600'>
+            No listings found.
+          </p>
+        )
       )}
     </div>
   );

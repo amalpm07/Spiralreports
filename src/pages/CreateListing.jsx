@@ -1,16 +1,13 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect } from 'react';
+// CreateListing.js
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../firebase';
+import FormInput from '../components/FormInput';
+import ImageUploader from '../components/ImageUploader';
+import QuestionInput from '../components/questioninput';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -30,7 +27,9 @@ export default function CreateListing() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
+  const [approvalNeeded, setApprovalNeeded] = useState(false); // State for approval needed
 
+  // Fetch questions based on ServiceName...
   useEffect(() => {
     const fetchQuestions = async () => {
       if (!formData.ServiceName) return;
@@ -129,15 +128,15 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       if (formData.imageUrls.length < 1) {
         throw new Error('You must upload at least one image');
       }
-  
+
       setLoading(true);
       setError(null);
-  
+
       const {
         hostelName,
         ServiceName,
@@ -147,7 +146,7 @@ export default function CreateListing() {
         imageUrls,
         answers,
       } = formData;
-  
+
       const serviceHomePayload = {
         id: 0,
         userId: currentUser.id,
@@ -156,12 +155,13 @@ export default function CreateListing() {
         address,
         phoneNumber,
         description,
+        approvalNeeded, // Include the approval status
         ...imageUrls.reduce((acc, url, index) => {
           acc[`photo${index + 1}`] = url;
           return acc;
         }, {}),
       };
-  
+
       const answersPayload = {
         Answers: Object.keys(answers).map((questionId) => ({
           question_id: parseInt(questionId, 10),
@@ -169,14 +169,14 @@ export default function CreateListing() {
           ans: String(answers[questionId]),
         })),
       };
-  
+
       const headers = {
         'Content-Type': 'application/json',
         'Token': currentUser.guid,
       };
-  
+
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
-        fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
+        fetch('https://hibow.in/api/Provider/AddServiceHomeDetails?IsApprovalNeeded=' + approvalNeeded, {
           method: 'POST',
           headers,
           body: JSON.stringify(serviceHomePayload),
@@ -187,17 +187,16 @@ export default function CreateListing() {
           body: JSON.stringify(answersPayload),
         }),
       ]);
-  
+
       const serviceHomeData = await serviceHomeRes.json();
       const addAnswersData = await addAnswersRes.json();
-  
+
       console.log('Service Home Response:', serviceHomeData);
       console.log('Add Answers Response:', addAnswersData);
-  
-      // Adjusting the success condition
+
       const isServiceHomeSuccess = serviceHomeData && serviceHomeData.id; // Assuming existence of id means success
       const isAnswersSuccess = addAnswersData && addAnswersData.message === 'Answers added successfully!!';
-  
+
       if (isServiceHomeSuccess && isAnswersSuccess) {
         alert('Listing created successfully!');
         navigate(`/`);
@@ -213,28 +212,20 @@ export default function CreateListing() {
       setLoading(false);
     }
   };
-  
-  
-  
-  
 
   return (
     <main className='p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg'>
-      <h1 className='text-4xl font-bold text-center my-8 text-gray-800'>
-        Create a Listing
-      </h1>
+      <h1 className='text-4xl font-bold text-center my-8 text-gray-800'>Create a Listing</h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
         <div className='flex flex-col gap-4'>
-          <input
-            type='text'
-            placeholder='Hostel Name'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
+          <FormInput
             id='hostelName'
-            maxLength='62'
-            minLength='5'
-            required
-            onChange={handleChange}
+            placeholder='Hostel Name'
             value={formData.hostelName}
+            onChange={handleChange}
+            required
+            minLength={5}
+            maxLength={62}
           />
           <textarea
             placeholder='Description'
@@ -244,23 +235,19 @@ export default function CreateListing() {
             onChange={handleChange}
             value={formData.description}
           />
-          <input
-            type='text'
-            placeholder='Full Address'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
+          <FormInput
             id='address'
-            required
-            onChange={handleChange}
+            placeholder='Full Address'
             value={formData.address}
-          />
-          <input
-            type='text'
-            placeholder='Phone Number'
-            className='border border-gray-300 p-4 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-            id='phoneNumber'
-            required
             onChange={handleChange}
+            required
+          />
+          <FormInput
+            id='phoneNumber'
+            placeholder='Phone Number'
             value={formData.phoneNumber}
+            onChange={handleChange}
+            required
           />
           <div className='flex flex-wrap gap-4 mt-4'>
             {['boarding', 'training', 'grooming'].map((service) => (
@@ -276,77 +263,58 @@ export default function CreateListing() {
               </div>
             ))}
           </div>
-        </div>
-        <div className='flex flex-col gap-4'>
-          <p className='font-semibold text-gray-800'>
-            Images:
-            <span className='font-normal text-gray-600 ml-2'>
-              The first image will be the cover (max 6)
-            </span>
-          </p>
-          <div className='flex gap-4'>
-            <input
-              onChange={(e) => setFiles(e.target.files)}
-              className='p-3 border border-gray-300 rounded w-full'
-              type='file'
-              id='images'
-              accept='image/*'
-              multiple
-            />
-            <button
-              type='button'
-              disabled={uploading}
-              onClick={handleImageSubmit}
-              className='p-3 bg-[#6d4c7d] text-white rounded uppercase hover:bg-[#755AA6] disabled:opacity-80'
-            >
-              {uploading ? 'Uploading...' : 'Upload'}
-            </button>
+          <div className='mt-4'>
+            <label className='font-semibold text-gray-800'>Approval Needed:</label>
+            <div className='flex gap-4'>
+              <label className='flex items-center'>
+                <input
+                  type='radio'
+                  name='approvalNeeded'
+                  value='true'
+                  checked={approvalNeeded === true}
+                  onChange={() => setApprovalNeeded(true)}
+                  className='mr-2'
+                />
+                Yes
+              </label>
+              <label className='flex items-center'>
+                <input
+                  type='radio'
+                  name='approvalNeeded'
+                  value='false'
+                  checked={approvalNeeded === false}
+                  onChange={() => setApprovalNeeded(false)}
+                  className='mr-2'
+                />
+                No
+              </label>
+            </div>
           </div>
-          <p className='text-red-600 text-sm'>
-            {imageUploadError}
-          </p>
-          {formData.imageUrls.length > 0 && (
-            <div className='flex flex-wrap gap-4 mt-4'>
-              {formData.imageUrls.map((url, index) => (
-                <div key={url} className='flex flex-col items-center'>
-                  <img
-                    src={url}
-                    alt='listing'
-                    className='w-20 h-20 object-cover rounded-lg shadow'
-                  />
-                  <button
-                    type='button'
-                    onClick={() => handleRemoveImage(index)}
-                    className='mt-2 text-red-600 hover:text-red-800'
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {questions.length > 0 && (
-            <div className='mt-6'>
-              <h2 className='text-xl font-semibold text-gray-800'>Questions</h2>
-              <ul className='list-disc ml-5'>
-                {questions.map((question) => (
-                  <li key={question.id} className='mb-2'>
-                    <div className='text-gray-700'>{question.questions}</div>
-                    <div className='flex flex-col gap-2 mt-2'>
-                      <input
-                        type='text'
-                        id={question.id}
-                        value={formData.answers[question.id] || ''}
-                        onChange={handleQuestionChange(question.id)}
-                        className='p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none'
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
+        <ImageUploader
+          files={files}
+          setFiles={setFiles}
+          handleImageSubmit={handleImageSubmit}
+          imageUploadError={imageUploadError}
+          uploading={uploading}
+          handleRemoveImage={handleRemoveImage}
+          imageUrls={formData.imageUrls}
+        />
+        {questions.length > 0 && (
+          <div className='mt-6'>
+            <h2 className='text-xl font-semibold text-gray-800'>Questions</h2>
+            <ul className='list-disc ml-5'>
+              {questions.map((question) => (
+                <QuestionInput
+                  key={question.id}
+                  question={question}
+                  value={formData.answers[question.id] || ''}
+                  onChange={handleQuestionChange(question.id)}
+                />
+              ))}
+            </ul>
+          </div>
+        )}
         <button
           disabled={loading || uploading}
           className='p-3 bg-[#755AA6] text-white rounded-lg uppercase hover:bg-[#6d4c7d] disabled:opacity-80 mt-6'

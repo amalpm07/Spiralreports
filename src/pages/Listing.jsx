@@ -98,7 +98,7 @@ console.log(serviceHomeId);
   const fetchReviews = useCallback(async (serviceHomeId) => {
     if (!serviceHomeId) return; // Early return if serviceHomeId is not available
     try {
-      const res = await fetch(`https://hibow.in/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
+      const res = await fetch(`/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
         headers: {
           'Content-Type': 'application/json',
           'Token': currentUser?.guid || '',

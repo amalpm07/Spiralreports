@@ -17,7 +17,7 @@ const useFetchListing = (selectedType, id) => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`https://hibow.in/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`, {
+      const res = await fetch(`/api/Provider/GetListingByUserIdAndServiceName?serviceName=${selectedType}&userId=${id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -35,7 +35,7 @@ const useFetchListing = (selectedType, id) => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(`https://hibow.in/api/Booking/GetTheListofQuestions?serviceName=profile${selectedType}`, {
+      const response = await fetch(`/api/Booking/GetTheListofQuestions?serviceName=profile${selectedType}`, {
         headers: {
           'Content-Type': 'application/json',
         },

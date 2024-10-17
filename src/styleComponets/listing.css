@@ -195,7 +195,8 @@ body {
   background-color: white; /* Light background */
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 2px 4px #6a4f8a; /* Subtle shadow */
-  width: 95%;
+  width: 93%;
+  margin-left: 20px;
 }
 
 .reviews-title {
@@ -272,6 +273,7 @@ body {
   font-weight: 700;
   margin-bottom: 1rem;
   color: #6a4f8a;
+  margin-left: 40px;
 }
 
 .review-error {
@@ -286,7 +288,7 @@ body {
 }
 
 .review-textarea {
-  width: 100%;
+  width: 103%;
   padding: 0.75rem;
   border: 1px solid #6a4f8a;
   border-radius: 4px;

@@ -42,6 +42,7 @@ export default function UpdateListing() {
         }
 
         const listingData = await listingResponse.json();
+        
         const {
           id,
           hostelName,
@@ -140,6 +141,7 @@ export default function UpdateListing() {
     try {
       setLoading(true);
       setError(null);
+  console.log(formData);
   
       // Prepare update listing data
       const updateListingData = {

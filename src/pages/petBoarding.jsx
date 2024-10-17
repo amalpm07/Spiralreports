@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom'; // Import useParams
 import ListingItem from '../components/ListingItem';
 import useLocationData from '../Hooks/useLocationData';
 import '../styleComponets/search.css';
@@ -34,13 +35,13 @@ const SearchForm = ({ onSearch, error }) => {
   const handleSearch = (e) => {
     e.preventDefault();
     const location = district || state.state_Name;
-    onSearch({ location, services: ['boarding'] });
+    onSearch({ location, services: [state.state_Name] }); // Adjust to include state name if needed
   };
 
   return (
     <form onSubmit={handleSearch} className="flex flex-col gap-6">
       {error && <p className="text-red-600">{error}</p>}
-
+      
       {/* Country Selection */}
       <div className="flex flex-col mb-4">
         <label htmlFor="country" className="font-medium text-gray-700 mb-1">Country:</label>
@@ -107,11 +108,11 @@ const SearchResults = ({ listings, loading, error, currentPage, listingsPerPage,
 
   return (
     <div className="flex-1 p-8">
-      <h1 className="text-3xl font-semibold text-[#755AA6] border-b-2 pb-2 mb-4">Boarding</h1>
+      <h1 className="text-3xl font-semibold text-[#755AA6] border-b-2 pb-2 mb-4">Results</h1>
       {loading && <p className="text-xl text-gray-700 text-center">Loading...</p>}
       {error && <p className="text-xl text-red-600 text-center">{error}</p>}
       {!loading && listings.length === 0 && !error && (
-        <p className="text-xl text-gray-700 text-center">No ServiceHome found!</p>
+        <p className="text-xl text-gray-700 text-center">No Service Home found!</p>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {!loading && listings.slice((currentPage - 1) * listingsPerPage, currentPage * listingsPerPage).map((listing) => (
@@ -134,6 +135,7 @@ const SearchResults = ({ listings, loading, error, currentPage, listingsPerPage,
 };
 
 const Search = () => {
+  const { serviceName } = useParams(); // Get the service name from URL
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useState(null);
@@ -153,7 +155,7 @@ const Search = () => {
       if (location) {
         params.append('serviceHomeLocation', location);
       }
-      params.append('serviceName', 'boarding');
+      params.append('serviceName', serviceName || 'boarding'); // Use serviceName from URL
 
       const res = await fetch(`${url}?${params}`);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -167,7 +169,7 @@ const Search = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchParams]);
+  }, [searchParams, serviceName]); // Include serviceName in the dependency array
 
   useEffect(() => {
     fetchListings();

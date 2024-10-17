@@ -195,6 +195,8 @@ const Home = () => {
           stars: item.stars,
         }));
         setServiceHomes(serviceHomesData);
+       
+        
       } catch (error) {
         console.error('Error fetching service homes:', error);
       }

@@ -38,6 +38,14 @@ const BookingsPage = () => {
       }
 
       const data = await res.json();
+
+      // Check if the bookings are available
+      if (data.message) {
+        setError(data.message);
+        setBookings({ completed: [], confirmed: [], pending: [], cancelled: [] });
+        return; // Early exit if no bookings
+      }
+
       const bookingsArray = Array.isArray(data.bookings) ? data.bookings : data;
 
       setBookings(categorizeBookings(bookingsArray));
