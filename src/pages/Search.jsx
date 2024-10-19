@@ -24,7 +24,7 @@ const SearchForm = ({ onSearch, error }) => {
     setState(selectedState ? selectedState : '');
     setDistrict('');
     if (selectedState) {
-      fetchDistricts(selectedState.id); // Pass the ID to fetch districts
+      fetchDistricts(selectedState.id);
     }
   };
 
@@ -34,19 +34,17 @@ const SearchForm = ({ onSearch, error }) => {
 
   const handleServiceChange = (e) => {
     const serviceName = e.target.value;
-    setServices(prevServices => {
-      if (prevServices.includes(serviceName)) {
-        return prevServices.filter(service => service !== serviceName);
-      } else {
-        return [...prevServices, serviceName];
-      }
-    });
+    setServices(prevServices => 
+      prevServices.includes(serviceName) 
+        ? prevServices.filter(service => service !== serviceName) 
+        : [...prevServices, serviceName]
+    );
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const location = district || state.state_Name; // Use the state name now
-    onSearch({ location, services }); // Pass the selected services
+    const location = district || state.state_Name;
+    onSearch({ location, services });
   };
 
   return (
@@ -145,7 +143,7 @@ const SearchResults = ({ listings, loading, error, visibleListings, onShowMore }
     )}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {!loading && listings.slice(0, visibleListings).map((listing) => (
-        <ListingItem key={listing.id} listing={listing} />
+        <ListingItem key={listing.serviceHome.id} listing={listing.serviceHome} />
       ))}
     </div>
     {!loading && listings.length > visibleListings && (
@@ -173,19 +171,20 @@ const Search = () => {
       const url = 'https://hibow.in/api/Provider/SearchServiceHomeByLocationAndServicenName';
       const params = new URLSearchParams();
 
-      const location = searchParams?.district || searchParams?.location; // Use the state name now
+      const location = searchParams?.district || searchParams?.location;
 
       if (location) {
-        params.append('serviceHomeLocation', location); // Use location name
+        params.append('serviceHomeLocation', location);
       }
       if (searchParams?.services) {
-        params.append('serviceName', searchParams.services.join(',')); // Pass the selected services as a comma-separated string
+        params.append('serviceName', searchParams.services.join(','));
       }
 
       const res = await fetch(`${url}?${params}`);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       const data = await res.json();
-      setListings(data);
+      console.log(data); // Log the data to inspect structure
+      setListings(data); // Directly set the fetched data
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to fetch listings. Please try again later.');
@@ -202,8 +201,9 @@ const Search = () => {
   }, [searchParams, fetchListings]);
 
   const handleSearch = (params) => {
+    console.log(params); // Log the parameters
     setSearchParams(params);
-    setVisibleListings(3); // Reset visible listings on new search
+    setVisibleListings(3);
   };
 
   const handleShowMore = () => {

@@ -196,6 +196,7 @@ console.log(listing);
             customerId:currentUser?.id,
             providerId: listing?.serviceHome?.userId,
             serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
+            ServiceHomeName:listing?.serviceHome?.hostelName,
             bookingDate: currentDate.toISOString(),
             serviceFromDate: checkInDate.toISOString(),
             serviceToDate: checkOutDate.toISOString(),

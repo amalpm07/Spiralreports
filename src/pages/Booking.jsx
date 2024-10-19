@@ -142,6 +142,7 @@ const BookingForm = () => {
   const acceptedPetTypes = listingDetails.acceptedPetTypes || [];
   const acceptedPetSizes = listingDetails.acceptedPetSizes || [];
 
+console.log(listingDetails);
 
 
   useEffect(() => {
@@ -207,11 +208,13 @@ const BookingForm = () => {
       if (isNaN(charge)) {
         throw new Error('Invalid charge value. Please check the listing details.');
       }
+  console.log(listing);
   
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
         providerId: listing?.serviceHome?.userId,
         serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
+        ServiceHomeName:listing?.serviceHome?.hostelName,
         bookingDate: currentDate.toISOString(),
         serviceFromDate: checkInDate.toISOString(),
         serviceToDate: checkOutDate.toISOString(),
