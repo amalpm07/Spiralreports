@@ -242,7 +242,7 @@ console.log(listing);
             }))
         };
 
-        const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
+        const answersRes = await fetch('/api/User/AddAnswers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

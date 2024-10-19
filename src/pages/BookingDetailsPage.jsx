@@ -116,7 +116,7 @@ const BookingDetailsPage = () => {
               <button className="button cancel-button" onClick={handleCancelBooking}>
                 Cancel
               </button>
-              {currentUser.usertype === 'provider' ? (
+              {currentUser.usertype === 'Provider' ? (
                 <button className="button confirm-button" onClick={handleConfirmBooking}>
                   Confirm
                 </button>

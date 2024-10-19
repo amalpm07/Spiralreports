@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -9,11 +9,14 @@ export default function UpdateListing() {
 
   const [formData, setFormData] = useState({
     id: null,
+    userId: currentUser.id,
+    serviceName: serviceName,
     hostelName: '',
     description: '',
     address: '',
-    photos: [], // Updated to handle array of photos
-    answers: {}, // Updated to store answers for questions dynamically
+    photos: [],
+    answers: {},
+    isApprovalNeeded: false, // Assuming this needs to be included
   });
 
   const [questions, setQuestions] = useState([]);
@@ -42,7 +45,6 @@ export default function UpdateListing() {
         }
 
         const listingData = await listingResponse.json();
-        
         const {
           id,
           hostelName,
@@ -53,7 +55,8 @@ export default function UpdateListing() {
           photo3,
           photo4,
           photo5,
-          photo6
+          photo6,
+          isApprovalNeeded,
         } = listingData.serviceHome;
 
         const preparedAnswers = {};
@@ -63,11 +66,14 @@ export default function UpdateListing() {
 
         setFormData({
           id,
+          userId: currentUser.id,
+          serviceName,
           hostelName,
           description,
           address,
           photos: [photo1, photo2, photo3, photo4, photo5, photo6].filter(photo => photo !== ""),
           answers: preparedAnswers,
+          isApprovalNeeded,
         });
 
         // Fetch questions data
@@ -128,30 +134,38 @@ export default function UpdateListing() {
 
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
-    // Assuming you want to limit to 6 photos, adjust as necessary
     const newPhotos = files.map(file => URL.createObjectURL(file)).slice(0, 6);
     setFormData({
       ...formData,
       photos: [...formData.photos, ...newPhotos],
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       setLoading(true);
       setError(null);
-  console.log(formData);
-  
+      console.log('Form Data before submit:', formData); // Debugging
+
       // Prepare update listing data
       const updateListingData = {
         id: formData.id,
+        userId: formData.userId,
+        serviceName: formData.serviceName,
         hostelName: formData.hostelName,
-        description: formData.description,
         address: formData.address,
-        photos: formData.photos,
+        description: formData.description,
+        photo1: formData.photos[0] || "",
+        photo2: formData.photos[1] || "",
+        photo3: formData.photos[2] || "",
+        photo4: formData.photos[3] || "",
+        photo5: formData.photos[4] || "",
+        photo6: formData.photos[5] || "",
+        isApprovalNeeded: formData.isApprovalNeeded,
       };
-  
+
       // Update Listing API call
       const updateListingResponse = await fetch('https://hibow.in/api/Provider/EditServiceHomeDetails', {
         method: 'POST',
@@ -161,18 +175,19 @@ export default function UpdateListing() {
         },
         body: JSON.stringify(updateListingData),
       });
-  
+
       if (!updateListingResponse.ok) {
-        throw new Error('Failed to update listing');
+        const errorText = await updateListingResponse.text();
+        throw new Error(`Failed to update listing: ${errorText}`);
       }
-  
+
       // Prepare answers payload
       const answersPayload = Object.keys(formData.answers).map((questionId) => ({
-        question_id: parseInt(questionId), // Ensure question_id is parsed as integer if required by API
+        question_id: parseInt(questionId),
         customer_id: currentUser.id,
         ans: formData.answers[questionId],
       }));
-  
+
       // Add Answers API call
       const addAnswersResponse = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
@@ -180,23 +195,24 @@ export default function UpdateListing() {
           'Content-Type': 'application/json',
           Token: currentUser.guid,
         },
-        body: JSON.stringify({ newAnswers: answersPayload }), // Ensure to wrap in 'newAnswers' if required by API
+        body: JSON.stringify({ newAnswers: answersPayload }),
       });
-  
+
+      const responseData = await addAnswersResponse.json();
+      console.log('Add Answers Response:', responseData); // Debugging
+
       if (!addAnswersResponse.ok) {
-        throw new Error('Failed to add answers');
+        const errorText = await addAnswersResponse.text();
+        throw new Error(`Failed to add answers: ${errorText}`);
       }
-  
-      navigate(`/`); // Redirect to home page after successful update
+
+      navigate(`/`); // Redirect after successful update
     } catch (error) {
       setError(error.message || 'Failed to update listing');
     } finally {
       setLoading(false);
     }
   };
-  
-  
-  
 
   return (
     <main className='p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg'>

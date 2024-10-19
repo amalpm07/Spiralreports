@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-// CreateListing.js
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +28,7 @@ export default function CreateListing() {
   const [questions, setQuestions] = useState([]);
   const [approvalNeeded, setApprovalNeeded] = useState(false); // State for approval needed
 
-  // Fetch questions based on ServiceName...
+  // Fetch questions based on ServiceName
   useEffect(() => {
     const fetchQuestions = async () => {
       if (!formData.ServiceName) return;
@@ -155,7 +154,7 @@ export default function CreateListing() {
         address,
         phoneNumber,
         description,
-        approvalNeeded, // Include the approval status
+        isApprovalNeeded: approvalNeeded, // Updated here
         ...imageUrls.reduce((acc, url, index) => {
           acc[`photo${index + 1}`] = url;
           return acc;
@@ -176,7 +175,7 @@ export default function CreateListing() {
       };
 
       const [serviceHomeRes, addAnswersRes] = await Promise.all([
-        fetch('https://hibow.in/api/Provider/AddServiceHomeDetails?IsApprovalNeeded=' + approvalNeeded, {
+        fetch('https://hibow.in/api/Provider/AddServiceHomeDetails', {
           method: 'POST',
           headers,
           body: JSON.stringify(serviceHomePayload),
