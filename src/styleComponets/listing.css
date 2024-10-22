@@ -36,6 +36,7 @@ body {
   align-items: center;
   gap: 15px;
   margin-bottom: 2rem;
+  margin-left: 10px;
 }
 
 /* Profile Pic */
@@ -65,6 +66,7 @@ body {
   font-size: 1.125rem; /* Fixed size */
   color: #444;
   margin-bottom: 20px;
+  margin-left: 13px;
 }
 
 /* Photo Gallery */
@@ -74,6 +76,7 @@ body {
   gap: 10px; /* Reduce gap */
   overflow-x: auto; /* Enable horizontal scrolling */
   margin-bottom: 50px; /* Ensure gap of 50px between gallery and service container */
+  margin-left: 10px;
 }
 
 /* Thumbnails */
