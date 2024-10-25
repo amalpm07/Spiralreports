@@ -9,6 +9,11 @@ import { FiCalendar } from 'react-icons/fi';
 import styled, { createGlobalStyle } from 'styled-components';
 import CustomDatePicker from '../components/CustomDatePicker';
 
+// Cache busting function
+const addCacheBuster = (url) => {
+  return `${url}?v=${import.meta.env.VITE_APP_VERSION}`;
+};
+
 // Styled components
 const Checkbox = ({ checked, onChange, label, name }) => (
   <label>
@@ -142,9 +147,6 @@ const BookingForm = () => {
   const acceptedPetTypes = listingDetails.acceptedPetTypes || [];
   const acceptedPetSizes = listingDetails.acceptedPetSizes || [];
 
-console.log(listingDetails);
-
-
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
@@ -191,30 +193,27 @@ console.log(listingDetails);
   };
 
   const handleProceedClick = async () => {
-    let userData; // Declare userData here
+    let userData;
     try {
       if (checkOutDate <= checkInDate) {
         setDateError('Check-out date must be after check-in date');
         return;
       }
-  
+
       const currentDate = new Date();
-  
-      // Check charge and ensure it's a valid number
+
       const chargeValue = listing?.answer.find(item => item.answer.question_id === 40)?.answer.ans;
       const charge = typeof chargeValue === 'number' ? chargeValue : parseFloat(chargeValue);
-  
-      // If charge is not a valid number, handle the error
+
       if (isNaN(charge)) {
         throw new Error('Invalid charge value. Please check the listing details.');
       }
-  console.log(listing);
-  
+
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
         providerId: listing?.serviceHome?.userId,
         serviceName: listing?.serviceHome?.serviceName || "Default Service Name",
-        ServiceHomeName:listing?.serviceHome?.hostelName,
+        ServiceHomeName: listing?.serviceHome?.hostelName,
         bookingDate: currentDate.toISOString(),
         serviceFromDate: checkInDate.toISOString(),
         serviceToDate: checkOutDate.toISOString(),
@@ -227,19 +226,18 @@ console.log(listingDetails);
         answers: Object.keys(answers).map((questionId) => ({
           id: 0,
           question_id: parseInt(questionId),
-          customer_id: currentUser?.id || 0, // Use 0 for guest user
+          customer_id: currentUser?.id || 0,
           ans: String(answers[questionId]),
         }))
       };
-  
-      // Check if user is not logged in
+
       if (!currentUser) {
         const userAdd = {
           email,
           phoneNumber,
           usertype: "guest"
         };
-  
+
         const addUserRes = await fetch('https://hibow.in/api/User/Add', {
           method: 'POST',
           headers: {
@@ -247,21 +245,19 @@ console.log(listingDetails);
           },
           body: JSON.stringify(userAdd)
         });
-  
+
         if (!addUserRes.ok) {
           throw new Error('Failed to add user');
         }
-  
-        userData = await addUserRes.json(); // Get user data after successful add
-  console.log(userData.id);
-  
-        // Update bookingData with the guest user's details
+
+        userData = await addUserRes.json();
+        
         bookingData = {
           ...bookingData,
-          customerid: userData.id, // Use the id from the response
+          customerid: userData.id,
         };
       }
-  
+
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
@@ -272,22 +268,22 @@ console.log(listingDetails);
           userType: currentUser ? "Customer" : "guest"
         })
       });
-  
+
       if (!bookingRes.ok) {
         throw new Error('Failed to book service');
       }
-  
+
       const bookingResult = await bookingRes.json();
-  
+
       const answersData = {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
           question_id: parseInt(questionId),
-          customer_id: currentUser?.id || userData.id, // Use the id from the response if guest
+          customer_id: currentUser?.id || userData.id,
           ans: String(answers[questionId]),
         }))
       };
-  
+
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
         headers: {
@@ -295,43 +291,32 @@ console.log(listingDetails);
         },
         body: JSON.stringify(answersData)
       });
-  
+
       if (!answersRes.ok) {
         throw new Error('Failed to add answers');
       }
-  
+
       handleNotification('Booking successful!', 'success');
       navigate('/payment', { state: { bookingResponse: bookingResult } });
-  
+      
     } catch (error) {
       handleNotification(error.message, 'error');
     }
   };
-  
-  
-  const handleAnswerChange = (questionId, answer) => {
-    setAnswers(prevAnswers => ({
+
+  const handleAnswerChange = (id, value) => {
+    setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [questionId]: answer
+      [id]: value,
     }));
   };
 
-  const handleCheckboxChange = (e, value) => {
-    const questionId = e.target.name;
-
-    // Only update the answer for the selected checkbox
-    if (e.target.checked) {
-      setAnswers(prevAnswers => ({
-        ...prevAnswers,
-        [questionId]: value
-      }));
-    } else {
-      // If unchecked, clear the answer for that question
-      setAnswers(prevAnswers => ({
-        ...prevAnswers,
-        [questionId]: ''
-      }));
-    }
+  const handleCheckboxChange = (e, petType) => {
+    const checked = e.target.checked;
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [petType]: checked ? petType : '',
+    }));
   };
 
   return (
@@ -340,7 +325,7 @@ console.log(listingDetails);
       {currentSection === 1 && (
         <>
           <FormGroup>
-            <Span>Email:</Span>
+            <Span>Email</Span>
             <Input
               type="email"
               value={email}
@@ -349,7 +334,7 @@ console.log(listingDetails);
             />
           </FormGroup>
           <FormGroup>
-            <Span>Phone Number:</Span>
+            <Span>Phone Number</Span>
             <Input
               type="tel"
               value={phoneNumber}
@@ -357,51 +342,33 @@ console.log(listingDetails);
               placeholder="Enter your phone number"
             />
           </FormGroup>
+          <Button onClick={handleProceedTodatepicker}>Next</Button>
           {error && <p style={{ color: 'red' }}>{error}</p>}
-          <Button onClick={handleProceedTodatepicker}>Proceed to Date Picker</Button>
         </>
       )}
 
       {currentSection === 2 && (
         <>
           <FormGroup>
-            <Span><FiCalendar /> Check-In</Span>
+            <Span>Check-in Date</Span>
             <DatePicker
               selected={checkInDate}
-              onChange={(date) => {
-                setCheckInDate(date);
-                if (date >= checkOutDate) {
-                  setDateError('Check-in date must be before check-out date');
-                } else {
-                  setDateError('');
-                }
-              }}
+              onChange={setCheckInDate}
               minDate={new Date()}
               placeholder="Select check-in date"
             />
           </FormGroup>
-
           <FormGroup>
-            <Span><FiCalendar /> Check-Out</Span>
+            <Span>Check-out Date</Span>
             <DatePicker
               selected={checkOutDate}
-              onChange={(date) => {
-                setCheckOutDate(date);
-                if (date <= checkInDate) {
-                  setDateError('Check-out date must be after check-in date');
-                } else {
-                  setDateError('');
-                }
-              }}
-              minDate={checkInDate}
+              onChange={setCheckOutDate}
+              minDate={new Date(checkInDate.getTime() + 86400000)} // At least one day after check-in
               placeholder="Select check-out date"
             />
-            {dateError && <p style={{ color: 'red', marginTop: '5px' }}>{dateError}</p>}
           </FormGroup>
-
-          <FormGroup>
-            <Button onClick={handleProceedToQuestions} disabled={loading}>Next</Button>
-          </FormGroup>
+          <Button onClick={handleProceedToQuestions}>Next</Button>
+          {dateError && <p style={{ color: 'red' }}>{dateError}</p>}
         </>
       )}
 
@@ -412,7 +379,18 @@ console.log(listingDetails);
           {questions.map((question, index) => (
             <FormGroup key={question.id}>
               <Span>{question.questions}</Span>
-              {index === 0 && acceptedPetTypes.length > 0 ? (
+              {question.questions === 'Breed of your pet' ? (
+                <select
+                  name={question.id}
+                  value={answers[question.id] || ''}
+                  onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                >
+                  <option value="" disabled>Select breed</option>
+                  {['Labrador', 'Poodle', 'Beagle', 'Bulldog', 'Other'].map((breed) => (
+                    <option key={breed} value={breed}>{breed}</option>
+                  ))}
+                </select>
+              ) : index === 0 && acceptedPetTypes.length > 0 ? (
                 acceptedPetTypes.map(pet => (
                   <Checkbox
                     key={pet}
@@ -423,26 +401,17 @@ console.log(listingDetails);
                   />
                 ))
               ) : index === 2 ? (
-                <>
+                // Existing checkbox logic for age groups
+                // Example:
+                ['Puppy', 'Adult', 'Senior'].map(ageGroup => (
                   <Checkbox
-                    label="Young"
+                    key={ageGroup}
+                    label={ageGroup}
                     name={question.id}
-                    checked={answers[question.id] === 'Young'}
-                    onChange={(e) => handleCheckboxChange(e, 'Young')}
+                    checked={answers[question.id] === ageGroup}
+                    onChange={(e) => handleAnswerChange(question.id, ageGroup)}
                   />
-                  <Checkbox
-                    label="Adult"
-                    name={question.id}
-                    checked={answers[question.id] === 'Adult'}
-                    onChange={(e) => handleCheckboxChange(e, 'Adult')}
-                  />
-                  <Checkbox
-                    label="Senior"
-                    name={question.id}
-                    checked={answers[question.id] === 'Senior'}
-                    onChange={(e) => handleCheckboxChange(e, 'Senior')}
-                  />
-                </>
+                ))
               ) : index === 3 && acceptedPetSizes.length > 0 ? (
                 acceptedPetSizes.map(size => (
                   <Checkbox
@@ -474,8 +443,7 @@ console.log(listingDetails);
 };
 
 BookingForm.propTypes = {
-  currentUser: PropTypes.object,
-  listing: PropTypes.object,
+  // Add any necessary PropTypes here
 };
 
 export default BookingForm;

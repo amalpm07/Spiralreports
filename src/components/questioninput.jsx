@@ -6,7 +6,6 @@ import React from 'react';
 const QuestionInput = ({ question, value, onChange }) => {
   return (
     <li className='mb-2'>
-      <div className='text-gray-700'>{question.questions}</div>
       <div className='flex flex-col gap-2 mt-2'>
         <input
           type='text'

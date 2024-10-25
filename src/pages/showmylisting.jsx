@@ -74,7 +74,7 @@ function UserListings() {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6'>
           {userListings.map((listing) => (
             <div key={listing.id} className='border rounded-lg shadow-lg overflow-hidden bg-white transition-transform transform hover:scale-105'>
-              <Link to={`/listing/${listing.id}`}>
+              <Link >
                 <img
                   src={listing.photo1}
                   alt='listing cover'

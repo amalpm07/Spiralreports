@@ -8,36 +8,41 @@ import petTrainingIcon from '../assets/pet-Training.png';
 import petStore from '../assets/pet-Store.jpg';
 import petTaxiIcon from '../assets/pet-Taxi.jpg';
 
+// Utility function for cache busting
+const addCacheBuster = (url) => {
+  return `${url}?v=${import.meta.env.VITE_APP_VERSION}`;
+};
+
 const services = [
   {
-    icon: petBoardingIcon,
+    icon: addCacheBuster(petBoardingIcon),
     title: 'Pet Boarding',
     description: 'Perfect if your pet needs overnight pet care.',
-    link: '/petBoarding' // Add link property
+    link: '/petBoarding'
   },
   {
-    icon: petStore,
+    icon: addCacheBuster(petStore),
     title: 'Pet Store',
     description: 'For pet products.',
-    link: '/petStore' // Add link property
+    link: '/petStore'
   },
   {
-    icon: petTaxiIcon,
+    icon: addCacheBuster(petTaxiIcon),
     title: 'Pet Taxi',
     description: 'When your pet needs help going somewhere.',
-    link: '/petTaxi' // Add link property
+    link: '/petTaxi'
   },
   {
-    icon: petGroomingIcon,
+    icon: addCacheBuster(petGroomingIcon),
     title: 'Pet Grooming',
     description: 'Give your pet a new look.',
-    link: '/petGrooming' // Add link property
+    link: '/petGrooming'
   },
   {
-    icon: petTrainingIcon,
+    icon: addCacheBuster(petTrainingIcon),
     title: 'Pet Training',
     description: 'For training pets to be in their best behavior.',
-    link: '/petTraining' // Add link property
+    link: '/petTraining'
   },
 ];
 

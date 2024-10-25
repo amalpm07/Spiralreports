@@ -6,11 +6,16 @@
 /* Body to manage zoom adjustments */
 body {
   display: flex;
-  justify-content: center; /* Center content horizontally */
-  align-items: flex-start; /* Align items at the top */
-  min-height: 100vh; /* Ensure the body takes full height */
-  margin: 0; /* Reset default margin */
+  justify-content: center; /* Centers the content horizontally */
+  align-items: flex-start; /* Keeps the items at the start vertically */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0 20px; /* Adjusts the padding to decrease the gap between borders */
+  
 }
+
+
+
 
 /* Listing Container */
 .listing-container {
@@ -36,7 +41,8 @@ body {
   align-items: center;
   gap: 15px;
   margin-bottom: 2rem;
-  margin-left: 10px;
+  margin-left: 20px;
+  margin-top: 20px;
 }
 
 /* Profile Pic */
@@ -66,7 +72,7 @@ body {
   font-size: 1.125rem; /* Fixed size */
   color: #444;
   margin-bottom: 20px;
-  margin-left: 13px;
+  margin-left: 30px;
 }
 
 /* Photo Gallery */
@@ -76,7 +82,7 @@ body {
   gap: 10px; /* Reduce gap */
   overflow-x: auto; /* Enable horizontal scrolling */
   margin-bottom: 50px; /* Ensure gap of 50px between gallery and service container */
-  margin-left: 10px;
+  margin-left: 20px;
 }
 
 /* Thumbnails */
@@ -126,6 +132,7 @@ body {
 /* Questions Section */
 .questions-section {
   margin-top: 2rem;
+  margin-left: 20px;
 }
 
 .questions-list {
@@ -413,7 +420,7 @@ body {
     width: 100%; /* Full width */
     margin: 0 auto; /* Center horizontally */
     margin-bottom: var(--container-gap); /* Consistent bottom margin */
-    margin-left: 35px;
+    margin-left: 20px;
   }
   .image-gallery-container {
     /* flex-direction: column; Stack images */
@@ -432,6 +439,7 @@ body {
   .thumbnail {
     width: 60px; /* Smaller thumbnails */
     height: 60px; /* Fixed size */
+    margin-left: 7px;
   }
 
   .image-viewer {
@@ -446,6 +454,10 @@ body {
   .submit-review-button,
   .book-now-button {
     font-size: 1rem; /* Smaller button font size */
+  }
+  .profile-section{
+    margin-left: 10px;
+    margin-top: 10px;
   }
 }
 

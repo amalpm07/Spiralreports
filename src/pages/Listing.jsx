@@ -7,20 +7,20 @@ import useFetchListing from '../Hooks/useFetchListing';
 import ListingDetails from '../components/ListingDetails';
 import { useSelector } from 'react-redux';
 
+// Utility function for cache busting
+const addCacheBuster = (url) => {
+  return `${url}?v=${import.meta.env.VITE_APP_VERSION}`;
+};
+
 const Listing = () => {
   const { selectedType, id } = useParams();
   const navigate = useNavigate();
   const { listing, loading, error, questions, reviews: initialReviews } = useFetchListing(selectedType, id);
-  const [reviews, setReviews] = useState(initialReviews); // Local state for reviews
+  const [reviews, setReviews] = useState(initialReviews);
   const [newReview, setNewReview] = useState({ text: '', rating: 0 });
   const [reviewError, setReviewError] = useState(null);
-
-  // Access currentUser from Redux store
   const { currentUser } = useSelector((state) => state.user);
-
-  // Safely check if listing is available
   const serviceHomeId = listing?.serviceHome?.id;
-console.log(serviceHomeId);
 
   const handleBookNowClick = () => {
     const acceptedPetTypes = listing?.answer?.find((item) => item.answer.question_id === 35)?.answer.ans.split(', ') || [];
@@ -61,9 +61,7 @@ console.log(serviceHomeId);
         postedDate: new Date().toISOString(),
       };
 
-      console.log('Review Payload:', reviewPayload); // Debugging line
-
-      const res = await fetch('https://hibow.in/api/User/AddCustomerReview', {
+      const res = await fetch(addCacheBuster('https://hibow.in/api/User/AddCustomerReview'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,31 +72,28 @@ console.log(serviceHomeId);
 
       if (!res.ok) {
         const errorData = await res.json();
-        console.error('Failed to submit review:', errorData); // Detailed error logging
         throw new Error('Failed to submit review: ' + errorData.title);
       }
 
       const data = await res.json();
-      // Update the local reviews state immediately
       setReviews((prevReviews) => [
         ...prevReviews,
         {
           ...data,
-          postedDate: new Date().toISOString(), // Assuming the response has the same structure as the review
+          postedDate: new Date().toISOString(),
         },
       ]);
       setNewReview({ text: '', rating: 0 });
       setReviewError(null);
     } catch (error) {
-      console.error('Error submitting review:', error);
       setReviewError('Failed to submit review');
     }
   };
 
   const fetchReviews = useCallback(async (serviceHomeId) => {
-    if (!serviceHomeId) return; // Early return if serviceHomeId is not available
+    if (!serviceHomeId) return;
     try {
-      const res = await fetch(`/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`, {
+      const res = await fetch(addCacheBuster(`/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`), {
         headers: {
           'Content-Type': 'application/json',
           'Token': currentUser?.guid || '',
@@ -115,7 +110,7 @@ console.log(serviceHomeId);
 
   const handleDeleteReview = async (reviewId) => {
     try {
-      const res = await fetch(`https://hibow.in/api/User/DeleteCustomerReview?reviewId=${reviewId}`, {
+      const res = await fetch(addCacheBuster(`https://hibow.in/api/User/DeleteCustomerReview?reviewId=${reviewId}`), {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -125,11 +120,9 @@ console.log(serviceHomeId);
 
       if (!res.ok) {
         const errorData = await res.json();
-        console.error('Failed to delete review:', errorData); // Detailed error logging
         throw new Error('Failed to delete review: ' + errorData.title);
       }
 
-      // Remove the deleted review from the local state
       setReviews((prevReviews) => prevReviews.filter((review) => review.id !== reviewId));
     } catch (error) {
       console.error('Error deleting review:', error);
@@ -163,7 +156,7 @@ console.log(serviceHomeId);
   return (
     <ListingDetails
       listing={listing}
-      reviews={reviews} // Use local state for reviews
+      reviews={reviews}
       questions={questions}
       handleBookNowClick={handleBookNowClick}
       handleReviewSubmit={handleReviewSubmit}

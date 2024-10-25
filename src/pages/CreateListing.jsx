@@ -26,7 +26,7 @@ export default function CreateListing() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
-  const [approvalNeeded, setApprovalNeeded] = useState(false); // State for approval needed
+  const [approvalNeeded, setApprovalNeeded] = useState(false);
 
   // Fetch questions based on ServiceName
   useEffect(() => {
@@ -44,7 +44,20 @@ export default function CreateListing() {
           }
         );
         const data = await response.json();
-        setQuestions(data);
+
+        // Filter out duplicates for questions except 24 and 25
+        const uniqueQuestions = [];
+        const seenQuestions = new Set();
+
+        data.forEach(question => {
+          if (question.id === 24 || question.id === 25 || !seenQuestions.has(question.id)) {
+            uniqueQuestions.push(question);
+            seenQuestions.add(question.id);
+          }
+        });
+
+        console.log('Fetched Questions:', uniqueQuestions);
+        setQuestions(uniqueQuestions);
       } catch (error) {
         console.error('Error fetching questions:', error);
       }
@@ -154,7 +167,7 @@ export default function CreateListing() {
         address,
         phoneNumber,
         description,
-        isApprovalNeeded: approvalNeeded, // Updated here
+        isApprovalNeeded: approvalNeeded,
         ...imageUrls.reduce((acc, url, index) => {
           acc[`photo${index + 1}`] = url;
           return acc;
@@ -193,7 +206,7 @@ export default function CreateListing() {
       console.log('Service Home Response:', serviceHomeData);
       console.log('Add Answers Response:', addAnswersData);
 
-      const isServiceHomeSuccess = serviceHomeData && serviceHomeData.id; // Assuming existence of id means success
+      const isServiceHomeSuccess = serviceHomeData && serviceHomeData.id;
       const isAnswersSuccess = addAnswersData && addAnswersData.message === 'Answers added successfully!!';
 
       if (isServiceHomeSuccess && isAnswersSuccess) {
@@ -304,12 +317,113 @@ export default function CreateListing() {
             <h2 className='text-xl font-semibold text-gray-800'>Questions</h2>
             <ul className='list-disc ml-5'>
               {questions.map((question) => (
-                <QuestionInput
-                  key={question.id}
-                  question={question}
-                  value={formData.answers[question.id] || ''}
-                  onChange={handleQuestionChange(question.id)}
-                />
+                <li key={question.id} className='mb-2'>
+                  <span className='font-semibold'>{question.questions}</span>
+                  {question.id === 24 || question.id === 25 ? (
+                    <div className='flex gap-4 mt-2'>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='Yes'
+                          checked={formData.answers[question.id] === 'Yes'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                        Yes
+                      </label>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='No'
+                          checked={formData.answers[question.id] === 'No'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                        No
+                      </label>
+                    </div>
+                  ) : question.id === 35 ? (
+                    <div className='flex gap-4 mt-2'>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='Dog'
+                          checked={formData.answers[question.id] === 'Dog'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                      Dog
+                      </label>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='Cat'
+                          checked={formData.answers[question.id] === 'Cat'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                     Cat
+                      </label>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='Bird'
+                          checked={formData.answers[question.id] === 'Bird'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                       Bird
+                      </label>
+                    </div>
+                  ) : question.id === 36 ? (
+                    <div className='flex gap-4 mt-2'>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='Small'
+                          checked={formData.answers[question.id] === 'Small'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                        Small
+                      </label>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='Medium'
+                          checked={formData.answers[question.id] === 'Medium'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                        Medium
+                      </label>
+                      <label className='flex items-center'>
+                        <input
+                          type='radio'
+                          name={`question-${question.id}`}
+                          value='Large'
+                          checked={formData.answers[question.id] === 'Large'}
+                          onChange={handleQuestionChange(question.id)}
+                          className='mr-2'
+                        />
+                        Large
+                      </label>
+                    </div>
+                  ) : (
+                    <QuestionInput
+                      question={question}
+                      value={formData.answers[question.id] || ''}
+                      onChange={handleQuestionChange(question.id)}
+                    />
+                  )}
+                </li>
               ))}
             </ul>
           </div>

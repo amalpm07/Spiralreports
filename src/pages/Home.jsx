@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -7,7 +6,6 @@ import CategoryMetaNav from '../components/CategoryNav';
 import styled from 'styled-components';
 import banner from '../assets/banner3.png';
 
-// Styled-components for responsiveness and improved design
 const BannerSection = styled.section`
   position: relative;
   overflow: hidden;
@@ -57,7 +55,6 @@ const BannerSection = styled.section`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    animation: fadeInContent 1s ease-out;
 
     h1 {
       font-size: 1.5rem;
@@ -68,7 +65,6 @@ const BannerSection = styled.section`
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
       padding: 0.5rem;
       border-radius: 5px;
-      animation: fadeInText 1s ease-out;
 
       @media (min-width: 576px) {
         font-size: 2rem;
@@ -90,7 +86,6 @@ const BannerSection = styled.section`
       padding: 0.5rem;
       border-radius: 5px;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-      animation: fadeInText 1s ease-out;
 
       @media (min-width: 576px) {
         font-size: 1rem;
@@ -117,8 +112,6 @@ const BannerSection = styled.section`
       display: inline-block;
       margin-top: 1rem;
       transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
-      position: relative;
-      z-index: 3;
 
       &:hover {
         background: #6a4b85;
@@ -130,44 +123,6 @@ const BannerSection = styled.section`
         background: #755AA6;
         transform: scale(1);
       }
-
-      @media (max-width: 768px) {
-        padding: 10px 20px;
-        font-size: 0.875rem;
-      }
-
-      @media (max-width: 480px) {
-        padding: 8px 16px;
-        font-size: 0.75rem;
-      }
-    }
-  }
-
-  @keyframes fadeInContent {
-    from {
-      opacity: 0;
-      transform: translate(-50%, -45%) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-  }
-
-  @keyframes fadeInText {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 767px) {
-    .content {
-      animation: none;
     }
   }
 `;
@@ -195,8 +150,6 @@ const Home = () => {
           stars: item.stars,
         }));
         setServiceHomes(serviceHomesData);
-       
-        
       } catch (error) {
         console.error('Error fetching service homes:', error);
       }
@@ -209,11 +162,13 @@ const Home = () => {
     <div>
       {/* Banner Section */}
       <BannerSection>
-        <img src={banner} alt="Banner" />
+        <img src={`${banner}?v=${import.meta.env.VITE_APP_VERSION}`} alt="Banner" />
         <div className="overlay"></div>
         <div className="content">
-          <h1>"Discover a New World for Your Pet"</h1>
-          <p>"Experience the ultimate in pet care and comfort. Where every pet's journey begins with love and exceptional service."</p>
+          <h1>Discover a New World for Your Pet</h1>
+          <p>
+            Experience the ultimate in pet care and comfort. Where every pet's journey begins with love and exceptional service.
+          </p>
           <Link to="/premium-subscription" className="cta-button">
             Explore Premium
           </Link>
@@ -235,7 +190,7 @@ const Home = () => {
               <div className="relative w-full h-48">
                 <img
                   className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
-                  src={home.photo1}
+                  src={`${home.photo1}?v=${import.meta.env.VITE_APP_VERSION}`} // Cache busting for home images
                   alt={home.serviceName}
                 />
               </div>
@@ -259,14 +214,12 @@ const Home = () => {
 
                 {/* Display charge and stars */}
                 <div className="mt-4 flex justify-between items-center">
-                  <p className="text-gray-700 font-bold">
-                    ₹{home.charge}/night
-                  </p>
+                  <p className="text-gray-700 font-bold">₹{home.charge}/night</p>
                   <div className="flex items-center">
-                    {Array.from({ length: home.stars }).map((_, index) => (
+                    {Array.from({ length: home.stars }, (_, index) => (
                       <FaStar key={index} className="text-yellow-500" />
                     ))}
-                    {Array.from({ length: 5 - home.stars }).map((_, index) => (
+                    {Array.from({ length: 5 - home.stars }, (_, index) => (
                       <FaStar key={index} className="text-gray-300" />
                     ))}
                   </div>

@@ -16,7 +16,7 @@ export default function UpdateListing() {
     address: '',
     photos: [],
     answers: {},
-    isApprovalNeeded: false, // Assuming this needs to be included
+    isApprovalNeeded: false,
   });
 
   const [questions, setQuestions] = useState([]);
@@ -198,9 +198,6 @@ export default function UpdateListing() {
         body: JSON.stringify({ newAnswers: answersPayload }),
       });
 
-      const responseData = await addAnswersResponse.json();
-      console.log('Add Answers Response:', responseData); // Debugging
-
       if (!addAnswersResponse.ok) {
         const errorText = await addAnswersResponse.text();
         throw new Error(`Failed to add answers: ${errorText}`);
@@ -298,26 +295,126 @@ export default function UpdateListing() {
         <div>
           <h2 className='text-2xl font-semibold'>Questions</h2>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            {questions.map((question) => (
-              <div key={question.id}>
-                <label htmlFor={`question-${question.id}`} className='text-gray-700'>
-                  {question.questions}
-                </label>
-                <input
-                  type='text'
-                  id={`question-${question.id}`}
-                  className='border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none w-full'
-                  value={formData.answers[question.id] || ''}
-                  onChange={handleQuestionChange(question.id)}
-                />
-              </div>
-            ))}
+            {questions.map((question) => {
+              if (question.id === 24 || question.id === 25) {
+                return (
+                  <div key={question.id}>
+                    <label className='text-gray-700'>{question.questions}</label>
+                    <div className='flex flex-col'>
+                      <label>
+                        <input
+                          type='radio'
+                          value='yes'
+                          checked={formData.answers[question.id] === 'yes'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        Yes
+                      </label>
+                      <label>
+                        <input
+                          type='radio'
+                          value='no'
+                          checked={formData.answers[question.id] === 'no'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        No
+                      </label>
+                    </div>
+                  </div>
+                );
+              } else if (question.id === 35) {
+                return (
+                  <div key={question.id}>
+                    <label className='text-gray-700'>{question.questions}</label>
+                    <div className='flex flex-col'>
+                      <label>
+                        <input
+                          type='radio'
+                          value='dog'
+                          checked={formData.answers[question.id] === 'dog'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        Dog
+                      </label>
+                      <label>
+                        <input
+                          type='radio'
+                          value='cat'
+                          checked={formData.answers[question.id] === 'cat'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        Cat
+                      </label>
+                      <label>
+                        <input
+                          type='radio'
+                          value='bird'
+                          checked={formData.answers[question.id] === 'bird'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        Bird
+                      </label>
+                    </div>
+                  </div>
+                );
+              } else if (question.id === 36) {
+                return (
+                  <div key={question.id}>
+                    <label className='text-gray-700'>{question.questions}</label>
+                    <div className='flex flex-col'>
+                      <label>
+                        <input
+                          type='radio'
+                          value='small'
+                          checked={formData.answers[question.id] === 'small'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        Small
+                      </label>
+                      <label>
+                        <input
+                          type='radio'
+                          value='medium'
+                          checked={formData.answers[question.id] === 'medium'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        Medium
+                      </label>
+                      <label>
+                        <input
+                          type='radio'
+                          value='large'
+                          checked={formData.answers[question.id] === 'large'}
+                          onChange={handleQuestionChange(question.id)}
+                        />
+                        Large
+                      </label>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={question.id}>
+                    <label htmlFor={`question-${question.id}`} className='text-gray-700'>
+                      {question.questions}
+                    </label>
+                    <input
+                      type='text'
+                      id={`question-${question.id}`}
+                      className='border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none w-full'
+                      value={formData.answers[question.id] || ''}
+                      onChange={handleQuestionChange(question.id)}
+                    />
+                  </div>
+                );
+              }
+            })}
           </div>
         </div>
 
         <button
           type='submit'
-          className='bg-blue-500 text-white py-3 rounded-lg font-semibold mt-6 disabled:opacity-50 w-full'
+          className='bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold'
           disabled={loading}
         >
           {loading ? 'Updating...' : 'Update Listing'}
