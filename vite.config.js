@@ -13,8 +13,17 @@ export default defineConfig({
     },
   },
   plugins: [
-    react() // Include @vitejs/plugin-react-swc for React compilation with SWC
+    react(), // Include @vitejs/plugin-react-swc for React compilation with SWC
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: '[name].[hash].js',
+        chunkFileNames: '[name].[hash].js',
+        assetFileNames: '[name].[hash].[ext]',
+      },
+    },
+  },
   optimizeDeps: {
     include: ['clsx'], // Ensure clsx is included in optimization
   },
