@@ -167,9 +167,9 @@ const ListingDetails = ({
                         ) : (
                           acceptedPetTypes.map((type) => (
                             <span key={type} className='pet-type'>
-                              {type === 'dog' && <img src={dogImg} alt={type} className='pet-icon large-pet-icon' />}
-                              {type === 'cat' && <img src={catImg} alt={type} className='pet-icon large-pet-icon' />}
-                              {type === 'bird' && <img src={birdImg} alt={type} className='pet-icon large-pet-icon' />}
+                              {type === 'Dog' && <img src={dogImg} alt={type} className='pet-icon large-pet-icon' />}
+                              {type === 'Cat' && <img src={catImg} alt={type} className='pet-icon large-pet-icon' />}
+                              {type === 'Bird' && <img src={birdImg} alt={type} className='pet-icon large-pet-icon' />}
                               <span className='pet-type-label'>{type}</span>
                             </span>
                           ))
@@ -177,7 +177,7 @@ const ListingDetails = ({
                       </div>
                     )}
                     {question.id === 36 && (
-  <div className='pet-sizes'>
+    <div className='pet-sizes'>
     {acceptedPetSizes.map((size) => (
       <span key={size} className='pet-size'>
         <img 
