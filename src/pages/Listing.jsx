@@ -7,11 +7,6 @@ import useFetchListing from '../Hooks/useFetchListing';
 import ListingDetails from '../components/ListingDetails';
 import { useSelector } from 'react-redux';
 
-// Utility function for cache busting
-const addCacheBuster = (url) => {
-  return `${url}?v=${import.meta.env.VITE_APP_VERSION}`;
-};
-
 const Listing = () => {
   const { selectedType, id } = useParams();
   const navigate = useNavigate();
@@ -53,7 +48,7 @@ const Listing = () => {
 
     try {
       const reviewPayload = {
-        serviceHomeId: serviceHomeId,
+        serviceHomeId: serviceHomeId, // Correctly passes serviceHomeId
         customerId: currentUser.id,
         customerName: currentUser.userName,
         reviewMessage: newReview.text,
@@ -61,7 +56,7 @@ const Listing = () => {
         postedDate: new Date().toISOString(),
       };
 
-      const res = await fetch(addCacheBuster('https://hibow.in/api/User/AddCustomerReview'), {
+      const res = await fetch('https://hibow.in/api/User/AddCustomerReview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +88,8 @@ const Listing = () => {
   const fetchReviews = useCallback(async (serviceHomeId) => {
     if (!serviceHomeId) return;
     try {
-      const res = await fetch(addCacheBuster(`/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`), {
+      const url = `/api/User/GetCustomerReviewByProviderServiceHomeId?serviceHomeId=${serviceHomeId}`;
+      const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           'Token': currentUser?.guid || '',
@@ -110,7 +106,7 @@ const Listing = () => {
 
   const handleDeleteReview = async (reviewId) => {
     try {
-      const res = await fetch(addCacheBuster(`https://hibow.in/api/User/DeleteCustomerReview?reviewId=${reviewId}`), {
+      const res = await fetch(`https://hibow.in/api/User/DeleteCustomerReview?reviewId=${reviewId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
