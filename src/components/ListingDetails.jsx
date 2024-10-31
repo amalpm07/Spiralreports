@@ -177,19 +177,21 @@ const ListingDetails = ({
                       </div>
                     )}
                     {question.id === 36 && (
-                      <div className='pet-sizes'>
-                        {acceptedPetSizes.map((size) => (
-                          <span key={size} className='pet-size'>
-                            <img 
-                              src={petSizeImg} 
-                              alt={`${size} Pet`} 
-                              className={petSizeClasses[size]} 
-                            /> 
-                            {size}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+  <div className='pet-sizes'>
+    {acceptedPetSizes.map((size) => (
+      <span key={size} className='pet-size'>
+        <img 
+          src={petSizeImg} 
+          alt={`${size} Pet`} 
+          className={`pet-size-img ${petSizeClasses[size]}`} 
+          style={{ width: size === 'small' ? '20px' : size === 'medium' ? '30px' : '40px' }} 
+        /> 
+        {size}
+      </span>
+    ))}
+  </div>
+)}
+
                     {question.id === 37 && (
                       <div className='pet-potty'>
                         {PottyBreak.map((size) => (
