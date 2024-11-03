@@ -396,10 +396,11 @@ const BookingForm = () => {
                     key={pet}
                     label={pet.charAt(0).toUpperCase() + pet.slice(1)}
                     name={question.id}
-                    checked={answers[question.id] === pet}
+                    checked={answers[question.id]?.includes(pet)} // Check if the pet type is included
                     onChange={(e) => handleCheckboxChange(e, pet)}
                   />
                 ))
+                
               ) : index === 2 ? (
                 // Existing checkbox logic for age groups
                 // Example:
@@ -418,7 +419,7 @@ const BookingForm = () => {
                     key={size}
                     label={size.charAt(0).toUpperCase() + size.slice(1)}
                     name={question.id}
-                    checked={answers[question.id] === size}
+                    checked={answers[question.id]?.includes(size)} // Check if the size is included
                     onChange={(e) => handleCheckboxChange(e, size)}
                   />
                 ))
