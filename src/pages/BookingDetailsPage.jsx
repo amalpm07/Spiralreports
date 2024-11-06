@@ -40,13 +40,23 @@ const BookingDetailsPage = () => {
   }, [id, currentUser.guid]);
 
   const handleCancelBooking = async () => {
+    const bookingRequestModel = {
+      bookingDetails: {
+        ...bookingDetails,
+        userType: currentUser.usertype || 'defaultUserType', // Ensure UserType is included
+        bookingModel: bookingDetails.bookingModel || 'defaultBookingModel', // Ensure BookingModel is included
+      },
+      canceledBy: currentUser.usertype,
+    };
+
     try {
-      const res = await fetch(`https://hibow.in/api/Booking/CancelBooking?bookingId=${id}&canceledBy=${currentUser.usertype}`, {
+      const res = await fetch(`https://hibow.in/api/Booking/CancelBooking`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Token': currentUser.guid,
         },
+        body: JSON.stringify(bookingRequestModel),
       });
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
@@ -63,13 +73,22 @@ const BookingDetailsPage = () => {
   };
 
   const handleConfirmBooking = async () => {
+    const bookingRequestModel = {
+      bookingDetails: {
+        ...bookingDetails,
+        userType: currentUser.usertype || 'defaultUserType', // Ensure UserType is included
+        bookingModel: bookingDetails.bookingModel || 'defaultBookingModel', // Ensure BookingModel is included
+      },
+    };
+
     try {
-      const res = await fetch(`https://hibow.in/api/Booking/ConfirmBooking?bookingId=${id}`, {
+      const res = await fetch(`https://hibow.in/api/Booking/ConfirmBooking`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Token': currentUser.guid,
         },
+        body: JSON.stringify(bookingRequestModel),
       });
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
@@ -94,8 +113,8 @@ const BookingDetailsPage = () => {
     return <p className="loading-text">Loading...</p>;
   }
 
-  const serviceName = bookingDetails.serviceName.replace(/\s+/g, '-').toLowerCase(); // Convert to URL-friendly format
-  const serviceId = bookingDetails.providerId; // Assuming serviceId is available in bookingDetails
+  const serviceName = bookingDetails.serviceName.replace(/\s+/g, '-').toLowerCase();
+  const serviceId = bookingDetails.providerId;
 
   return (
     <div className="booking-details-container">
@@ -121,7 +140,11 @@ const BookingDetailsPage = () => {
                   Confirm
                 </button>
               ) : (
-                <Link to={`/edit-booking/${id}`} className="button edit-button">
+                <Link
+                  to={`/edit-booking/${id}`}
+                  className="button edit-button"
+                  state={{ bookingDetails }} // Pass the booking details as state
+                >
                   Edit
                 </Link>
               )}
@@ -142,7 +165,7 @@ const BookingDetailsPage = () => {
         </div>
         <div className="service-provider-link">
           <Link to={`/listing/${serviceName}/${serviceId}`} className="button provider-button">
-            View Service Providers Profile 
+            View Service Provider&#39;s Profile
           </Link>
         </div>
       </div>

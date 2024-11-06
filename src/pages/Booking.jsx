@@ -199,16 +199,16 @@ const BookingForm = () => {
         setDateError('Check-out date must be after check-in date');
         return;
       }
-
+  
       const currentDate = new Date();
-
+  
       const chargeValue = listing?.answer.find(item => item.answer.question_id === 40)?.answer.ans;
       const charge = typeof chargeValue === 'number' ? chargeValue : parseFloat(chargeValue);
-
+  
       if (isNaN(charge)) {
         throw new Error('Invalid charge value. Please check the listing details.');
       }
-
+  
       let bookingData = {
         customerName: currentUser?.userName || "Guest",
         providerId: listing?.serviceHome?.userId,
@@ -230,34 +230,46 @@ const BookingForm = () => {
           ans: String(answers[questionId]),
         }))
       };
-
+  
+      // If no current user, proceed to add a guest
       if (!currentUser) {
         const userAdd = {
-          email,
-          phoneNumber,
-          usertype: "guest"
+          email: email,                    // dynamically pass the email
+          phoneNumber: phoneNumber,         // dynamically pass the phone number
+          usertype: "guest",                // usertype set as guest
+          firstName: null,                  // other fields set to null
+          lastName: null,
+          password: null,
+          rePassword: null,
+          district: null,
+          housename: null,
+          landmark: null,
+          pincode: null,
+          photo: null
         };
-
+  
         const addUserRes = await fetch('https://hibow.in/api/User/Add', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userAdd)
+          body: JSON.stringify(userAdd),
         });
-
+  
         if (!addUserRes.ok) {
-          throw new Error('Failed to add user');
+          // If user add fails, navigate to login page
+          navigate('/login');
+          return;  // Return early and stop the process
         }
-
+  
         userData = await addUserRes.json();
-        
         bookingData = {
           ...bookingData,
           customerid: userData.id,
         };
       }
-
+  
+      // Proceed to book the service (whether customer or guest)
       const bookingRes = await fetch('https://hibow.in/api/Booking/BookAService', {
         method: 'POST',
         headers: {
@@ -265,16 +277,17 @@ const BookingForm = () => {
         },
         body: JSON.stringify({
           bookingModel: bookingData,
-          userType: currentUser ? "Customer" : "guest"
-        })
+          userType: currentUser ? "Customer" : "guest",
+        }),
       });
-
+  
       if (!bookingRes.ok) {
         throw new Error('Failed to book service');
       }
-
+  
       const bookingResult = await bookingRes.json();
-
+  
+      // Add answers
       const answersData = {
         newAnswers: Object.keys(answers).map((questionId) => ({
           id: 0,
@@ -283,26 +296,27 @@ const BookingForm = () => {
           ans: String(answers[questionId]),
         }))
       };
-
+  
       const answersRes = await fetch('https://hibow.in/api/User/AddAnswers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(answersData)
+        body: JSON.stringify(answersData),
       });
-
+  
       if (!answersRes.ok) {
         throw new Error('Failed to add answers');
       }
-
+  
       handleNotification('Booking successful!', 'success');
       navigate('/payment', { state: { bookingResponse: bookingResult } });
-      
+  
     } catch (error) {
       handleNotification(error.message, 'error');
     }
   };
+  
 
   const handleAnswerChange = (id, value) => {
     setAnswers((prevAnswers) => ({

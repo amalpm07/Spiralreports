@@ -9,14 +9,13 @@ import image1 from '../assets/prebanner1.jpeg';
 import image2 from '../assets/prebanner2.jpeg';
 import image3 from '../assets/prebanner3.jpeg';
 
-// Define the primary theme color
 const themeColors = {
-  primary: '#6d4c7d', // Violet
-  secondary: '#8e5a9f', // Light Violet
-  background: '#f3f4f6', // Light Grey
-  textPrimary: '#212121', // Dark Grey
-  textSecondary: '#757575', // Grey
-  border: '#e0e0e0', // Light Border
+  primary: '#6d4c7d',
+  secondary: '#8e5a9f',
+  background: '#f3f4f6',
+  textPrimary: '#212121',
+  textSecondary: '#757575',
+  border: '#e0e0e0',
 };
 
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -82,11 +81,7 @@ const quotes = [
   "No one appreciates the very special genius of your conversation as much as the dog does.",
 ];
 
-const images = [
-  image1,
-  image2,
-  image3,
-];
+const images = [image1, image2, image3];
 
 const PremiumSubscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -195,7 +190,7 @@ const PremiumSubscription = () => {
                   amount: bookingDetails.charge,
                 };
 
-                const updateDatabaseResponse = await axios.post(
+                await axios.post(
                   'YOUR_SERVER_ENDPOINT_TO_UPDATE_DATABASE',
                   paymentInfo,
                   {
@@ -205,8 +200,6 @@ const PremiumSubscription = () => {
                     },
                   }
                 );
-
-                console.log('Database update response:', updateDatabaseResponse.data);
               } else {
                 throw new Error('Payment verification failed');
               }
@@ -268,7 +261,7 @@ const PremiumSubscription = () => {
         Select Your Premium Subscription
       </Typography>
       <Typography variant="h6" gutterBottom align="center" color={themeColors.textSecondary}>
-        Choose the plan that best suits your pet's needs
+        Choose the plan that best suits your pet&lsquo;s needs
       </Typography>
       <Grid container spacing={4}>
         {['Basic', 'Standard', 'Premium'].map((plan) => (
@@ -298,7 +291,7 @@ const PremiumSubscription = () => {
           </Grid>
         ))}
       </Grid>
-      {selectedPlan && (
+      {selectedPlan && currentUser && (
         <CenteredBox>
           <form onSubmit={handleSubmit} style={{ width: '100%', maxWidth: '600px', margin: 'auto' }}>
             <TextField
@@ -397,7 +390,7 @@ const PremiumSubscription = () => {
         {quotes.map((quote, index) => (
           <QuoteBox key={index}>
             <Typography variant="body1" style={{ fontStyle: 'italic', color: themeColors.textSecondary }}>
-              "{quote}"
+              &ldquo;{quote}&#34;
             </Typography>
           </QuoteBox>
         ))}

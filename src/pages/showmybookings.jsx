@@ -73,6 +73,7 @@ const BookingsPage = () => {
   const displayedBookings = visibleCategory === 'all'
     ? Object.values(bookings).flat()
     : bookings[visibleCategory];
+console.log(displayedBookings);
 
   return (
     <div className="bookings-container">
